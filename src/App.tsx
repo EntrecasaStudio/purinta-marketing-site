@@ -1,4 +1,4 @@
-import Nav from '@/components/Nav'
+import { NavMobile } from '@/components/Nav'
 import Hero from '@/components/sections/Hero'
 import Features from '@/components/sections/Features'
 import HowItWorks from '@/components/sections/HowItWorks'
@@ -11,7 +11,7 @@ function App() {
   useReveal()
   return (
     <div className="bg-background min-h-screen">
-      <Nav />
+      <NavMobile />
       <Hero />
       <Features />
       <HowItWorks />

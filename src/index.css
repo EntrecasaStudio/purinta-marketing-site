@@ -10,8 +10,19 @@
  * Per Purinta Design System (font tokens UI / Display).
  */
 
-/* ---------- DS primitives (from Figma — Mint / Cream / Info) ---------- */
+/* ---------- DS primitives (from Figma Marketing Site tokens) ---------- */
 @theme {
+  /* Green (primary brand scale used in marketing site) */
+  --color-green-50: #f1f3e7;
+  --color-green-100: #c8e4b0;
+  --color-green-200: #9ecf84;
+  --color-green-300: #78ba68;
+  --color-green-400: #57a053;
+  --color-green-500: #498746;
+  --color-green-600: #39763d;
+  --color-green-700: #185229;
+  --color-green-800: #144d26;
+
   /* Mint */
   --color-mint-50: #f2f7f4;
   --color-mint-100: #e7f4ec;
@@ -36,6 +47,26 @@
   --color-cream-800: #a39e75;
   --color-cream-900: #8b8765;
 
+  /* Blush (kawaii pink accents) */
+  --color-blush-50: #fffafa;
+  --color-blush-100: #fff5f4;
+  --color-blush-300: #fedbd8;
+  --color-blush-400: #fec4c0;
+  --color-blush-500: #feaaa4;
+  --color-blush-600: #e67a74;
+
+  /* Success (pastel teal) */
+  --color-success-50: #f2f8f7;
+  --color-success-200: #bfe3e0;
+  --color-success-400: #6ecfc6;
+  --color-success-500: #41c8bd;
+
+  /* Warning (pastel orange) */
+  --color-warning-50: #fff5ed;
+  --color-warning-200: #ffd7b2;
+  --color-warning-400: #ffa466;
+  --color-warning-500: #f98c4b;
+
   /* Info */
   --color-info-50: #edf4ff;
   --color-info-100: #e0ecff;
@@ -48,17 +79,84 @@
   --color-info-800: #214ba3;
   --color-info-900: #1c418c;
 
+  /* Neutral */
+  --color-neutral-50: #fefefe;
+  --color-neutral-300: #cccccc;
+  --color-neutral-400: #b2b2b2;
+  --color-neutral-800: #4c4c4c;
+  --color-neutral-900: #333333;
+  --color-neutral-gray-4: #b0b2b5;
+  --color-neutral-gray-8b: #181a1f;
+
   /* Brand aliases (used directly in markup) */
-  --color-purinta-forest: var(--color-mint-900);
-  --color-purinta-green: var(--color-mint-600);
-  --color-purinta-light: var(--color-mint-400);
+  --color-purinta-forest: var(--color-green-700);
+  --color-purinta-green: var(--color-green-400);
+  --color-purinta-green-300: var(--color-green-300);
+  --color-purinta-green-200: var(--color-green-200);
+  --color-purinta-light: var(--color-green-200);
   --color-purinta-mint: var(--color-mint-100);
 
   /* Typography (Purinta DS) */
-  --font-display: "ohno-softie-variable", "Fredoka", "Nunito",
-    ui-sans-serif, system-ui, sans-serif;
+  --font-display: "ohno-softie-variable", "Ohno Softie Variable",
+    "Fredoka", "Nunito", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Rubik", ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-body);
+
+  /* Type scale — Display (Ohno Softie Variable) */
+  --text-display-sm: 16px;
+  --text-display-sm--line-height: 26px;
+  --text-display-sm--letter-spacing: 3px;
+  --text-display-md: 20px;
+  --text-display-md--line-height: 32px;
+  --text-display-md--letter-spacing: 2px;
+  --text-display-5xl: 76px;
+  --text-display-5xl--line-height: 76px;
+  --text-display-5xl--letter-spacing: 1px;
+  --text-display-6xl: 95px;
+  --text-display-6xl--line-height: 95px;
+  --text-display-6xl--letter-spacing: 1px;
+
+  /* Type scale — UI (Rubik) */
+  --text-ui-sm: 16px;
+  --text-ui-sm--line-height: 26px;
+  --text-ui-sm--letter-spacing: 1px;
+  --text-ui-md: 20px;
+  --text-ui-md--line-height: 32px;
+  --text-ui-md--letter-spacing: 1px;
+  --text-ui-lg: 25px;
+  --text-ui-lg--line-height: 38px;
+  --text-ui-lg--letter-spacing: 1px;
+
+  /* Sizing (Purinta DS Space scale).
+   * NB: Tailwind v4 derives all spacing utilities (p-*, m-*, gap-*) from
+   * its own spacing scale (1 = 0.25rem). To avoid clobbering that, we
+   * expose DS values under a `--ds-space-*` namespace and use arbitrary
+   * values (`px-[8px]`, etc.) in markup where exact DS pixel values are
+   * needed. */
+  --ds-space-4: 4px;
+  --ds-space-6: 6px;
+  --ds-space-8: 8px;
+  --ds-space-10: 10px;
+  --ds-space-12: 12px;
+  --ds-space-16: 16px;
+  --ds-space-20: 20px;
+  --ds-space-32: 32px;
+
+  /* Radius (also under DS namespace to avoid Tailwind collisions) */
+  --ds-radius-32: 32px;
+  --ds-radius-full: 9999px;
+
+  /* Brand gradients */
+  --gradient-bg: linear-gradient(
+    106.89deg,
+    var(--color-blush-50) 2.38%,
+    var(--color-mint-50) 106.36%
+  );
+  --gradient-button: linear-gradient(
+    158.4deg,
+    var(--color-green-200) 0%,
+    var(--color-green-300) 100%
+  );
 
   /* Animations */
   --animate-float: float 4s ease-in-out infinite;
@@ -67,54 +165,54 @@
 
 /* ---------- Semantic tokens (shadcn-compatible) ---------- */
 :root {
-  --background: var(--color-cream-50);
-  --foreground: var(--color-mint-900);
+  --background: var(--color-neutral-50);
+  --foreground: var(--color-neutral-900);
 
   --card: #ffffff;
-  --card-foreground: var(--color-mint-900);
+  --card-foreground: var(--color-neutral-900);
 
   --popover: #ffffff;
-  --popover-foreground: var(--color-mint-900);
+  --popover-foreground: var(--color-neutral-900);
 
-  --primary: var(--color-mint-600);
-  --primary-foreground: var(--color-cream-50);
+  --primary: var(--color-green-400);
+  --primary-foreground: var(--color-green-700);
 
-  --secondary: var(--color-mint-100);
-  --secondary-foreground: var(--color-mint-800);
+  --secondary: var(--color-green-100);
+  --secondary-foreground: var(--color-green-700);
 
-  --muted: var(--color-mint-100);
-  --muted-foreground: #6b7565;
+  --muted: var(--color-cream-200);
+  --muted-foreground: var(--color-neutral-800);
 
-  --accent: var(--color-mint-200);
-  --accent-foreground: var(--color-mint-800);
+  --accent: var(--color-blush-100);
+  --accent-foreground: var(--color-blush-600);
 
   --destructive: oklch(0.577 0.245 27.325);
 
-  --border: var(--color-mint-200);
-  --input: var(--color-mint-200);
-  --ring: var(--color-mint-500);
+  --border: var(--color-neutral-300);
+  --input: var(--color-neutral-300);
+  --ring: var(--color-green-300);
 
   --radius: 0.75rem;
 }
 
 .dark {
-  --background: var(--color-mint-900);
+  --background: var(--color-green-800);
   --foreground: var(--color-cream-50);
-  --card: var(--color-mint-800);
+  --card: var(--color-green-700);
   --card-foreground: var(--color-cream-50);
-  --popover: var(--color-mint-800);
+  --popover: var(--color-green-700);
   --popover-foreground: var(--color-cream-50);
-  --primary: var(--color-mint-500);
-  --primary-foreground: var(--color-mint-900);
-  --secondary: var(--color-mint-800);
+  --primary: var(--color-green-300);
+  --primary-foreground: var(--color-green-800);
+  --secondary: var(--color-green-700);
   --secondary-foreground: var(--color-cream-100);
-  --muted: var(--color-mint-800);
-  --muted-foreground: var(--color-mint-300);
-  --accent: var(--color-mint-700);
+  --muted: var(--color-green-700);
+  --muted-foreground: var(--color-green-200);
+  --accent: var(--color-green-600);
   --accent-foreground: var(--color-cream-50);
-  --border: var(--color-mint-700);
-  --input: var(--color-mint-700);
-  --ring: var(--color-mint-400);
+  --border: var(--color-green-600);
+  --input: var(--color-green-600);
+  --ring: var(--color-green-200);
 }
 
 @theme inline {
