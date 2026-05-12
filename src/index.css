@@ -3,21 +3,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ---------- Fonts ---------- */
-@font-face {
-  font-family: "Nunito";
-  src: url("/fonts/Nunito-Variable-Latin.woff2") format("woff2");
-  font-weight: 200 1000;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Space Grotesk";
-  src: url("/fonts/SpaceGrotesk-Variable-Latin.woff2") format("woff2");
-  font-weight: 300 700;
-  font-style: normal;
-  font-display: swap;
-}
+/* ---------- Fonts ----------
+ * Loaded via <link> in index.html:
+ *   - ohno-softie-variable  (Adobe Typekit kit rne3qwz)  → display / headings
+ *   - Rubik                 (Google Fonts)               → UI / body
+ * Per Purinta Design System (font tokens UI / Display).
+ */
 
 /* ---------- DS primitives (from Figma — Mint / Cream / Info) ---------- */
 @theme {
@@ -63,9 +54,10 @@
   --color-purinta-light: var(--color-mint-400);
   --color-purinta-mint: var(--color-mint-100);
 
-  /* Typography */
-  --font-display: "Nunito", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  /* Typography (Purinta DS) */
+  --font-display: "ohno-softie-variable", "Fredoka", "Nunito",
+    ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Rubik", ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-body);
 
   /* Animations */
