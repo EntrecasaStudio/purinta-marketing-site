@@ -93,8 +93,26 @@ export default function Hero() {
             />
           </div>
 
-          {/* Tofu / Hero mascot — display:contents, 14 layered parts */}
-          <HeroMascot />
+          {/* Tofu / Hero mascot — single flattened SVG export from Figma.
+              Bounding box mirrors the original Figma frame inset:
+              top 37.29% / right 41.17% / bottom 42.94% / left 41.58%
+              of the 1920×1461 BG container. */}
+          <div
+            className="absolute"
+            style={{
+              top: '37.29%',
+              left: '41.58%',
+              right: '41.17%',
+              bottom: '42.94%',
+            }}
+            data-node-id="384:2224"
+          >
+            <img
+              src="/assets/figma/hero-mascot.svg"
+              alt="Purinta mascot"
+              className="block h-full w-full"
+            />
+          </div>
         </div>
       </motion.div>
 
@@ -158,106 +176,3 @@ export default function Hero() {
   )
 }
 
-/* ============================================================
- * Hero Mascot — composed of 14 image layers per Figma node 384:2224.
- *
- * Figma declared the wrapper with `position: contents`, so children's
- * `inset` percentages resolve against the GRANDPARENT (1920×1461 BG).
- * We mirror that with `display: contents` here.
- *
- * Each <img> is wrapped in a positioned <div> because replaced
- * elements (<img>) use their intrinsic size instead of deriving
- * width/height from top+bottom / left+right. The img then fills
- * its wrapping box with width:100% height:100%.
- *
- * Bounding box ~ inset[37.29% 41.17% 42.94% 41.58%] of the BG container.
- * ============================================================ */
-type PartProps = {
-  src: string
-  inset: { top: string; left: string; right: string; bottom: string }
-  flipX?: boolean
-  alt?: string
-}
-
-function MascotPart({ src, inset, flipX, alt = '' }: PartProps) {
-  return (
-    <div className="absolute" style={inset}>
-      <img
-        src={src}
-        alt={alt}
-        className={`block h-full w-full max-w-none ${flipX ? '-scale-x-100' : ''}`}
-      />
-    </div>
-  )
-}
-
-function HeroMascot() {
-  return (
-    <div style={{ display: 'contents' }} data-node-id="384:2224">
-      {/* Legs */}
-      <MascotPart
-        src="/assets/figma/mascot-leg-r.svg"
-        inset={{ top: '52.17%', left: '51.22%', right: '45.19%', bottom: '42.94%' }}
-      />
-      <MascotPart
-        src="/assets/figma/mascot-leg-l.svg"
-        inset={{ top: '51.65%', left: '46.25%', right: '49.89%', bottom: '43.57%' }}
-      />
-
-      {/* Body */}
-      <MascotPart
-        src="/assets/figma/mascot-body-stroke.svg"
-        inset={{ top: '37.29%', left: '44.79%', right: '42.33%', bottom: '47.07%' }}
-      />
-      <MascotPart
-        src="/assets/figma/mascot-body-fill.svg"
-        inset={{ top: '37.65%', left: '45.09%', right: '42.63%', bottom: '47.43%' }}
-      />
-      <MascotPart
-        src="/assets/figma/mascot-body-shadow.svg"
-        inset={{ top: '38.99%', left: '48.72%', right: '42.82%', bottom: '47.75%' }}
-      />
-      <MascotPart
-        src="/assets/figma/mascot-body-lateral-line.svg"
-        inset={{ top: '39.01%', left: '49.91%', right: '44.12%', bottom: '47.55%' }}
-      />
-
-      {/* Face */}
-      <MascotPart
-        src="/assets/figma/mascot-slot-bills.svg"
-        inset={{ top: '47.67%', left: '45.55%', right: '45.45%', bottom: '49.26%' }}
-      />
-      <MascotPart
-        src="/assets/figma/mascot-eye-r.svg"
-        inset={{ top: '40.75%', left: '51.21%', right: '46.26%', bottom: '55.74%' }}
-      />
-      <MascotPart
-        src="/assets/figma/mascot-eye-l.svg"
-        inset={{ top: '40.2%', left: '46.58%', right: '50.71%', bottom: '56.1%' }}
-      />
-      <MascotPart
-        src="/assets/figma/mascot-cheeks.svg"
-        inset={{ top: '42.5%', left: '46.29%', right: '45.9%', bottom: '53.41%' }}
-      />
-      <MascotPart
-        src="/assets/figma/mascot-slot-line.svg"
-        inset={{ top: '47.05%', left: '45.1%', right: '42.61%', bottom: '50.49%' }}
-      />
-      <MascotPart
-        src="/assets/figma/mascot-mouth.svg"
-        inset={{ top: '43.62%', left: '48.13%', right: '48.05%', bottom: '51.88%' }}
-      />
-
-      {/* Hands */}
-      <MascotPart
-        src="/assets/figma/mascot-hand-l.svg"
-        inset={{ top: '44.78%', left: '41.58%', right: '55.21%', bottom: '51.05%' }}
-      />
-      <MascotPart
-        src="/assets/figma/mascot-hand-r.svg"
-        inset={{ top: '46.07%', left: '55.62%', right: '41.17%', bottom: '49.75%' }}
-        flipX
-      />
-    </div>
-  )
-}
