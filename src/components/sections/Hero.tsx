@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
 import { Plus } from 'lucide-react'
 import Nav from '@/components/Nav'
+import { Button } from '@/components/ui/button'
 
 /**
  * Hero — Figma node 384:2207 ("Purinta - Desktop 1440px").
@@ -159,16 +160,17 @@ export default function Hero() {
               </p>
             </div>
 
-            {/* CTA */}
-            <a
-              href="https://app.purinta.xyz"
-              className="inline-flex items-center justify-center gap-[8px] rounded-[25px] border border-solid border-[var(--color-green-300)] px-[33px] py-[13px] font-display text-[20px] leading-[32px] tracking-[0.4px] text-[var(--color-green-700)] transition-all duration-300 hover:scale-105 hover:opacity-90"
-              style={{ backgroundImage: 'var(--gradient-button)' }}
-              data-node-id="384:2316"
-            >
-              <Plus size={20} strokeWidth={2.5} />
-              Launch App
-            </a>
+            {/* CTA — uses shared Button from purinta-app DS (primary, lg) */}
+            <Button variant="primary" size="lg" asChild>
+              <a
+                href="https://app.purinta.xyz"
+                data-node-id="384:2316"
+                className="px-8"
+              >
+                <Plus className="size-5" strokeWidth={2.5} />
+                Launch App
+              </a>
+            </Button>
           </div>
         </motion.div>
       </div>

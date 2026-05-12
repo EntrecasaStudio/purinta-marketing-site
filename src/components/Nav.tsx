@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Logo from '@/components/Logo'
 import { XIcon, DiscordIcon } from '@/components/icons/Social'
 import { Menu, X as Close, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 const links = [
   { href: '#', label: 'Home', active: true },
@@ -68,15 +69,9 @@ export default function Nav() {
             </div>
           </div>
 
-          <a
-            href="https://app.purinta.xyz"
-            className="inline-flex items-center justify-center gap-[8px] rounded-[22px] border border-solid border-[var(--color-green-300)] px-[21px] py-[13px] font-display text-[16px] leading-[26px] tracking-[0.48px] text-[var(--color-green-700)] transition-opacity hover:opacity-90"
-            style={{
-              backgroundImage: 'var(--gradient-button)',
-            }}
-          >
-            Launch App
-          </a>
+          <Button variant="primary" size="sm" asChild>
+            <a href="https://app.purinta.xyz">Launch App</a>
+          </Button>
         </div>
       </div>
     </nav>
@@ -137,14 +132,12 @@ export function NavMobile() {
                   <DiscordIcon />
                 </a>
               </div>
-              <a
-                href="https://app.purinta.xyz"
-                className="inline-flex items-center gap-2 rounded-full border border-[var(--color-green-300)] px-4 py-2 font-display text-sm text-[var(--color-green-700)]"
-                style={{ backgroundImage: 'var(--gradient-button)' }}
-              >
-                <Plus size={14} />
-                Launch App
-              </a>
+              <Button variant="primary" size="sm" asChild>
+                <a href="https://app.purinta.xyz">
+                  <Plus className="size-3.5" />
+                  Launch App
+                </a>
+              </Button>
             </div>
           </div>
         </div>
