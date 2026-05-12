@@ -1,16 +1,24 @@
+import Nav from '@/components/Nav'
 import Hero from '@/components/sections/Hero'
 import Features from '@/components/sections/Features'
-import CTA from '@/components/sections/CTA'
+import HowItWorks from '@/components/sections/HowItWorks'
+import Ecosystem from '@/components/sections/Ecosystem'
+import Community from '@/components/sections/Community'
 import Footer from '@/components/sections/Footer'
+import { useReveal } from '@/hooks/useReveal'
 
 function App() {
+  useReveal()
   return (
-    <main className="relative bg-background text-foreground">
+    <div className="bg-background min-h-screen">
+      <Nav />
       <Hero />
       <Features />
-      <CTA />
+      <HowItWorks />
+      <Ecosystem />
+      <Community />
       <Footer />
-    </main>
+    </div>
   )
 }
 
