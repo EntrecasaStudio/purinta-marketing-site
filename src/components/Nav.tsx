@@ -34,7 +34,7 @@ export default function Nav() {
                 <li key={l.label}>
                   <a
                     href={l.href}
-                    className={`block px-[8px] py-[1.5px] font-['Rubik'] text-[16px] leading-[26px] tracking-[0.16px] whitespace-nowrap text-[#333] transition-colors hover:text-[var(--color-green-600)] ${
+                    className={`block px-[8px] py-[1.5px] font-body text-[16px] leading-[26px] tracking-[0.16px] whitespace-nowrap text-[#333] transition-colors hover:text-[var(--color-green-600)] ${
                       l.active
                         ? 'border-b border-solid border-[#B2B2B2]'
                         : ''
@@ -70,7 +70,7 @@ export default function Nav() {
 
           <a
             href="https://app.purinta.xyz"
-            className="inline-flex items-center justify-center gap-[8px] rounded-[22px] border border-solid border-[var(--color-green-300)] px-[21px] py-[13px] font-['Ohno_Softie_Variable'] text-[16px] leading-[26px] tracking-[0.48px] text-[var(--color-green-700)] transition-opacity hover:opacity-90"
+            className="inline-flex items-center justify-center gap-[8px] rounded-[22px] border border-solid border-[var(--color-green-300)] px-[21px] py-[13px] font-display text-[16px] leading-[26px] tracking-[0.48px] text-[var(--color-green-700)] transition-opacity hover:opacity-90"
             style={{
               backgroundImage: 'var(--gradient-button)',
             }}
@@ -113,7 +113,7 @@ export function NavMobile() {
                 key={l.label}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="rounded-md px-3 py-2 font-['Rubik'] text-base text-[#333] hover:bg-[var(--color-green-50)]"
+                className="rounded-md px-3 py-2 font-body text-base text-[#333] hover:bg-[var(--color-green-50)]"
               >
                 {l.label}
               </a>
@@ -139,7 +139,7 @@ export function NavMobile() {
               </div>
               <a
                 href="https://app.purinta.xyz"
-                className="inline-flex items-center gap-2 rounded-full border border-[var(--color-green-300)] px-4 py-2 font-['Ohno_Softie_Variable'] text-sm text-[var(--color-green-700)]"
+                className="inline-flex items-center gap-2 rounded-full border border-[var(--color-green-300)] px-4 py-2 font-display text-sm text-[var(--color-green-700)]"
                 style={{ backgroundImage: 'var(--gradient-button)' }}
               >
                 <Plus size={14} />

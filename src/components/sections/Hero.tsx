@@ -116,7 +116,7 @@ export default function Hero() {
             <div className="flex flex-col items-center gap-[10px]">
               {/* Headline */}
               <h1
-                className="text-center font-['Ohno_Softie_Variable'] text-[76px] leading-[76px] font-bold tracking-[0.76px] text-[#333]"
+                className="text-center font-display text-[76px] leading-[76px] font-bold tracking-[0.76px] text-[#333]"
                 style={{
                   textShadow: '2px 2px 8px rgba(254, 254, 254, 0.52)',
                   width: '731.684px',
@@ -132,7 +132,7 @@ export default function Hero() {
 
               {/* Sub */}
               <p
-                className="text-center font-['Rubik'] text-[20px] leading-[32px] font-medium tracking-[0.2px] text-[#181A1F]"
+                className="text-center font-body text-[20px] leading-[32px] font-medium tracking-[0.2px] text-[#181A1F]"
                 data-node-id="384:2315"
               >
                 The first lending protocol for memecoin degens —
@@ -144,7 +144,7 @@ export default function Hero() {
             {/* CTA */}
             <a
               href="https://app.purinta.xyz"
-              className="inline-flex items-center justify-center gap-[8px] rounded-[25px] border border-solid border-[var(--color-green-300)] px-[33px] py-[13px] font-['Ohno_Softie_Variable'] text-[20px] leading-[32px] tracking-[0.4px] text-[var(--color-green-700)] transition-all duration-300 hover:scale-105 hover:opacity-90"
+              className="inline-flex items-center justify-center gap-[8px] rounded-[25px] border border-solid border-[var(--color-green-300)] px-[33px] py-[13px] font-display text-[20px] leading-[32px] tracking-[0.4px] text-[var(--color-green-700)] transition-all duration-300 hover:scale-105 hover:opacity-90"
               style={{ backgroundImage: 'var(--gradient-button)' }}
               data-node-id="384:2316"
             >
