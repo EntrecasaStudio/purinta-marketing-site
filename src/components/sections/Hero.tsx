@@ -43,13 +43,15 @@ export default function Hero() {
       >
         <div className="relative h-[1461.385px] w-[1920px] overflow-hidden">
           {/* Scene — Figma node 430:4341 ("Purinta Hero back - 20260512")
-              Natural 1920×1462. Position kept identical to the previous
-              background.png so the mascots and content layer don't shift. */}
+              Natural 1920×1462. Positioned with inset-0 + object-cover
+              per the Figma export so the sky band lands at the top of
+              the section (where the headline + CTA sit), with the
+              meadow extending below toward the white fade. */}
           <motion.img
             src="/assets/figma/background.webp"
             alt=""
             style={{ scale: sceneScale }}
-            className="absolute top-[-22.64%] left-[-0.09%] h-full w-[100.17%] max-w-none object-cover"
+            className="absolute inset-0 size-full max-w-none object-cover"
             data-node-id="430:4341"
           />
 
