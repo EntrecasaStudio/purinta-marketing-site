@@ -324,13 +324,15 @@ function ExpandedContent({
         ease: 'easeOut',
       }}
       id={`feature-panel-${card.id}`}
-      className="pointer-events-none absolute inset-0 z-10 flex flex-col pt-6 pr-4 pb-0 pl-4"
+      className="pointer-events-none absolute inset-0 z-10"
     >
-      {/* Star + Title live at Card level (persistent across states).
-          This block holds only the body + Learn-more link — those are
-          the parts that cross-fade. pt-[120px] reserves space for the
-          star (32–56) + title (~64–120). */}
-      <div className="pointer-events-auto flex flex-col gap-2 px-4 pt-[120px] pb-2">
+      {/* Body + Learn-more cross-fade in this slot. Positioned
+       *  absolutely just below the title so the gap is the
+       *  Figma-spec 8 px (title.bottom = 64 + 31 = 95, body.top = 103). */}
+      <div
+        className="pointer-events-auto absolute flex flex-col gap-2"
+        style={{ top: 103, left: 32, right: 32 }}
+      >
         <p className="font-body text-[16px] leading-[26px] tracking-[0.16px] text-[var(--color-neutral-600)]">
           {card.body}
         </p>
@@ -466,12 +468,13 @@ function Title({ card, isActive }: { card: CardData; isActive: boolean }) {
         {card.titleCollapsed}
       </motion.h3>
 
-      {/* Expanded variant — visible when isActive */}
+      {/* Expanded variant — visible when isActive.
+       *   y = star.top (32) + star.size (24) + gap-8 = 64 per Figma */}
       <motion.h3
         aria-hidden={!isActive}
         className="pointer-events-none absolute z-10 m-0 font-display font-semibold text-[var(--color-neutral-900)]"
         style={{
-          top: 72,
+          top: 64,
           left: 32,
           width: 316,
           fontSize: 31,
