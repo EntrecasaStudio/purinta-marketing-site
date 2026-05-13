@@ -62,7 +62,9 @@ export default function Hero() {
             data-node-id="430:4341"
           />
 
-          {/* Hill ellipse (under the mascots) */}
+          {/* Hill ellipse — Figma position top 839 of the 1462 bg
+              container, soft blurred ellipse with white → pale-lime
+              gradient. Sits under the mascots as the visual horizon. */}
           <img
             src="/assets/figma/hill-ellipse.svg"
             alt=""

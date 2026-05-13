@@ -176,7 +176,8 @@ export default function Features() {
   return (
     <section
       id="features"
-      className="relative w-full bg-white py-32"
+      className="relative w-full py-32"
+      style={{ backgroundImage: 'var(--gradient-bg)' }}
       data-node-id="383:4066"
     >
       <div className="mx-auto w-full max-w-[1024px] px-6">
