@@ -48,7 +48,7 @@ const CARDS: CardData[] = [
     title: 'Borrow Against Memes',
     titleCollapsed: 'Borrow\nAgainst Memes',
     body: 'Lock your PEPE, SHIB, or any supported memecoin as collateral and borrow USDC without selling your bags. Your memes stay yours — you just unlock their liquidity.',
-    mascot: '/assets/mascot-heart.webp',
+    mascot: '/assets/figma/features/borrow.webp',
     accent: {
       bg: 'var(--color-blush-50)',
       border: 'var(--color-blush-400)',
@@ -60,7 +60,7 @@ const CARDS: CardData[] = [
     title: 'Best APY on the Market',
     titleCollapsed: 'Best APY\non the Market',
     body: 'Competitive rates powered by efficient market design. Lenders earn real yield from memecoin borrowers, while borrowers get the best rates available anywhere.',
-    mascot: '/assets/mascot-wave.webp',
+    mascot: '/assets/figma/features/apy.webp',
     accent: {
       bg: 'var(--color-success-50)',
       border: 'var(--color-success-400)',
@@ -68,11 +68,26 @@ const CARDS: CardData[] = [
     },
   },
   {
+    /* Per Figma node 383:4368: Morpho card uses the Warning palette
+     * (orange), not Info — verified against the live design system. */
     id: 'morpho',
     title: 'Built on Morpho',
     titleCollapsed: 'Built on\nMorpho',
     body: "Purinta is built on Morpho's battle-tested lending infrastructure — the same protocol securing billions in DeFi. No shortcuts on security.",
-    mascot: '/assets/mascot-layer.webp',
+    mascot: '/assets/figma/features/morpho.webp',
+    accent: {
+      bg: 'var(--color-warning-50)',
+      border: 'var(--color-warning-400)',
+      blob: 'var(--color-warning-200)',
+    },
+  },
+  {
+    /* Per Figma node 383:4769: Mainnet card uses the Info palette (blue). */
+    id: 'mainnet',
+    title: 'Mainnet Native',
+    titleCollapsed: 'Mainnet\nNative',
+    body: 'Live on Ethereum mainnet from day one. Deep liquidity, real security, no testnet games. Your memes deserve the real thing.',
+    mascot: '/assets/figma/features/mainnet.webp',
     accent: {
       bg: 'var(--color-info-50)',
       border: 'var(--color-info-400)',
@@ -80,27 +95,17 @@ const CARDS: CardData[] = [
     },
   },
   {
-    id: 'mainnet',
-    title: 'Mainnet Native',
-    titleCollapsed: 'Mainnet\nNative',
-    body: 'Live on Ethereum mainnet from day one. Deep liquidity, real security, no testnet games. Your memes deserve the real thing.',
-    mascot: '/assets/mascot-sleep.webp',
-    accent: {
-      bg: 'var(--color-cream-200)',
-      border: 'var(--color-cream-600)',
-      blob: 'var(--color-cream-300)',
-    },
-  },
-  {
+    /* Per Figma node 383:5010: Api3 card uses Green (the brand color),
+     * not Mint — matches the protocol identity. */
     id: 'api3',
     title: 'Powered by Api3',
     titleCollapsed: 'Powered\nby Api3',
     body: 'First-party oracle feeds with OEV capture. Accurate pricing for your memecoins, with value flowing back to the protocol.',
-    mascot: '/assets/mascot-smirk.webp',
+    mascot: '/assets/figma/features/api3.webp',
     accent: {
-      bg: 'var(--color-mint-50)',
-      border: 'var(--color-mint-400)',
-      blob: 'var(--color-mint-200)',
+      bg: 'var(--color-green-50)',
+      border: 'var(--color-green-400)',
+      blob: 'var(--color-green-100)',
     },
   },
 ]
@@ -237,8 +242,10 @@ function Card({ card, isActive, progress, onSelect }: CardProps) {
       animate={{
         width: isActive ? 384 : 152,
       }}
-      transition={{ type: 'spring', stiffness: 180, damping: 24 }}
-      className="relative h-[416px] shrink-0 cursor-pointer overflow-hidden rounded-[24px] border border-solid bg-white text-left transition-colors duration-300 outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+      /* Softer spring than the default — the pill takes ~600 ms to
+       * settle so the content swap happens after the width is stable. */
+      transition={{ type: 'spring', stiffness: 110, damping: 26, mass: 0.9 }}
+      className="relative h-[416px] shrink-0 cursor-pointer overflow-hidden rounded-[24px] border border-solid bg-white text-left transition-colors duration-500 outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
         backgroundColor: isActive ? card.accent.bg : '#FEFEFE',
         borderColor: card.accent.border,
@@ -260,7 +267,9 @@ function CollapsedContent({ card }: { card: CardData }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
+      /* Exit immediately so we don't see the small layout fighting
+       * with the widening pill. */
+      transition={{ duration: 0.18 }}
       className="flex h-full flex-col items-center px-4 py-5"
     >
       {/* Star icon */}
@@ -310,18 +319,26 @@ function ExpandedContent({
   card: CardData
   progress: number
 }) {
+  /* Stagger the inner content behind the width morph: title + body
+   * + CTA fade in once the pill is mostly settled (~450 ms in). The
+   * mascot lags slightly more so the eye lands on the text first. */
   return (
     <motion.div
       key={`${card.id}-expanded`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.35, delay: 0.08 }}
+      transition={{ duration: 0.25, delay: 0.45 }}
       id={`feature-panel-${card.id}`}
       className="relative flex h-full flex-col pt-6 pr-4 pb-0 pl-4"
     >
       {/* Star + Title + Body */}
-      <div className="flex flex-col gap-2 px-4 py-2">
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.5, ease: 'easeOut' }}
+        className="flex flex-col gap-2 px-4 py-2"
+      >
         <Sparkle
           className="size-6"
           strokeWidth={1.5}
@@ -340,10 +357,15 @@ function ExpandedContent({
           Learn more
           <ChevronRight className="size-4" strokeWidth={2} />
         </a>
-      </div>
+      </motion.div>
 
       {/* Mascot in lower-right, rotated 6deg (polaroid feel) */}
-      <div className="pointer-events-none absolute right-2 bottom-0 flex h-[180px] w-[180px] items-center justify-center">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85, rotate: 0 }}
+        animate={{ opacity: 1, scale: 1, rotate: 6 }}
+        transition={{ duration: 0.4, delay: 0.55, ease: 'easeOut' }}
+        className="pointer-events-none absolute right-2 bottom-0 flex h-[180px] w-[180px] items-center justify-center"
+      >
         <div
           className="absolute h-[150px] w-[170px] rotate-[68deg] rounded-[50%]"
           style={{ background: card.accent.blob, opacity: 0.7 }}
@@ -351,10 +373,10 @@ function ExpandedContent({
         <img
           src={card.mascot}
           alt=""
-          className="relative h-[140px] w-[140px] rotate-[6deg] object-contain drop-shadow-[0_8px_8px_rgba(0,0,0,0.15)]"
+          className="relative h-[160px] w-[160px] object-contain drop-shadow-[0_8px_8px_rgba(0,0,0,0.15)]"
           loading="lazy"
         />
-      </div>
+      </motion.div>
 
       {/* Progress bar */}
       <div
