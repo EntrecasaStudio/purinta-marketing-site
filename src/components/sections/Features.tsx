@@ -138,7 +138,6 @@ export default function Features() {
    * RESUME_AFTER_INPUT_MS of no further input. */
   const [inputPauseTick, setInputPauseTick] = useState(0)
   const [inputPaused, setInputPaused] = useState(false)
-  const [progress, setProgress] = useState(0)
 
   const paused = reduceMotion || hoverPause || inputPaused
 
@@ -158,32 +157,15 @@ export default function Features() {
       // Keep current progress visible while paused (do not reset).
       return
     }
-    let raf = 0
-    let advanced = false
-    const start = performance.now()
-    const tick = (t: number) => {
-      if (advanced) return
-      const elapsed = t - start
-      setProgress(Math.min(1, elapsed / CYCLE_MS))
-      if (elapsed >= CYCLE_MS) {
-        advanced = true // guard against double-advance under StrictMode
-        setActiveIdx((i) => (i + 1) % CARDS.length)
-        setProgress(0)
-      } else {
-        raf = requestAnimationFrame(tick)
-      }
-    }
-    raf = requestAnimationFrame(tick)
-    return () => {
-      advanced = true
-      cancelAnimationFrame(raf)
-    }
+    const t = setTimeout(() => {
+      setActiveIdx((i) => (i + 1) % CARDS.length)
+    }, CYCLE_MS)
+    return () => clearTimeout(t)
   }, [activeIdx, paused])
 
   const handleSelect = (idx: number) => {
     if (idx !== activeIdx) {
       setActiveIdx(idx)
-      setProgress(0)
     }
     setInputPauseTick((n) => n + 1)
   }
@@ -220,7 +202,6 @@ export default function Features() {
               key={card.id}
               card={card}
               isActive={i === activeIdx}
-              progress={i === activeIdx ? progress : 0}
               onSelect={() => handleSelect(i)}
             />
           ))}
@@ -244,11 +225,10 @@ export default function Features() {
 type CardProps = {
   card: CardData
   isActive: boolean
-  progress: number
   onSelect: () => void
 }
 
-function Card({ card, isActive, progress, onSelect }: CardProps) {
+function Card({ card, isActive, onSelect }: CardProps) {
   const ref = useRef<HTMLButtonElement>(null)
 
   return (
@@ -290,14 +270,14 @@ function Card({ card, isActive, progress, onSelect }: CardProps) {
           "leaves and re-enters" between auto-cycle ticks; only what is
           truly different (body text per card) fades in place. */}
       <CollapsedContent card={card} isActive={isActive} />
-      <ExpandedContent card={card} progress={progress} isActive={isActive} />
+      <ExpandedContent card={card} isActive={isActive} />
 
-      {/* Star + Title + Mascot — persistent layers, animate between
-          states instead of fading. Body text + Learn-more link + the
-          divider line are the only things that cross-fade. */}
+      {/* Mascot lives BEHIND the text so the polaroid + blob never
+          cover the body / Learn more / title. Star + Title + content
+          layers sit on top via z-10. */}
+      <Mascot card={card} isActive={isActive} />
       <Star card={card} isActive={isActive} />
       <Title card={card} isActive={isActive} />
-      <Mascot card={card} isActive={isActive} />
     </motion.button>
   )
 }
@@ -316,7 +296,7 @@ function CollapsedContent({
     <motion.div
       animate={{ opacity: isActive ? 0 : 1 }}
       transition={{ duration: 0.13, ease: 'easeOut' }}
-      className="pointer-events-none absolute inset-0 flex flex-col items-center px-4 pt-[60px] pb-5"
+      className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center px-4 pt-[60px] pb-5"
     >
       {/* Star + Title live at Card level (persistent across states).
           Spacer below reserves the visual room for them so the divider
@@ -338,11 +318,9 @@ function CollapsedContent({
 
 function ExpandedContent({
   card,
-  progress,
   isActive,
 }: {
   card: CardData
-  progress: number
   isActive: boolean
 }) {
   /* Stays mounted always — only the body / Learn-more / progress
@@ -357,7 +335,7 @@ function ExpandedContent({
         ease: 'easeOut',
       }}
       id={`feature-panel-${card.id}`}
-      className="pointer-events-none absolute inset-0 flex flex-col pt-6 pr-4 pb-0 pl-4"
+      className="pointer-events-none absolute inset-0 z-10 flex flex-col pt-6 pr-4 pb-0 pl-4"
     >
       {/* Star + Title live at Card level (persistent across states).
           This block holds only the body + Learn-more link — those are
@@ -378,36 +356,25 @@ function ExpandedContent({
 
       {/* Mascot lives outside this component in Card → see <Mascot /> */}
 
-      {/* Progress bar */}
-      <div
-        className="absolute right-4 bottom-3 left-4 h-[2px] overflow-hidden rounded-full opacity-30"
-        aria-hidden
-        style={{ backgroundColor: card.accent.border, opacity: 0.15 }}
-      >
-        <div
-          className="h-full rounded-full transition-[width] duration-100"
-          style={{
-            width: `${progress * 100}%`,
-            backgroundColor: card.accent.border,
-            opacity: 0.6,
-          }}
-        />
-      </div>
+      {/* No progress bar — read as a divider line at the bottom of
+          the expanded card. The auto-cycle is still announced via the
+          aria-live region; the visual indicator is dropped. */}
     </motion.div>
   )
 }
 
 /* ============================================================
  * Star — accent sparkle icon at the top-left of every card.
- * Uses the actual Figma SVG export so the fill color matches the
- * design exactly (each card gets a different tint:
- * borrow=Blush/300, apy=Success/200, morpho=Warning/200,
+ * Uses the actual Figma SVG so each card has its own fill tint
+ * (borrow=Blush/300, apy=Success/200, morpho=Warning/200,
  * mainnet=Info/200, api3=Green/100). Persistent across states —
  * animates only position and size.
  *
- * Per Figma:
- *   collapsed (152 pill): 16×16 at left 16, top 40
- *   expanded  (384 pill): 24×24 at left 32, top 32
+ * Per Figma the star sits inside a small anchor box (16 collapsed
+ * / 24 expanded) but the actual visible glyph extends beyond the
+ * anchor via `inset: -51.92% -59.61% -67.31% -59.62%` — that gives
+ * a visual size of ~35×35 (collapsed) / ~52×52 (expanded), with
+ * the SVG's viewBox 35.0772 × 35.077.
  * ============================================================ */
 function Star({ card, isActive }: { card: CardData; isActive: boolean }) {
   const reduceMotion = useReducedMotion()
@@ -420,17 +387,23 @@ function Star({ card, isActive }: { card: CardData; isActive: boolean }) {
         delay: isActive ? 0.13 : 0,
       } as const)
 
+  /* Anchor box per Figma was 16 (collapsed) / 24 (expanded) at the
+   * top-left, but the visible star glyph extends past it via negative
+   * insets, giving an actual visual size of 35×35 / 52.7×52.7. We
+   * just position the rendered <img> directly at those coordinates
+   * (anchor_left + inset_left, anchor_top + inset_top) and let the
+   * SVG render at its full visual size. */
   return (
     <motion.img
       src={`/assets/figma/features/star-${card.id}.svg`}
       alt=""
       aria-hidden
-      className="pointer-events-none absolute"
+      className="pointer-events-none absolute z-10 block max-w-none"
       animate={{
-        top: isActive ? 32 : 40,
-        left: isActive ? 32 : 16,
-        width: isActive ? 24 : 16,
-        height: isActive ? 24 : 16,
+        top: isActive ? 19.5 : 31.7,
+        left: isActive ? 17.7 : 6.5,
+        width: isActive ? 52.66 : 35.08,
+        height: isActive ? 52.66 : 35.08,
       }}
       transition={transition}
     />
