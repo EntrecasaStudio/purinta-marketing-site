@@ -242,15 +242,16 @@ function Card({ card, isActive, progress, onSelect }: CardProps) {
       animate={{
         width: isActive ? 384 : 152,
       }}
-      /* Spring tuned to the original "snappy" feel (settles in ~350 ms).
-       * Width delayed by 130 ms so the collapsed content can fade out
-       * first (see AnimatePresence mode="wait" below). The collapsing-
-       * back transition runs without delay. */
+      /* Spring tuned to the original snappy feel (~350 ms). Both
+       * directions share the same 130 ms delay so the opening and the
+       * closing cards start widening / shrinking at the EXACT same
+       * moment — that way the row stays exactly 1024 px wide throughout
+       * the transition instead of momentarily collapsing under that. */
       transition={{
         type: 'spring',
         stiffness: 180,
         damping: 24,
-        delay: isActive ? 0.13 : 0,
+        delay: 0.13,
       }}
       className="relative h-[416px] shrink-0 cursor-pointer overflow-hidden rounded-[24px] border border-solid bg-white text-left transition-colors duration-500 outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
@@ -282,9 +283,11 @@ function Card({ card, isActive, progress, onSelect }: CardProps) {
         )}
       </AnimatePresence>
 
-      {/* Star + Mascot — persistent layers, animate between states
-          instead of fading. Only the text and the divider line fade. */}
+      {/* Star + Title + Mascot — persistent layers, animate between
+          states instead of fading. Body text + Learn-more link + the
+          divider line are the only things that cross-fade. */}
       <Star card={card} isActive={isActive} />
+      <Title card={card} isActive={isActive} />
       <Mascot card={card} isActive={isActive} />
     </motion.button>
   )
@@ -309,15 +312,10 @@ function CollapsedContent({
       transition={{ duration: 0.13, ease: 'easeOut' }}
       className="flex h-full flex-col items-center px-4 pt-[60px] pb-5"
     >
-      {/* Star lives at Card level (persistent across states) */}
-
-      {/* Title — 100% line-height per Figma (matches font-size) */}
-      <p
-        className="w-full font-display text-[16px] leading-[16px] font-medium tracking-[0.48px] whitespace-pre-line text-[var(--color-neutral-900)]"
-        style={{ paddingBottom: 20 }}
-      >
-        {card.titleCollapsed}
-      </p>
+      {/* Star + Title live at Card level (persistent across states).
+          Spacer below reserves the visual room for them so the divider
+          lands at the right vertical position. */}
+      <div className="w-full" style={{ minHeight: 110 }} aria-hidden />
 
       {/* Divider — fades to 0 as soon as the card opens, even before
           this component unmounts on the next render. */}
@@ -348,23 +346,24 @@ function ExpandedContent({
       key={`${card.id}-expanded`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      /* Exit in 130 ms — matches the width-spring delay so the body
+       * text is gone BEFORE the pill starts shrinking. Otherwise we
+       * see the lines reflow visibly as the box narrows. */
+      exit={{ opacity: 0, transition: { duration: 0.13, ease: 'easeOut' } }}
       transition={{ duration: 0.2, delay: 0.28 }}
       id={`feature-panel-${card.id}`}
       className="relative flex h-full flex-col pt-6 pr-4 pb-0 pl-4"
     >
-      {/* Star lives at Card level (persistent across states) */}
-
-      {/* Title + Body */}
+      {/* Star + Title live at Card level (persistent across states).
+          This block holds only the body + Learn more (the things that
+          cross-fade on every transition). pt-[110px] reserves space
+          for the star (32–56) + title (~64–120). */}
       <motion.div
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.22, delay: 0.3, ease: 'easeOut' }}
-        className="flex flex-col gap-2 px-4 pt-[40px] pb-2"
+        className="flex flex-col gap-2 px-4 pt-[120px] pb-2"
       >
-        <h3 className="font-display text-[31px] leading-[31px] font-semibold tracking-[0.62px] text-[var(--color-neutral-900)]">
-          {card.title}
-        </h3>
         <p className="font-body text-[16px] leading-[26px] tracking-[0.16px] text-[var(--color-neutral-600)]">
           {card.body}
         </p>
@@ -439,6 +438,47 @@ function Star({ card, isActive }: { card: CardData; isActive: boolean }) {
         />
       </motion.div>
     </motion.div>
+  )
+}
+
+/* ============================================================
+ * Title — persistent card title. Same text node in both states,
+ * just morphs font-size / weight / letter-spacing / width / position.
+ * Because the width animates, the text reflows naturally between
+ * the multi-line collapsed form and the wider expanded form without
+ * needing a content swap.
+ *
+ * Per Figma:
+ *   collapsed (152 pill): 16/16 Medium tracking 0.48, width ~120, top 80
+ *   expanded  (384 pill): 31/31 Semibold tracking 0.62, width ~316, top 72
+ * ============================================================ */
+function Title({ card, isActive }: { card: CardData; isActive: boolean }) {
+  const reduceMotion = useReducedMotion()
+  const transition = reduceMotion
+    ? { duration: 0 }
+    : ({
+        type: 'spring',
+        stiffness: 180,
+        damping: 24,
+        delay: 0.13,
+      } as const)
+
+  return (
+    <motion.h3
+      className="pointer-events-none absolute m-0 font-display text-[var(--color-neutral-900)]"
+      animate={{
+        top: isActive ? 72 : 80,
+        left: isActive ? 32 : 16,
+        width: isActive ? 316 : 120,
+        fontSize: isActive ? 31 : 16,
+        lineHeight: isActive ? '31px' : '16px',
+        fontWeight: isActive ? 600 : 500,
+        letterSpacing: isActive ? '0.62px' : '0.48px',
+      }}
+      transition={transition}
+    >
+      {card.title}
+    </motion.h3>
   )
 }
 
