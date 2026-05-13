@@ -189,8 +189,8 @@ export default function Features() {
       data-node-id="383:4066"
     >
       <div className="mx-auto w-full max-w-[1024px] px-6">
-        {/* Section title — 100% line-height per Figma */}
-        <h2 className="text-center font-display text-[44px] leading-[1] font-bold tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
+        {/* Section title — Rubik (font-body) per Figma, 100% line-height */}
+        <h2 className="text-center font-body text-[44px] leading-[1] font-bold tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
           Why Degens Love Purinta
         </h2>
       </div>

@@ -69,7 +69,14 @@ export default function Nav() {
             </div>
           </div>
 
-          <Button variant="primary" size="sm" asChild>
+          {/* Nav primary button uses Figma-specific dimensions
+              (font 16, px-[21] py-[13], rounded-[22]) — bigger font
+              than .btn-sm (13 px), smaller padding than .btn (12/24). */}
+          <Button
+            variant="primary"
+            asChild
+            className="rounded-[22px] !px-[21px] !py-[13px] !text-[16px] tracking-[0.48px]"
+          >
             <a href="https://app.purinta.xyz">Launch App</a>
           </Button>
         </div>
