@@ -55,7 +55,8 @@ const CARDS: CardData[] = [
     titleCollapsed: 'Borrow\nAgainst Memes',
     body: 'Lock your PEPE, SHIB, or any supported memecoin as collateral and borrow USDC without selling your bags. Your memes stay yours — you just unlock their liquidity.',
     mascot: '/assets/figma/features/borrow.png',
-    mascotSize: { w: 254, h: 312 },
+    /* Source PNG is exported @2x — divide by 2 for design size. */
+    mascotSize: { w: 127, h: 156 },
     accent: {
       bg: 'var(--color-blush-50)',
       border: 'var(--color-blush-400)',
@@ -69,7 +70,7 @@ const CARDS: CardData[] = [
     titleCollapsed: 'Best APY\non the Market',
     body: 'Competitive rates powered by efficient market design. Lenders earn real yield from memecoin borrowers, while borrowers get the best rates available anywhere.',
     mascot: '/assets/figma/features/apy.png',
-    mascotSize: { w: 225, h: 206 },
+    mascotSize: { w: 113, h: 103 },
     accent: {
       bg: 'var(--color-success-50)',
       border: 'var(--color-success-400)',
@@ -85,7 +86,7 @@ const CARDS: CardData[] = [
     titleCollapsed: 'Built on\nMorpho',
     body: "Purinta is built on Morpho's battle-tested lending infrastructure — the same protocol securing billions in DeFi. No shortcuts on security.",
     mascot: '/assets/figma/features/morpho.png',
-    mascotSize: { w: 321, h: 280 },
+    mascotSize: { w: 161, h: 140 },
     accent: {
       bg: 'var(--color-warning-50)',
       border: 'var(--color-warning-400)',
@@ -100,7 +101,7 @@ const CARDS: CardData[] = [
     titleCollapsed: 'Mainnet\nNative',
     body: 'Live on Ethereum mainnet from day one. Deep liquidity, real security, no testnet games. Your memes deserve the real thing.',
     mascot: '/assets/figma/features/mainnet.png',
-    mascotSize: { w: 252, h: 319 },
+    mascotSize: { w: 126, h: 160 },
     accent: {
       bg: 'var(--color-info-50)',
       border: 'var(--color-info-400)',
@@ -116,7 +117,7 @@ const CARDS: CardData[] = [
     titleCollapsed: 'Powered\nby Api3',
     body: 'First-party oracle feeds with OEV capture. Accurate pricing for your memecoins, with value flowing back to the protocol.',
     mascot: '/assets/figma/features/api3.png',
-    mascotSize: { w: 246, h: 268 },
+    mascotSize: { w: 123, h: 134 },
     accent: {
       bg: 'var(--color-green-50)',
       border: 'var(--color-green-400)',
