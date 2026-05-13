@@ -58,7 +58,7 @@ export default function Hero() {
             width={1920}
             height={1462}
             style={{ scale: sceneScale }}
-            className="absolute top-[-160px] left-0 block h-auto w-[1920px] max-w-none"
+            className="absolute top-[-220px] left-0 block h-auto w-[1920px] max-w-none"
             data-node-id="430:4341"
           />
 
