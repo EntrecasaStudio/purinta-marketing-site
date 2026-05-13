@@ -20,7 +20,7 @@ const links = [
 export default function Nav() {
   return (
     <nav
-      className="fade-in-on-load relative z-50 mx-auto mt-6 hidden h-[84px] w-full max-w-[1280px] items-center justify-center rounded-[64px] bg-[#FEFEFE] px-[40px] py-[24px] shadow-[0_4px_24px_rgba(24,82,41,0.06)] md:flex"
+      className="fade-in-on-load relative z-50 mx-auto hidden h-[84px] w-full max-w-[1280px] items-center justify-center rounded-[64px] bg-[#FEFEFE] px-[40px] py-[24px] shadow-[0_4px_24px_rgba(24,82,41,0.06)] md:flex"
       data-node-id="384:2293"
     >
       <div className="flex w-full items-center justify-between pl-4">
@@ -53,7 +53,7 @@ export default function Nav() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Purinta on X"
-                className="flex size-[32px] items-center justify-center text-[#181A1F] transition-colors hover:text-[var(--color-green-600)]"
+                className="flex size-[32px] items-center justify-center text-[#B0B2B5] transition-colors hover:text-[var(--color-green-600)]"
               >
                 <XIcon width={20} height={18} />
               </a>
@@ -62,7 +62,7 @@ export default function Nav() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Purinta on Discord"
-                className="flex size-[32px] items-center justify-center text-[#181A1F] transition-colors hover:text-[var(--color-green-600)]"
+                className="flex size-[32px] items-center justify-center text-[#B0B2B5] transition-colors hover:text-[var(--color-green-600)]"
               >
                 <DiscordIcon width={24} height={18.5} />
               </a>
