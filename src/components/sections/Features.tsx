@@ -39,6 +39,9 @@ type CardData = {
   titleCollapsed: string
   body: string
   mascot: string
+  /** Natural pixel size of the mascot artwork — used so the image
+   * renders at 100% of its source dimensions (no scaling). */
+  mascotSize: { w: number; h: number }
   accent: Accent
   /** Per-card blob rotations from Figma — each card has its own
    * organic ellipse shape oriented differently to feel hand-placed. */
@@ -51,7 +54,8 @@ const CARDS: CardData[] = [
     title: 'Borrow Against Memes',
     titleCollapsed: 'Borrow\nAgainst Memes',
     body: 'Lock your PEPE, SHIB, or any supported memecoin as collateral and borrow USDC without selling your bags. Your memes stay yours — you just unlock their liquidity.',
-    mascot: '/assets/figma/features/borrow.webp',
+    mascot: '/assets/figma/features/borrow.png',
+    mascotSize: { w: 254, h: 312 },
     accent: {
       bg: 'var(--color-blush-50)',
       border: 'var(--color-blush-400)',
@@ -64,7 +68,8 @@ const CARDS: CardData[] = [
     title: 'Best APY on the Market',
     titleCollapsed: 'Best APY\non the Market',
     body: 'Competitive rates powered by efficient market design. Lenders earn real yield from memecoin borrowers, while borrowers get the best rates available anywhere.',
-    mascot: '/assets/figma/features/apy.webp',
+    mascot: '/assets/figma/features/apy.png',
+    mascotSize: { w: 225, h: 206 },
     accent: {
       bg: 'var(--color-success-50)',
       border: 'var(--color-success-400)',
@@ -79,7 +84,8 @@ const CARDS: CardData[] = [
     title: 'Built on Morpho',
     titleCollapsed: 'Built on\nMorpho',
     body: "Purinta is built on Morpho's battle-tested lending infrastructure — the same protocol securing billions in DeFi. No shortcuts on security.",
-    mascot: '/assets/figma/features/morpho.webp',
+    mascot: '/assets/figma/features/morpho.png',
+    mascotSize: { w: 321, h: 280 },
     accent: {
       bg: 'var(--color-warning-50)',
       border: 'var(--color-warning-400)',
@@ -93,7 +99,8 @@ const CARDS: CardData[] = [
     title: 'Mainnet Native',
     titleCollapsed: 'Mainnet\nNative',
     body: 'Live on Ethereum mainnet from day one. Deep liquidity, real security, no testnet games. Your memes deserve the real thing.',
-    mascot: '/assets/figma/features/mainnet.webp',
+    mascot: '/assets/figma/features/mainnet.png',
+    mascotSize: { w: 252, h: 319 },
     accent: {
       bg: 'var(--color-info-50)',
       border: 'var(--color-info-400)',
@@ -108,7 +115,8 @@ const CARDS: CardData[] = [
     title: 'Powered by Api3',
     titleCollapsed: 'Powered\nby Api3',
     body: 'First-party oracle feeds with OEV capture. Accurate pricing for your memecoins, with value flowing back to the protocol.',
-    mascot: '/assets/figma/features/api3.webp',
+    mascot: '/assets/figma/features/api3.png',
+    mascotSize: { w: 246, h: 268 },
     accent: {
       bg: 'var(--color-green-50)',
       border: 'var(--color-green-400)',
@@ -539,15 +547,21 @@ function Mascot({
         transition={transition}
       />
 
-      {/* Polaroid mascot illustration */}
+      {/* Polaroid mascot illustration — rendered at its NATURAL pixel
+       * dimensions in both states (per-card mascotSize from CardData),
+       * so the artwork prints at 100% of its source size. The card
+       * pill has overflow-hidden, so the bits that exceed the 198 px
+       * collapsed width are clipped gracefully. */}
       <motion.img
         src={card.mascot}
         alt=""
-        className="relative object-contain drop-shadow-[0_8px_8px_rgba(0,0,0,0.15)]"
+        width={card.mascotSize.w}
+        height={card.mascotSize.h}
+        className="relative max-w-none flex-none drop-shadow-[0_8px_8px_rgba(0,0,0,0.15)]"
         animate={{
+          width: card.mascotSize.w,
+          height: card.mascotSize.h,
           rotate: isActive ? 6 : 0,
-          width: isActive ? 160 : 110,
-          height: isActive ? 160 : 110,
         }}
         transition={transition}
       />
