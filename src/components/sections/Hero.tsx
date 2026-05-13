@@ -32,7 +32,7 @@ export default function Hero() {
   return (
     <section
       ref={ref}
-      className="relative flex min-h-[1100px] w-full flex-col items-center overflow-hidden"
+      className="relative flex min-h-[1300px] w-full flex-col items-center overflow-hidden"
       data-node-id="384:2207"
     >
       {/* ---------- BG layer (1920×1462, overflow-clip) ----------
@@ -61,9 +61,12 @@ export default function Hero() {
             data-node-id="430:4341"
           />
 
-          {/* Hill ellipse — Figma position top 839 of the 1462 bg
-              container, soft blurred ellipse with white → pale-lime
-              gradient. Sits under the mascots as the visual horizon. */}
+          {/* Hill ellipse — soft blurred white→lime gradient that
+              acts as the visual horizon under the meadow. With the
+              section now 1300 px tall (was 1100), the gradient
+              transition zone of the ellipse lands at the section
+              bottom, blending the meadow into the page gradient
+              without a visible cut. */}
           <img
             src="/assets/figma/hill-ellipse.svg"
             alt=""
