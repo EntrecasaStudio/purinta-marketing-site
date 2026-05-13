@@ -193,12 +193,17 @@ export default function Features() {
         <h2 className="text-center font-display text-[44px] leading-[1] font-bold tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
           Why Degens Love Purinta
         </h2>
+      </div>
 
-        {/* Cards row — auto-cycling carousel */}
+      {/* Cards row — pulled OUT of the 1024 safe-area container so it
+          can bleed slightly past it when one card is active (active
+          384 + 4 collapsed × 198 + gaps ≈ 1208 px). Centered on the
+          page instead. */}
+      <div className="mx-auto mt-16 flex w-fit max-w-none justify-center">
         <div
           role="tablist"
           aria-label="Purinta features"
-          className="mt-16 flex gap-[8px]"
+          className="flex gap-[8px]"
           onMouseEnter={() => setHoverPause(true)}
           onMouseLeave={() => setHoverPause(false)}
         >
@@ -248,7 +253,11 @@ function Card({ card, isActive, progress, onSelect }: CardProps) {
       id={`feature-tab-${card.id}`}
       onClick={onSelect}
       animate={{
-        width: isActive ? 384 : 152,
+        /* Collapsed cards stay at the Figma 198 px width even when a
+         * sibling is active — even though the row total then exceeds
+         * the 1024 px safe content area by ~180 px, the user signed
+         * off on letting it overflow. */
+        width: isActive ? 384 : 198,
       }}
       /* Spring tuned to the original snappy feel (~350 ms). Both
        * directions share the same 130 ms delay so the opening and the
@@ -306,15 +315,14 @@ function CollapsedContent({
           lands at the right vertical position. */}
       <div className="w-full" style={{ minHeight: 110 }} aria-hidden />
 
-      {/* Divider — fades to 0 as soon as the card opens, even before
-          this component unmounts on the next render. */}
-      <div
-        className="w-full border-b transition-opacity duration-150"
-        style={{
-          borderColor: card.accent.border,
-          opacity: isActive ? 0 : 1,
-        }}
-      />
+      {/* Divider — only rendered while the card is collapsed (NOT in
+          the expanded state, per the Figma design). */}
+      {!isActive && (
+        <div
+          className="w-full border-b"
+          style={{ borderColor: card.accent.border }}
+        />
+      )}
       {/* Mascot lives outside this component in Card → see <Mascot /> */}
     </motion.div>
   )
