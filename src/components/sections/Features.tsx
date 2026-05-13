@@ -428,8 +428,8 @@ function Star({ card, isActive }: { card: CardData; isActive: boolean }) {
  * the multi-line collapsed form and the wider expanded form without
  * needing a content swap.
  *
- * Per Figma:
- *   collapsed (152 pill): 16/16 Medium tracking 0.48, width ~120, top 80
+ * Per Figma node 454:6635 (all-collapsed) and 383:4216 (expanded):
+ *   collapsed (152 pill): 25/25 Bold tracking 0.5, width ~120, top 80
  *   expanded  (384 pill): 31/31 Semibold tracking 0.62, width ~316, top 72
  * ============================================================ */
 function Title({ card, isActive }: { card: CardData; isActive: boolean }) {
@@ -450,10 +450,10 @@ function Title({ card, isActive }: { card: CardData; isActive: boolean }) {
         top: isActive ? 72 : 80,
         left: isActive ? 32 : 16,
         width: isActive ? 316 : 120,
-        fontSize: isActive ? 31 : 16,
-        lineHeight: isActive ? '31px' : '16px',
-        fontWeight: isActive ? 600 : 500,
-        letterSpacing: isActive ? '0.62px' : '0.48px',
+        fontSize: isActive ? 31 : 25,
+        lineHeight: isActive ? '31px' : '25px',
+        fontWeight: isActive ? 600 : 700,
+        letterSpacing: isActive ? '0.62px' : '0.5px',
       }}
       transition={transition}
     >
