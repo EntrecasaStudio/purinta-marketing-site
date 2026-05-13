@@ -160,14 +160,10 @@ export default function Hero() {
               </p>
             </div>
 
-            {/* CTA — uses shared Button from purinta-app DS (primary, lg) */}
+            {/* CTA — shared Button from purinta-app DS (primary, lg) */}
             <Button variant="primary" size="lg" asChild>
-              <a
-                href="https://app.purinta.xyz"
-                data-node-id="384:2316"
-                className="px-8"
-              >
-                <Plus className="size-5" strokeWidth={2.5} />
+              <a href="https://app.purinta.xyz" data-node-id="384:2316">
+                <Plus className="btn-icon" strokeWidth={2.5} />
                 Launch App
               </a>
             </Button>

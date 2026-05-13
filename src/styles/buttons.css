@@ -1,0 +1,169 @@
+/*
+ * Buttons — ported verbatim from purinta-app/index.html (the live
+ * dapp source of truth, NOT purinta-ui-system.jsx which is an
+ * outdated demo).
+ *
+ * This file is intentionally kept out of index.css so Tailwind v4
+ * does not see it. Tailwind v4 prunes custom rules whose selectors
+ * it cannot statically match against discovered source classes,
+ * which silently strips component CSS like this.
+ *
+ * Tokens (--color-green-XXX, --color-mint-XXX, --color-cream-XXX)
+ * come from the @theme block in index.css and resolve to the same
+ * hex values as the dapp tokens (--green-XXX, --mint-XXX, --cream-XXX).
+ */
+
+.btn {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.3px;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-transform: none;
+  touch-action: manipulation;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+}
+.btn:focus-visible:not(:disabled) {
+  transform: translateY(-3px);
+  outline: 2px solid var(--color-green-300);
+  outline-offset: 2px;
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.96);
+  filter: brightness(0.95);
+}
+
+.btn-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.btn-icon-lg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.btn-full {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Primary — soft mint gradient, dark green text, springy hover
+ * with an "extruded" stamp shadow that grows on hover. */
+.btn-primary {
+  background: linear-gradient(
+    160deg,
+    var(--color-green-200),
+    var(--color-green-300)
+  );
+  color: var(--color-green-700);
+  box-shadow: none;
+  position: relative;
+  overflow: visible;
+  border: none;
+  padding: 13px 28px;
+  letter-spacing: 0.5px;
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-primary:hover:not(:disabled),
+.btn-primary:focus-visible:not(:disabled) {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow:
+    0 6px 0 0 var(--color-green-500),
+    0 10px 20px rgba(57, 118, 61, 0.12);
+}
+.btn-primary:active:not(:disabled) {
+  transform: translateY(2px) scale(0.95);
+  box-shadow: 0 1px 0 0 var(--color-green-300);
+  filter: brightness(0.93);
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+}
+.btn-primary:disabled,
+.btn-primary[disabled],
+.btn-primary[aria-disabled='true'] {
+  background: var(--color-mint-100) !important;
+  color: var(--color-green-200) !important;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Secondary — pale mint surface with a green pill border. */
+.btn-secondary {
+  background: var(--color-mint-100);
+  color: var(--color-green-700);
+  border: 1px solid var(--color-green-300);
+  border-radius: 9999px;
+  padding: 11px 24px 13px;
+  box-shadow: 0 0 0 0 var(--color-green-300);
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-secondary:hover:not(:disabled),
+.btn-secondary:focus-visible:not(:disabled) {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 7px 0 0 var(--color-green-300);
+}
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(1px) scale(0.96);
+  box-shadow: 0 0 0 0 var(--color-green-300);
+  filter: brightness(0.95);
+}
+
+/* Connect — neutral wallet-pill variant (used by the dapp top bar). */
+.btn-connect {
+  background: #ffffff;
+  color: var(--color-neutral-900);
+  border: 1.5px solid var(--color-cream-400);
+  font-size: 13px;
+  padding: 9.5px 16px;
+}
+
+/* Size modifiers */
+.btn-sm {
+  font-size: 13px;
+  padding: 11px 14px;
+}
+.btn-sm .btn-icon,
+.btn-sm i.btn-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+}
+.btn-lg {
+  font-size: 20px;
+  padding: 14.75px 32px;
+}
+
+/* Respect prefers-reduced-motion (vestibular sensitivity) */
+@media (prefers-reduced-motion: reduce) {
+  .btn:hover,
+  .btn:focus-visible,
+  .btn:active,
+  .btn-primary:hover,
+  .btn-primary:focus-visible,
+  .btn-primary:active,
+  .btn-secondary:hover,
+  .btn-secondary:focus-visible,
+  .btn-secondary:active {
+    transform: none;
+    box-shadow: none;
+    filter: none;
+  }
+}

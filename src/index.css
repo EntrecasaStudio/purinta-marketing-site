@@ -257,6 +257,9 @@
   }
 }
 
+/* Button rules live in /src/styles/buttons.css (imported separately
+ * from main.tsx) so Tailwind v4 doesn't prune them. */
+
 /* ---------- Patterns ---------- */
 .pattern-scanlines {
   background-image: repeating-linear-gradient(
