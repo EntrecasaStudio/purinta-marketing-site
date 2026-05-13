@@ -32,7 +32,7 @@ export default function Hero() {
   return (
     <section
       ref={ref}
-      className="relative flex w-full flex-col items-center overflow-hidden"
+      className="relative flex min-h-[1100px] w-full flex-col items-center overflow-hidden"
       style={{ backgroundImage: 'var(--gradient-bg)' }}
       data-node-id="384:2207"
     >
@@ -175,16 +175,16 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      {/* Bottom white fade — soft transition into the next section.
-          Sits on top of the BG image so the scene appears to extend
-          and dissolve into the page background instead of cutting
-          sharply at the section edge. */}
+      {/* Bottom white fade — sits BELOW the mascots so it only touches
+          the meadow strip at the very bottom of the section, blending
+          it into the next section without covering the characters.
+          Mascots end at section y≈906, so the fade starts at y≈960. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute right-0 bottom-0 left-0 z-[7] h-[280px]"
+        className="pointer-events-none absolute right-0 bottom-0 left-0 z-[7] h-[140px]"
         style={{
           backgroundImage:
-            'linear-gradient(to bottom, rgba(254,254,254,0) 0%, rgba(254,254,254,0.6) 50%, rgba(254,254,254,1) 100%)',
+            'linear-gradient(to bottom, rgba(254,254,254,0) 0%, rgba(254,254,254,0.7) 60%, rgba(254,254,254,1) 100%)',
         }}
       />
     </section>
