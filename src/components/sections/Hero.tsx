@@ -40,10 +40,12 @@ export default function Hero() {
           Container matches the image's exact natural size so the
           scene renders at its true proportion (no object-cover crop,
           no stretching). Section overflow-hidden + section min-h
-          decide how much of the scene is visible at each viewport. */}
+          decide how much of the scene is visible at each viewport.
+          Offset -80px to bring the sky / horizon closer to the
+          top of the section per the Figma framing. */}
       <motion.div
         style={{ y: sceneY }}
-        className="pointer-events-none absolute top-0 left-1/2 z-[1] -translate-x-1/2"
+        className="pointer-events-none absolute top-[-80px] left-1/2 z-[1] -translate-x-1/2"
       >
         <div className="relative h-[1462px] w-[1920px] overflow-hidden">
           {/* Scene — Figma node 430:4341 ("Purinta Hero back - 20260512").
