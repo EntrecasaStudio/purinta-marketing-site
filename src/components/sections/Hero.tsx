@@ -182,18 +182,11 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      {/* Bottom white fade — sits BELOW the mascots so it only touches
-          the meadow strip at the very bottom of the section, blending
-          it into the next section without covering the characters.
-          Mascots end at section y≈906, so the fade starts at y≈960. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute right-0 bottom-0 left-0 z-[7] h-[140px]"
-        style={{
-          backgroundImage:
-            'linear-gradient(to bottom, rgba(254,254,254,0) 0%, rgba(254,254,254,0.7) 60%, rgba(254,254,254,1) 100%)',
-        }}
-      />
+      {/* Bottom transition is handled by the Figma hill ellipse SVG
+          inside the bg container (node 384:2217) — a blurred organic
+          ellipse with a #FEFEFE → #F1FCCB (pale lime) linear gradient
+          and a 50 px Gaussian blur. No additional CSS fade on top so
+          the green tones come through. */}
     </section>
   )
 }
