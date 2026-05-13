@@ -176,8 +176,8 @@ export default function Features() {
       data-node-id="383:4066"
     >
       <div className="mx-auto w-full max-w-[1024px] px-6">
-        {/* Title */}
-        <h2 className="text-center font-display text-[44px] leading-[55px] font-bold tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
+        {/* Section title — 100% line-height per Figma */}
+        <h2 className="text-center font-display text-[44px] leading-[1] font-bold tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
           Why Degens Love Purinta
         </h2>
 
@@ -272,9 +272,9 @@ function CollapsedContent({ card }: { card: CardData }) {
         />
       </div>
 
-      {/* Title */}
+      {/* Title — 100% line-height per Figma (matches font-size) */}
       <p
-        className="w-full font-display text-[16px] leading-[26px] font-medium tracking-[0.48px] whitespace-pre-line text-[var(--color-neutral-900)]"
+        className="w-full font-display text-[16px] leading-[16px] font-medium tracking-[0.48px] whitespace-pre-line text-[var(--color-neutral-900)]"
         style={{ paddingBottom: 20 }}
       >
         {card.titleCollapsed}
@@ -327,7 +327,7 @@ function ExpandedContent({
           strokeWidth={1.5}
           style={{ color: card.accent.border }}
         />
-        <h3 className="font-display text-[31px] leading-[37px] font-bold tracking-[0.62px] text-[var(--color-neutral-900)]">
+        <h3 className="font-display text-[31px] leading-[31px] font-bold tracking-[0.62px] text-[var(--color-neutral-900)]">
           {card.title}
         </h3>
         <p className="font-body text-[16px] leading-[26px] tracking-[0.16px] text-[var(--color-neutral-800)]">
