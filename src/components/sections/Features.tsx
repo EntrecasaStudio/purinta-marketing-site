@@ -242,9 +242,10 @@ function Card({ card, isActive, progress, onSelect }: CardProps) {
       animate={{
         width: isActive ? 384 : 152,
       }}
-      /* Softer spring than the default — the pill takes ~600 ms to
-       * settle so the content swap happens after the width is stable. */
-      transition={{ type: 'spring', stiffness: 110, damping: 26, mass: 0.9 }}
+      /* Spring tuned to the original "snappy" feel (settles in ~350 ms).
+       * Content swap is delayed separately so the text still arrives
+       * after the pill is mostly open. */
+      transition={{ type: 'spring', stiffness: 180, damping: 24 }}
       className="relative h-[416px] shrink-0 cursor-pointer overflow-hidden rounded-[24px] border border-solid bg-white text-left transition-colors duration-500 outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
         backgroundColor: isActive ? card.accent.bg : '#FEFEFE',
@@ -254,13 +255,19 @@ function Card({ card, isActive, progress, onSelect }: CardProps) {
       {isActive ? (
         <ExpandedContent card={card} progress={progress} />
       ) : (
-        <CollapsedContent card={card} />
+        <CollapsedContent card={card} isActive={isActive} />
       )}
     </motion.button>
   )
 }
 
-function CollapsedContent({ card }: { card: CardData }) {
+function CollapsedContent({
+  card,
+  isActive,
+}: {
+  card: CardData
+  isActive: boolean
+}) {
   return (
     <motion.div
       key={`${card.id}-collapsed`}
@@ -289,10 +296,14 @@ function CollapsedContent({ card }: { card: CardData }) {
         {card.titleCollapsed}
       </p>
 
-      {/* Divider */}
+      {/* Divider — fades to 0 as soon as the card opens, even before
+          this component unmounts on the next render. */}
       <div
-        className="w-full border-b"
-        style={{ borderColor: card.accent.border }}
+        className="w-full border-b transition-opacity duration-150"
+        style={{
+          borderColor: card.accent.border,
+          opacity: isActive ? 0 : 1,
+        }}
       />
 
       {/* Mascot blob */}
@@ -320,7 +331,7 @@ function ExpandedContent({
   progress: number
 }) {
   /* Stagger the inner content behind the width morph: title + body
-   * + CTA fade in once the pill is mostly settled (~450 ms in). The
+   * + CTA fade in once the pill is mostly settled (~280 ms in). The
    * mascot lags slightly more so the eye lands on the text first. */
   return (
     <motion.div
@@ -328,15 +339,15 @@ function ExpandedContent({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.25, delay: 0.45 }}
+      transition={{ duration: 0.2, delay: 0.28 }}
       id={`feature-panel-${card.id}`}
       className="relative flex h-full flex-col pt-6 pr-4 pb-0 pl-4"
     >
       {/* Star + Title + Body */}
       <motion.div
-        initial={{ opacity: 0, y: 8 }}
+        initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.5, ease: 'easeOut' }}
+        transition={{ duration: 0.22, delay: 0.3, ease: 'easeOut' }}
         className="flex flex-col gap-2 px-4 py-2"
       >
         <Sparkle
@@ -344,10 +355,10 @@ function ExpandedContent({
           strokeWidth={1.5}
           style={{ color: card.accent.border }}
         />
-        <h3 className="font-display text-[31px] leading-[31px] font-bold tracking-[0.62px] text-[var(--color-neutral-900)]">
+        <h3 className="font-display text-[31px] leading-[31px] font-semibold tracking-[0.62px] text-[var(--color-neutral-900)]">
           {card.title}
         </h3>
-        <p className="font-body text-[16px] leading-[26px] tracking-[0.16px] text-[var(--color-neutral-800)]">
+        <p className="font-body text-[16px] leading-[26px] tracking-[0.16px] text-[var(--color-neutral-600)]">
           {card.body}
         </p>
         <a
@@ -361,9 +372,9 @@ function ExpandedContent({
 
       {/* Mascot in lower-right, rotated 6deg (polaroid feel) */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.85, rotate: 0 }}
+        initial={{ opacity: 0, scale: 0.9, rotate: 0 }}
         animate={{ opacity: 1, scale: 1, rotate: 6 }}
-        transition={{ duration: 0.4, delay: 0.55, ease: 'easeOut' }}
+        transition={{ duration: 0.3, delay: 0.35, ease: 'easeOut' }}
         className="pointer-events-none absolute right-2 bottom-0 flex h-[180px] w-[180px] items-center justify-center"
       >
         <div
