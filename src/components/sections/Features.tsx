@@ -177,6 +177,15 @@ export default function Features() {
     <section
       id="features"
       className="relative w-full py-32"
+      style={{
+        /* Features sits on its own light surface, but the top 200 px
+         * fade from transparent → opaque so it blends smoothly with
+         * the hill ellipse glow at the bottom of the hero. Past that
+         * the surface is fully Neutral/50 so the white cards on it
+         * still pop. */
+        backgroundImage:
+          'linear-gradient(to bottom, transparent 0px, var(--color-neutral-50) 240px)',
+      }}
       data-node-id="383:4066"
     >
       <div className="mx-auto w-full max-w-[1024px] px-6">
