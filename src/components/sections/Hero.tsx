@@ -36,22 +36,26 @@ export default function Hero() {
       style={{ backgroundImage: 'var(--gradient-bg)' }}
       data-node-id="384:2207"
     >
-      {/* ---------- BG layer (1920×1461, overflow-clip) ---------- */}
+      {/* ---------- BG layer (1920×1462, overflow-clip) ----------
+          Container matches the image's exact natural size so the
+          scene renders at its true proportion (no object-cover crop,
+          no stretching). Section overflow-hidden + section min-h
+          decide how much of the scene is visible at each viewport. */}
       <motion.div
         style={{ y: sceneY }}
         className="pointer-events-none absolute top-0 left-1/2 z-[1] -translate-x-1/2"
       >
-        <div className="relative h-[1461.385px] w-[1920px] overflow-hidden">
-          {/* Scene — Figma node 430:4341 ("Purinta Hero back - 20260512")
-              Natural 1920×1462. Positioned with inset-0 + object-cover
-              per the Figma export so the sky band lands at the top of
-              the section (where the headline + CTA sit), with the
-              meadow extending below toward the white fade. */}
+        <div className="relative h-[1462px] w-[1920px] overflow-hidden">
+          {/* Scene — Figma node 430:4341 ("Purinta Hero back - 20260512").
+              Natural 1920×1462. Width pinned at the natural size, height
+              auto, so aspect is preserved without any object-fit crop. */}
           <motion.img
             src="/assets/figma/background.webp"
             alt=""
+            width={1920}
+            height={1462}
             style={{ scale: sceneScale }}
-            className="absolute inset-0 size-full max-w-none object-cover"
+            className="block h-auto w-[1920px] max-w-none"
             data-node-id="430:4341"
           />
 
