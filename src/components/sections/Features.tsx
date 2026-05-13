@@ -261,9 +261,11 @@ function Card({ card, isActive, progress, onSelect }: CardProps) {
       {/* AnimatePresence mode="wait" makes the new content wait for
           the previous content to finish its exit animation. Combined
           with the width-spring `delay` above, the sequence is:
-            1. Collapsed (or previous expanded) fades out (~130 ms)
+            1. Collapsed (or previous expanded) text fades out (~130 ms)
             2. Pill widens / shrinks (~350 ms spring)
-            3. New content fades in (with its own internal delays) */}
+            3. New text fades in (with its own internal delays)
+          The mascot + blob below sit OUTSIDE this AnimatePresence,
+          so they stay visible throughout the transition. */}
       <AnimatePresence mode="wait" initial={false}>
         {isActive ? (
           <ExpandedContent
@@ -279,6 +281,10 @@ function Card({ card, isActive, progress, onSelect }: CardProps) {
           />
         )}
       </AnimatePresence>
+
+      {/* Mascot + blob — persistent layer, animates between states
+          rather than fading in/out. */}
+      <Mascot card={card} isActive={isActive} />
     </motion.button>
   )
 }
@@ -328,20 +334,7 @@ function CollapsedContent({
           opacity: isActive ? 0 : 1,
         }}
       />
-
-      {/* Mascot blob */}
-      <div className="relative mt-auto flex h-[150px] w-[150px] items-center justify-center">
-        <div
-          className="absolute h-[120px] w-[135px] rotate-[49deg] rounded-[50%]"
-          style={{ background: card.accent.blob, opacity: 0.6 }}
-        />
-        <img
-          src={card.mascot}
-          alt=""
-          className="relative h-[103px] w-[103px] object-contain"
-          loading="lazy"
-        />
-      </div>
+      {/* Mascot lives outside this component in Card → see <Mascot /> */}
     </motion.div>
   )
 }
@@ -393,24 +386,7 @@ function ExpandedContent({
         </a>
       </motion.div>
 
-      {/* Mascot in lower-right, rotated 6deg (polaroid feel) */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9, rotate: 0 }}
-        animate={{ opacity: 1, scale: 1, rotate: 6 }}
-        transition={{ duration: 0.3, delay: 0.35, ease: 'easeOut' }}
-        className="pointer-events-none absolute right-2 bottom-0 flex h-[180px] w-[180px] items-center justify-center"
-      >
-        <div
-          className="absolute h-[150px] w-[170px] rotate-[68deg] rounded-[50%]"
-          style={{ background: card.accent.blob, opacity: 0.7 }}
-        />
-        <img
-          src={card.mascot}
-          alt=""
-          className="relative h-[160px] w-[160px] object-contain drop-shadow-[0_8px_8px_rgba(0,0,0,0.15)]"
-          loading="lazy"
-        />
-      </motion.div>
+      {/* Mascot lives outside this component in Card → see <Mascot /> */}
 
       {/* Progress bar */}
       <div
@@ -427,6 +403,75 @@ function ExpandedContent({
           }}
         />
       </div>
+    </motion.div>
+  )
+}
+
+/* ============================================================
+ * Mascot — Figma blob SVG behind the polaroid-style illustration.
+ * Lives at the Card level (outside the AnimatePresence text swap)
+ * so it stays mounted across collapsed ↔ expanded transitions and
+ * just animates position / size / rotation.
+ *
+ * The Card pill itself has overflow-hidden so the mascot can sit
+ * flush with the bottom edge.
+ * ============================================================ */
+function Mascot({
+  card,
+  isActive,
+}: {
+  card: CardData
+  isActive: boolean
+}) {
+  const reduceMotion = useReducedMotion()
+
+  /* Single spring keeps the mascot + blob + polaroid feel coherent —
+   * position, size and rotation all share the same transition curve. */
+  const transition = reduceMotion
+    ? { duration: 0 }
+    : ({
+        type: 'spring',
+        stiffness: 180,
+        damping: 24,
+        delay: isActive ? 0.13 : 0,
+      } as const)
+
+  return (
+    <motion.div
+      className="pointer-events-none absolute bottom-0 flex items-center justify-center"
+      animate={{
+        right: isActive ? 12 : 1,
+        width: isActive ? 180 : 150,
+        height: isActive ? 180 : 150,
+      }}
+      transition={transition}
+    >
+      {/* Background blob — real Figma SVG (colored fill baked in) */}
+      <motion.img
+        src={`/assets/figma/features/blob-${card.id}.svg`}
+        alt=""
+        aria-hidden
+        className="absolute"
+        animate={{
+          rotate: isActive && card.id === 'borrow' ? 68 : 50,
+          width: isActive ? 170 : 135,
+          height: isActive ? 150 : 120,
+        }}
+        transition={transition}
+      />
+
+      {/* Polaroid mascot illustration */}
+      <motion.img
+        src={card.mascot}
+        alt=""
+        className="relative object-contain drop-shadow-[0_8px_8px_rgba(0,0,0,0.15)]"
+        animate={{
+          rotate: isActive ? 6 : 0,
+          width: isActive ? 160 : 110,
+          height: isActive ? 160 : 110,
+        }}
+        transition={transition}
+      />
     </motion.div>
   )
 }
