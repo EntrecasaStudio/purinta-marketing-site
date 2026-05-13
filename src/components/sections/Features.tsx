@@ -270,49 +270,36 @@ function Card({ card, isActive, onSelect }: CardProps) {
           changes, instead of unmounting and remounting. That way nothing
           "leaves and re-enters" between auto-cycle ticks; only what is
           truly different (body text per card) fades in place. */}
-      <CollapsedContent card={card} isActive={isActive} />
+      <CollapsedContent isActive={isActive} />
       <ExpandedContent card={card} isActive={isActive} />
 
       {/* Mascot lives BEHIND the text so the polaroid + blob never
-          cover the body / Learn more / title. Star + Title + content
-          layers sit on top via z-10. */}
+          cover the body / Learn more / title. Star + Title + Divider
+          + content layers sit on top via z-10. */}
       <Mascot card={card} isActive={isActive} />
       <Star card={card} isActive={isActive} />
       <Title card={card} isActive={isActive} />
+      <Divider card={card} isActive={isActive} />
     </motion.button>
   )
 }
 
-function CollapsedContent({
-  card,
-  isActive,
-}: {
-  card: CardData
-  isActive: boolean
-}) {
-  /* Stays mounted always — only the divider line cross-fades via the
-   * inline transition below. Star, title and mascot are persistent
-   * siblings in the Card. */
+function CollapsedContent({ isActive }: { isActive: boolean }) {
+  /* Currently CollapsedContent has no per-state body — all the visible
+   * collapsed-state elements (star, title, divider, mascot, blob) are
+   * persistent layers at the Card level. This component is kept as a
+   * placeholder so the Card structure stays symmetric with
+   * ExpandedContent and so we have a hook if we later need any
+   * collapsed-only flourish. */
   return (
     <motion.div
       animate={{ opacity: isActive ? 0 : 1 }}
       transition={{ duration: 0.13, ease: 'easeOut' }}
       className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center px-4 pt-[60px] pb-5"
     >
-      {/* Star + Title live at Card level (persistent across states).
-          Spacer below reserves the visual room for them so the divider
-          lands at the right vertical position. */}
-      <div className="w-full" style={{ minHeight: 110 }} aria-hidden />
-
-      {/* Divider — only rendered while the card is collapsed (NOT in
-          the expanded state, per the Figma design). */}
-      {!isActive && (
-        <div
-          className="w-full border-b"
-          style={{ borderColor: card.accent.border }}
-        />
-      )}
-      {/* Mascot lives outside this component in Card → see <Mascot /> */}
+      {/* Star + Title + Divider live at Card level (persistent across
+          states). See sibling <Divider /> in Card for the line that
+          animates scaleX between states. */}
     </motion.div>
   )
 }
@@ -449,6 +436,38 @@ function Title({ card, isActive }: { card: CardData; isActive: boolean }) {
     >
       {card.title}
     </motion.h3>
+  )
+}
+
+/* ============================================================
+ * Divider — 1 px accent line under the title. Persistent across
+ * states; on activate it collapses from right to left (scaleX
+ * 1 → 0 with origin: left), on de-activate it grows back the
+ * opposite way (0 → 1, sweeping in from left to right).
+ *
+ * Position: y = 60 (pt of CollapsedContent) + 110 (spacer) = 170.
+ * Width spans the card pill width minus 16 px padding each side.
+ * ============================================================ */
+function Divider({
+  card,
+  isActive,
+}: {
+  card: CardData
+  isActive: boolean
+}) {
+  return (
+    <motion.div
+      aria-hidden
+      className="pointer-events-none absolute z-10 origin-left border-b"
+      style={{
+        top: 170,
+        left: 16,
+        right: 16,
+        borderColor: card.accent.border,
+      }}
+      animate={{ scaleX: isActive ? 0 : 1 }}
+      transition={{ duration: 0.45, ease: [0.65, 0, 0.35, 1] }}
+    />
   )
 }
 
