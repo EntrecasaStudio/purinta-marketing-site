@@ -460,7 +460,7 @@ function Title({ card, isActive }: { card: CardData; isActive: boolean }) {
         width: isActive ? 316 : 120,
         fontSize: isActive ? 31 : 25,
         lineHeight: isActive ? '31px' : '25px',
-        fontWeight: isActive ? 600 : 700,
+        fontWeight: 600,
         letterSpacing: isActive ? '0.62px' : '0.5px',
       }}
       transition={transition}
