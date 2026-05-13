@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
 import { ChevronRight, Sparkle } from 'lucide-react'
 
 /**
@@ -259,29 +259,13 @@ function Card({ card, isActive, progress, onSelect }: CardProps) {
         borderColor: card.accent.border,
       }}
     >
-      {/* AnimatePresence mode="wait" makes the new content wait for
-          the previous content to finish its exit animation. Combined
-          with the width-spring `delay` above, the sequence is:
-            1. Collapsed (or previous expanded) text fades out (~130 ms)
-            2. Pill widens / shrinks (~350 ms spring)
-            3. New text fades in (with its own internal delays)
-          The mascot + blob below sit OUTSIDE this AnimatePresence,
-          so they stay visible throughout the transition. */}
-      <AnimatePresence mode="wait" initial={false}>
-        {isActive ? (
-          <ExpandedContent
-            key={`exp-${card.id}`}
-            card={card}
-            progress={progress}
-          />
-        ) : (
-          <CollapsedContent
-            key={`col-${card.id}`}
-            card={card}
-            isActive={isActive}
-          />
-        )}
-      </AnimatePresence>
+      {/* Both content layers stay MOUNTED at all times — the body /
+          Learn-more / divider just cross-fade via opacity when isActive
+          changes, instead of unmounting and remounting. That way nothing
+          "leaves and re-enters" between auto-cycle ticks; only what is
+          truly different (body text per card) fades in place. */}
+      <CollapsedContent card={card} isActive={isActive} />
+      <ExpandedContent card={card} progress={progress} isActive={isActive} />
 
       {/* Star + Title + Mascot — persistent layers, animate between
           states instead of fading. Body text + Learn-more link + the
@@ -300,17 +284,14 @@ function CollapsedContent({
   card: CardData
   isActive: boolean
 }) {
+  /* Stays mounted always — only the divider line cross-fades via the
+   * inline transition below. Star, title and mascot are persistent
+   * siblings in the Card. */
   return (
     <motion.div
-      key={`${card.id}-collapsed`}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      /* Fade out fast (130 ms) before the pill starts widening. The
-       * width spring on the wrapper is delayed by the same amount so
-       * the sequence is: fade → expand → new content. */
+      animate={{ opacity: isActive ? 0 : 1 }}
       transition={{ duration: 0.13, ease: 'easeOut' }}
-      className="flex h-full flex-col items-center px-4 pt-[60px] pb-5"
+      className="pointer-events-none absolute inset-0 flex flex-col items-center px-4 pt-[60px] pb-5"
     >
       {/* Star + Title live at Card level (persistent across states).
           Spacer below reserves the visual room for them so the divider
@@ -334,36 +315,31 @@ function CollapsedContent({
 function ExpandedContent({
   card,
   progress,
+  isActive,
 }: {
   card: CardData
   progress: number
+  isActive: boolean
 }) {
-  /* Stagger the inner content behind the width morph: title + body
-   * + CTA fade in once the pill is mostly settled (~280 ms in). The
-   * mascot lags slightly more so the eye lands on the text first. */
+  /* Stays mounted always — only the body / Learn-more / progress
+   * cross-fade via opacity. Title is persistent at Card level (it
+   * morphs styles rather than fading), so it does NOT live here. */
   return (
     <motion.div
-      key={`${card.id}-expanded`}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      /* Exit in 130 ms — matches the width-spring delay so the body
-       * text is gone BEFORE the pill starts shrinking. Otherwise we
-       * see the lines reflow visibly as the box narrows. */
-      exit={{ opacity: 0, transition: { duration: 0.13, ease: 'easeOut' } }}
-      transition={{ duration: 0.2, delay: 0.28 }}
+      animate={{ opacity: isActive ? 1 : 0 }}
+      transition={{
+        duration: isActive ? 0.22 : 0.13,
+        delay: isActive ? 0.45 : 0,
+        ease: 'easeOut',
+      }}
       id={`feature-panel-${card.id}`}
-      className="relative flex h-full flex-col pt-6 pr-4 pb-0 pl-4"
+      className="pointer-events-none absolute inset-0 flex flex-col pt-6 pr-4 pb-0 pl-4"
     >
       {/* Star + Title live at Card level (persistent across states).
-          This block holds only the body + Learn more (the things that
-          cross-fade on every transition). pt-[110px] reserves space
-          for the star (32–56) + title (~64–120). */}
-      <motion.div
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.22, delay: 0.3, ease: 'easeOut' }}
-        className="flex flex-col gap-2 px-4 pt-[120px] pb-2"
-      >
+          This block holds only the body + Learn-more link — those are
+          the parts that cross-fade. pt-[120px] reserves space for the
+          star (32–56) + title (~64–120). */}
+      <div className="pointer-events-auto flex flex-col gap-2 px-4 pt-[120px] pb-2">
         <p className="font-body text-[16px] leading-[26px] tracking-[0.16px] text-[var(--color-neutral-600)]">
           {card.body}
         </p>
@@ -374,7 +350,7 @@ function ExpandedContent({
           Learn more
           <ChevronRight className="size-4" strokeWidth={2} />
         </a>
-      </motion.div>
+      </div>
 
       {/* Mascot lives outside this component in Card → see <Mascot /> */}
 
