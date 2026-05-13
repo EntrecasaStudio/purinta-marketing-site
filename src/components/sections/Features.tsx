@@ -282,8 +282,9 @@ function Card({ card, isActive, progress, onSelect }: CardProps) {
         )}
       </AnimatePresence>
 
-      {/* Mascot + blob — persistent layer, animates between states
-          rather than fading in/out. */}
+      {/* Star + Mascot — persistent layers, animate between states
+          instead of fading. Only the text and the divider line fade. */}
+      <Star card={card} isActive={isActive} />
       <Mascot card={card} isActive={isActive} />
     </motion.button>
   )
@@ -306,16 +307,9 @@ function CollapsedContent({
        * width spring on the wrapper is delayed by the same amount so
        * the sequence is: fade → expand → new content. */
       transition={{ duration: 0.13, ease: 'easeOut' }}
-      className="flex h-full flex-col items-center px-4 py-5"
+      className="flex h-full flex-col items-center px-4 pt-[60px] pb-5"
     >
-      {/* Star icon */}
-      <div className="self-start py-5">
-        <Sparkle
-          className="size-4"
-          strokeWidth={1.5}
-          style={{ color: card.accent.border }}
-        />
-      </div>
+      {/* Star lives at Card level (persistent across states) */}
 
       {/* Title — 100% line-height per Figma (matches font-size) */}
       <p
@@ -359,18 +353,15 @@ function ExpandedContent({
       id={`feature-panel-${card.id}`}
       className="relative flex h-full flex-col pt-6 pr-4 pb-0 pl-4"
     >
-      {/* Star + Title + Body */}
+      {/* Star lives at Card level (persistent across states) */}
+
+      {/* Title + Body */}
       <motion.div
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.22, delay: 0.3, ease: 'easeOut' }}
-        className="flex flex-col gap-2 px-4 py-2"
+        className="flex flex-col gap-2 px-4 pt-[40px] pb-2"
       >
-        <Sparkle
-          className="size-6"
-          strokeWidth={1.5}
-          style={{ color: card.accent.border }}
-        />
         <h3 className="font-display text-[31px] leading-[31px] font-semibold tracking-[0.62px] text-[var(--color-neutral-900)]">
           {card.title}
         </h3>
@@ -403,6 +394,50 @@ function ExpandedContent({
           }}
         />
       </div>
+    </motion.div>
+  )
+}
+
+/* ============================================================
+ * Star — accent sparkle icon at the top-left of every card.
+ * Persistent across collapsed ↔ expanded (no fade), animates
+ * position and size between the two states.
+ *
+ * Per Figma:
+ *   collapsed (152 pill): 16×16 at left 16, top 40, accent color
+ *   expanded  (384 pill): 24×24 at left 32, top 32, accent color
+ * ============================================================ */
+function Star({ card, isActive }: { card: CardData; isActive: boolean }) {
+  const reduceMotion = useReducedMotion()
+  const transition = reduceMotion
+    ? { duration: 0 }
+    : ({
+        type: 'spring',
+        stiffness: 180,
+        damping: 24,
+        delay: isActive ? 0.13 : 0,
+      } as const)
+
+  return (
+    <motion.div
+      className="pointer-events-none absolute"
+      animate={{
+        top: isActive ? 32 : 40,
+        left: isActive ? 32 : 16,
+      }}
+      transition={transition}
+    >
+      <motion.div
+        animate={{ width: isActive ? 24 : 16, height: isActive ? 24 : 16 }}
+        transition={transition}
+        className="flex items-center justify-center"
+      >
+        <Sparkle
+          className="h-full w-full"
+          strokeWidth={1.5}
+          style={{ color: card.accent.border }}
+        />
+      </motion.div>
     </motion.div>
   )
 }
