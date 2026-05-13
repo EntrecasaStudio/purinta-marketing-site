@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion, useReducedMotion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { ChevronRight, Sparkle } from 'lucide-react'
 
 /**
@@ -243,20 +243,42 @@ function Card({ card, isActive, progress, onSelect }: CardProps) {
         width: isActive ? 384 : 152,
       }}
       /* Spring tuned to the original "snappy" feel (settles in ~350 ms).
-       * Content swap is delayed separately so the text still arrives
-       * after the pill is mostly open. */
-      transition={{ type: 'spring', stiffness: 180, damping: 24 }}
+       * Width delayed by 130 ms so the collapsed content can fade out
+       * first (see AnimatePresence mode="wait" below). The collapsing-
+       * back transition runs without delay. */
+      transition={{
+        type: 'spring',
+        stiffness: 180,
+        damping: 24,
+        delay: isActive ? 0.13 : 0,
+      }}
       className="relative h-[416px] shrink-0 cursor-pointer overflow-hidden rounded-[24px] border border-solid bg-white text-left transition-colors duration-500 outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
         backgroundColor: isActive ? card.accent.bg : '#FEFEFE',
         borderColor: card.accent.border,
       }}
     >
-      {isActive ? (
-        <ExpandedContent card={card} progress={progress} />
-      ) : (
-        <CollapsedContent card={card} isActive={isActive} />
-      )}
+      {/* AnimatePresence mode="wait" makes the new content wait for
+          the previous content to finish its exit animation. Combined
+          with the width-spring `delay` above, the sequence is:
+            1. Collapsed (or previous expanded) fades out (~130 ms)
+            2. Pill widens / shrinks (~350 ms spring)
+            3. New content fades in (with its own internal delays) */}
+      <AnimatePresence mode="wait" initial={false}>
+        {isActive ? (
+          <ExpandedContent
+            key={`exp-${card.id}`}
+            card={card}
+            progress={progress}
+          />
+        ) : (
+          <CollapsedContent
+            key={`col-${card.id}`}
+            card={card}
+            isActive={isActive}
+          />
+        )}
+      </AnimatePresence>
     </motion.button>
   )
 }
@@ -274,9 +296,10 @@ function CollapsedContent({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      /* Exit immediately so we don't see the small layout fighting
-       * with the widening pill. */
-      transition={{ duration: 0.18 }}
+      /* Fade out fast (130 ms) before the pill starts widening. The
+       * width spring on the wrapper is delayed by the same amount so
+       * the sequence is: fade → expand → new content. */
+      transition={{ duration: 0.13, ease: 'easeOut' }}
       className="flex h-full flex-col items-center px-4 py-5"
     >
       {/* Star icon */}
