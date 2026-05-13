@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import { ChevronRight, Sparkle } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 
 /**
  * Features — Figma node 383:4066 ("Why Degens Love Purinta").
@@ -40,6 +40,9 @@ type CardData = {
   body: string
   mascot: string
   accent: Accent
+  /** Per-card blob rotations from Figma — each card has its own
+   * organic ellipse shape oriented differently to feel hand-placed. */
+  blobRotate: { collapsed: number; expanded: number }
 }
 
 const CARDS: CardData[] = [
@@ -54,6 +57,7 @@ const CARDS: CardData[] = [
       border: 'var(--color-blush-400)',
       blob: 'var(--color-blush-300)',
     },
+    blobRotate: { collapsed: -32.4, expanded: 68.88 },
   },
   {
     id: 'apy',
@@ -66,6 +70,7 @@ const CARDS: CardData[] = [
       border: 'var(--color-success-400)',
       blob: 'var(--color-success-200)',
     },
+    blobRotate: { collapsed: 49.81, expanded: 49.81 },
   },
   {
     /* Per Figma node 383:4368: Morpho card uses the Warning palette
@@ -80,6 +85,7 @@ const CARDS: CardData[] = [
       border: 'var(--color-warning-400)',
       blob: 'var(--color-warning-200)',
     },
+    blobRotate: { collapsed: 156.39, expanded: 49.81 },
   },
   {
     /* Per Figma node 383:4769: Mainnet card uses the Info palette (blue). */
@@ -93,6 +99,7 @@ const CARDS: CardData[] = [
       border: 'var(--color-info-400)',
       blob: 'var(--color-info-200)',
     },
+    blobRotate: { collapsed: 68.38, expanded: 49.81 },
   },
   {
     /* Per Figma node 383:5010: Api3 card uses Green (the brand color),
@@ -107,6 +114,7 @@ const CARDS: CardData[] = [
       border: 'var(--color-green-400)',
       blob: 'var(--color-green-100)',
     },
+    blobRotate: { collapsed: -9.47, expanded: 49.81 },
   },
 ]
 
@@ -375,12 +383,15 @@ function ExpandedContent({
 
 /* ============================================================
  * Star — accent sparkle icon at the top-left of every card.
- * Persistent across collapsed ↔ expanded (no fade), animates
- * position and size between the two states.
+ * Uses the actual Figma SVG export so the fill color matches the
+ * design exactly (each card gets a different tint:
+ * borrow=Blush/300, apy=Success/200, morpho=Warning/200,
+ * mainnet=Info/200, api3=Green/100). Persistent across states —
+ * animates only position and size.
  *
  * Per Figma:
- *   collapsed (152 pill): 16×16 at left 16, top 40, accent color
- *   expanded  (384 pill): 24×24 at left 32, top 32, accent color
+ *   collapsed (152 pill): 16×16 at left 16, top 40
+ *   expanded  (384 pill): 24×24 at left 32, top 32
  * ============================================================ */
 function Star({ card, isActive }: { card: CardData; isActive: boolean }) {
   const reduceMotion = useReducedMotion()
@@ -394,26 +405,19 @@ function Star({ card, isActive }: { card: CardData; isActive: boolean }) {
       } as const)
 
   return (
-    <motion.div
+    <motion.img
+      src={`/assets/figma/features/star-${card.id}.svg`}
+      alt=""
+      aria-hidden
       className="pointer-events-none absolute"
       animate={{
         top: isActive ? 32 : 40,
         left: isActive ? 32 : 16,
+        width: isActive ? 24 : 16,
+        height: isActive ? 24 : 16,
       }}
       transition={transition}
-    >
-      <motion.div
-        animate={{ width: isActive ? 24 : 16, height: isActive ? 24 : 16 }}
-        transition={transition}
-        className="flex items-center justify-center"
-      >
-        <Sparkle
-          className="h-full w-full"
-          strokeWidth={1.5}
-          style={{ color: card.accent.border }}
-        />
-      </motion.div>
-    </motion.div>
+    />
   )
 }
 
@@ -497,9 +501,12 @@ function Mascot({
       }}
       transition={transition}
     >
-      {/* Background blob — Figma SVG used as a mask so the fill color
-       * can animate between the collapsed (bg-50, lighter) and the
-       * expanded (blob, darker) shades, mirroring the Figma behavior. */}
+      {/* Background blob — each card uses its OWN unique organic
+       * ellipse shape (Figma assets ellipse-107..111). The shape comes
+       * via mask-image so we can animate background-color between the
+       * collapsed (bg-50, lighter) and the expanded (blob, darker)
+       * shades, matching the Figma behavior. Rotation also animates
+       * per-card to match the hand-placed feel of the design. */}
       <motion.div
         aria-hidden
         className="absolute"
@@ -515,7 +522,9 @@ function Mascot({
         }}
         animate={{
           backgroundColor: isActive ? card.accent.blob : card.accent.bg,
-          rotate: isActive && card.id === 'borrow' ? 68 : 50,
+          rotate: isActive
+            ? card.blobRotate.expanded
+            : card.blobRotate.collapsed,
           width: isActive ? 170 : 135,
           height: isActive ? 150 : 120,
         }}
