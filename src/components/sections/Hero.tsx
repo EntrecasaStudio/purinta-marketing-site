@@ -172,6 +172,19 @@ export default function Hero() {
           </div>
         </motion.div>
       </div>
+
+      {/* Bottom white fade — soft transition into the next section.
+          Sits on top of the BG image so the scene appears to extend
+          and dissolve into the page background instead of cutting
+          sharply at the section edge. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute right-0 bottom-0 left-0 z-[7] h-[280px]"
+        style={{
+          backgroundImage:
+            'linear-gradient(to bottom, rgba(254,254,254,0) 0%, rgba(254,254,254,0.6) 50%, rgba(254,254,254,1) 100%)',
+        }}
+      />
     </section>
   )
 }
