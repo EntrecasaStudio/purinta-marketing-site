@@ -176,13 +176,13 @@ export default function Features() {
   return (
     <section
       id="features"
-      className="relative w-full py-32"
+      /* Negative top margin pulls the entire section UP by 200 px so
+       * the title + cards sit higher in the page, overlapping the
+       * tail of the hero hill ellipse. The cards (z-40) and title
+       * (z-40) paint above the hill (z-30), and the Features bg
+       * gradient still fades in transparent → Neutral/50 underneath. */
+      className="relative -mt-[200px] w-full pt-[60px] pb-32"
       style={{
-        /* Features sits on its own light surface, but the top 200 px
-         * fade from transparent → opaque so it blends smoothly with
-         * the hill ellipse glow at the bottom of the hero. Past that
-         * the surface is fully Neutral/50 so the white cards on it
-         * still pop. */
         backgroundImage:
           'linear-gradient(to bottom, transparent 0px, var(--color-neutral-50) 240px)',
       }}
