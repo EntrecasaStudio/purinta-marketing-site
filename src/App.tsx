@@ -10,7 +10,15 @@ import { useReveal } from '@/hooks/useReveal'
 function App() {
   useReveal()
   return (
-    <div className="bg-background min-h-screen">
+    /* Page-level Blush/50 → Mint/50 gradient (per Figma — every
+     * section in the design sits on this same canvas, individual
+     * surfaces like cards are white on top). Applied on the root so
+     * the gradient is ONE continuous fill across all sections and
+     * doesn't reset at every section boundary. */
+    <div
+      className="min-h-screen"
+      style={{ backgroundImage: 'var(--gradient-bg)' }}
+    >
       <NavMobile />
       <Hero />
       <Features />

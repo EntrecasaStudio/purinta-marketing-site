@@ -33,7 +33,6 @@ export default function Hero() {
     <section
       ref={ref}
       className="relative flex min-h-[1100px] w-full flex-col items-center overflow-hidden"
-      style={{ backgroundImage: 'var(--gradient-bg)' }}
       data-node-id="384:2207"
     >
       {/* ---------- BG layer (1920×1462, overflow-clip) ----------
