@@ -40,24 +40,25 @@ export default function Hero() {
           Container matches the image's exact natural size so the
           scene renders at its true proportion (no object-cover crop,
           no stretching). Section overflow-hidden + section min-h
-          decide how much of the scene is visible at each viewport.
-          Offset -80px to bring the sky / horizon closer to the
-          top of the section per the Figma framing. */}
+          decide how much of the scene is visible at each viewport. */}
       <motion.div
         style={{ y: sceneY }}
-        className="pointer-events-none absolute top-[-80px] left-1/2 z-[1] -translate-x-1/2"
+        className="pointer-events-none absolute top-0 left-1/2 z-[1] -translate-x-1/2"
       >
         <div className="relative h-[1462px] w-[1920px] overflow-hidden">
           {/* Scene — Figma node 430:4341 ("Purinta Hero back - 20260512").
               Natural 1920×1462. Width pinned at the natural size, height
-              auto, so aspect is preserved without any object-fit crop. */}
+              auto, so aspect is preserved without any object-fit crop.
+              Vertical offset -80px so the sky band sits tighter at the
+              top while the mascots / hill / shadows stay anchored at
+              their original positions. */}
           <motion.img
             src="/assets/figma/background.webp"
             alt=""
             width={1920}
             height={1462}
             style={{ scale: sceneScale }}
-            className="block h-auto w-[1920px] max-w-none"
+            className="absolute top-[-80px] left-0 block h-auto w-[1920px] max-w-none"
             data-node-id="430:4341"
           />
 
