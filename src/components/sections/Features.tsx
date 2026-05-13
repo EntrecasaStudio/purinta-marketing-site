@@ -497,13 +497,24 @@ function Mascot({
       }}
       transition={transition}
     >
-      {/* Background blob — real Figma SVG (colored fill baked in) */}
-      <motion.img
-        src={`/assets/figma/features/blob-${card.id}.svg`}
-        alt=""
+      {/* Background blob — Figma SVG used as a mask so the fill color
+       * can animate between the collapsed (bg-50, lighter) and the
+       * expanded (blob, darker) shades, mirroring the Figma behavior. */}
+      <motion.div
         aria-hidden
         className="absolute"
+        style={{
+          WebkitMaskImage: `url(/assets/figma/features/blob-${card.id}.svg)`,
+          WebkitMaskSize: 'contain',
+          WebkitMaskRepeat: 'no-repeat',
+          WebkitMaskPosition: 'center',
+          maskImage: `url(/assets/figma/features/blob-${card.id}.svg)`,
+          maskSize: 'contain',
+          maskRepeat: 'no-repeat',
+          maskPosition: 'center',
+        }}
         animate={{
+          backgroundColor: isActive ? card.accent.blob : card.accent.bg,
           rotate: isActive && card.id === 'borrow' ? 68 : 50,
           width: isActive ? 170 : 135,
           height: isActive ? 150 : 120,
