@@ -399,43 +399,95 @@ function Star({ card, isActive }: { card: CardData; isActive: boolean }) {
 }
 
 /* ============================================================
- * Title — persistent card title. Same text node in both states,
- * just morphs font-size / weight / letter-spacing / width / position.
- * Because the width animates, the text reflows naturally between
- * the multi-line collapsed form and the wider expanded form without
- * needing a content swap.
+ * Title — cross-fades between two separate text nodes (NOT a
+ * single morphing element). Per the typographic / brand consult,
+ * the 2-line collapsed wrap ("Borrow\nAgainst Memes") is a real
+ * design decision — verb isolated, object phrase intact — and
+ * should not be sacrificed to a scale-morph. The container pill
+ * does the continuous work; the two titles fade in / out within
+ * the same slot so the eye reads them as one title transforming.
  *
- * Per Figma node 454:6635 (all-collapsed) and 383:4216 (expanded):
- *   collapsed (152 pill): 25/25 Bold tracking 0.5, width ~120, top 80
- *   expanded  (384 pill): 31/31 Semibold tracking 0.62, width ~316, top 72
+ * Per Figma:
+ *   collapsed (198 pill): 25/25 Semibold tracking 0.5, width ~120,
+ *                         (left 16, top 80)
+ *   expanded  (384 pill): 31/31 Semibold tracking 0.62, width ~316,
+ *                         (left 32, top 72)
+ *
+ * Timing (within the 350 ms pill spring):
+ *   out: 0–140 ms, in: 120–280 ms, 20 ms overlap window
+ *   ease cubic-bezier(0.32, 0.72, 0, 1) on both opacity and y
+ *   3 px y-translate on the incoming element (more reads as a swap)
+ *   60 ms delay so the pill leads, the title follows
  * ============================================================ */
+const TITLE_EASE = [0.32, 0.72, 0, 1] as const
+const TITLE_OUT_DURATION = 0.14
+const TITLE_IN_DURATION = 0.16
+const TITLE_IN_DELAY = 0.12 + 0.06 // 60 ms after the pill's 130 ms delay = ~190 ms total
+
 function Title({ card, isActive }: { card: CardData; isActive: boolean }) {
   const reduceMotion = useReducedMotion()
-  const transition = reduceMotion
+
+  /* Outgoing variant: opacity 1 → 0 immediately on state change.
+     Incoming variant: opacity 0 → 1 after a small lag + slight y-rise. */
+  const outTransition = reduceMotion
     ? { duration: 0 }
-    : ({
-        type: 'spring',
-        stiffness: 180,
-        damping: 24,
-        delay: 0.13,
-      } as const)
+    : { duration: TITLE_OUT_DURATION, ease: TITLE_EASE }
+  const inTransition = reduceMotion
+    ? { duration: 0 }
+    : {
+        duration: TITLE_IN_DURATION,
+        delay: TITLE_IN_DELAY,
+        ease: TITLE_EASE,
+      }
 
   return (
-    <motion.h3
-      className="pointer-events-none absolute m-0 font-display text-[var(--color-neutral-900)]"
-      animate={{
-        top: isActive ? 72 : 80,
-        left: isActive ? 32 : 16,
-        width: isActive ? 316 : 120,
-        fontSize: isActive ? 31 : 25,
-        lineHeight: isActive ? '31px' : '25px',
-        fontWeight: 600,
-        letterSpacing: isActive ? '0.62px' : '0.5px',
-      }}
-      transition={transition}
-    >
-      {card.title}
-    </motion.h3>
+    <>
+      {/* Collapsed variant — visible when !isActive */}
+      <motion.h3
+        aria-hidden={isActive}
+        className="pointer-events-none absolute z-10 m-0 font-display font-semibold whitespace-pre-line text-[var(--color-neutral-900)]"
+        style={{
+          top: 80,
+          left: 16,
+          width: 120,
+          fontSize: 25,
+          lineHeight: '25px',
+          letterSpacing: '0.5px',
+          willChange: 'opacity, transform',
+        }}
+        initial={false}
+        animate={{
+          opacity: isActive ? 0 : 1,
+          y: isActive ? -2 : 0,
+        }}
+        transition={isActive ? outTransition : inTransition}
+      >
+        {card.titleCollapsed}
+      </motion.h3>
+
+      {/* Expanded variant — visible when isActive */}
+      <motion.h3
+        aria-hidden={!isActive}
+        className="pointer-events-none absolute z-10 m-0 font-display font-semibold text-[var(--color-neutral-900)]"
+        style={{
+          top: 72,
+          left: 32,
+          width: 316,
+          fontSize: 31,
+          lineHeight: '31px',
+          letterSpacing: '0.62px',
+          willChange: 'opacity, transform',
+        }}
+        initial={false}
+        animate={{
+          opacity: isActive ? 1 : 0,
+          y: isActive ? 0 : 3,
+        }}
+        transition={isActive ? inTransition : outTransition}
+      >
+        {card.title}
+      </motion.h3>
+    </>
   )
 }
 
