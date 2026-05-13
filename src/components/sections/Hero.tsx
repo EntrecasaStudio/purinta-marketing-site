@@ -32,9 +32,21 @@ export default function Hero() {
   return (
     <section
       ref={ref}
-      className="relative flex min-h-[1300px] w-full flex-col items-center overflow-hidden"
+      className="relative flex min-h-[1300px] w-full flex-col items-center"
       data-node-id="384:2207"
     >
+      {/* Hill ellipse — pulled out of the bg container so the section
+          can have overflow-visible. Positioned absolutely with z-30 so
+          it paints OVER Features' bg plane (z-auto). The Features
+          title / cards have z-40+ so they stay above the hill. */}
+      <img
+        src="/assets/figma/hill-ellipse.svg"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 z-30 h-[1312.311px] w-[2485.428px] max-w-none -translate-x-1/2"
+        style={{ top: 839.17 }}
+        data-node-id="384:2217"
+      />
       {/* ---------- BG layer (1920×1462, overflow-clip) ----------
           Container matches the image's exact natural size so the
           scene renders at its true proportion (no object-cover crop,
@@ -61,18 +73,9 @@ export default function Hero() {
             data-node-id="430:4341"
           />
 
-          {/* Hill ellipse — soft blurred white→lime gradient that
-              acts as the visual horizon under the meadow. With the
-              section now 1300 px tall (was 1100), the gradient
-              transition zone of the ellipse lands at the section
-              bottom, blending the meadow into the page gradient
-              without a visible cut. */}
-          <img
-            src="/assets/figma/hill-ellipse.svg"
-            alt=""
-            className="absolute top-[839.17px] left-[-282.36px] h-[1312.311px] w-[2485.428px] max-w-none"
-            data-node-id="384:2217"
-          />
+          {/* Hill ellipse is now hoisted OUT of the bg container so
+              it can overflow into Features — see <img> at section
+              root above. */}
 
           {/* Drop shadows under mascots */}
           <img
@@ -166,7 +169,7 @@ export default function Hero() {
 
               {/* Sub */}
               <p
-                className="text-center font-body text-[20px] leading-[32px] font-medium tracking-[0.2px] text-[#181A1F]"
+                className="text-center font-body text-[20px] leading-[32px] font-medium tracking-[0.2px] text-[var(--color-neutral-900)]"
                 data-node-id="384:2315"
               >
                 The first lending protocol for memecoin degens —

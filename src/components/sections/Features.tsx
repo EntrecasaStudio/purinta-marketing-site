@@ -188,9 +188,9 @@ export default function Features() {
       }}
       data-node-id="383:4066"
     >
-      <div className="mx-auto w-full max-w-[1024px] px-6">
-        {/* Section title — Rubik (font-body) per Figma, 100% line-height */}
-        <h2 className="text-center font-body text-[44px] leading-[1] font-bold tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
+      <div className="relative z-40 mx-auto w-full max-w-[1024px] px-6">
+        {/* Section title — Rubik Medium 46/46 per Figma. */}
+        <h2 className="text-center font-body text-[44px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
           Why Degens Love Purinta
         </h2>
       </div>
@@ -198,8 +198,9 @@ export default function Features() {
       {/* Cards row — pulled OUT of the 1024 safe-area container so it
           can bleed slightly past it when one card is active (active
           384 + 4 collapsed × 198 + gaps ≈ 1208 px). Centered on the
-          page instead. */}
-      <div className="mx-auto mt-16 flex w-fit max-w-none justify-center">
+          page instead. z-40 so the cards paint above the hero hill
+          ellipse that overflows down into this section. */}
+      <div className="relative z-40 mx-auto mt-16 flex w-fit max-w-none justify-center">
         <div
           role="tablist"
           aria-label="Purinta features"
