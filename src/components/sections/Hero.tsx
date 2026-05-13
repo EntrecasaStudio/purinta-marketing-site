@@ -42,13 +42,15 @@ export default function Hero() {
         className="pointer-events-none absolute top-0 left-1/2 z-[1] -translate-x-1/2"
       >
         <div className="relative h-[1461.385px] w-[1920px] overflow-hidden">
-          {/* Scene */}
+          {/* Scene — Figma node 430:4341 ("Purinta Hero back - 20260512")
+              Natural 1920×1462. Position kept identical to the previous
+              background.png so the mascots and content layer don't shift. */}
           <motion.img
-            src="/assets/figma/background.png"
+            src="/assets/figma/background.webp"
             alt=""
             style={{ scale: sceneScale }}
             className="absolute top-[-22.64%] left-[-0.09%] h-full w-[100.17%] max-w-none object-cover"
-            data-node-id="384:2212"
+            data-node-id="430:4341"
           />
 
           {/* Hill ellipse (under the mascots) */}
