@@ -1,11 +1,12 @@
 import Logo from '@/components/Logo'
+import { asset } from '@/lib/utils'
 
 export default function Footer() {
   return (
     <footer className="relative overflow-hidden">
       <div className="relative h-[350px] w-full md:h-[500px]">
         <img
-          src="/assets/footer-bg.webp"
+          src={asset('/assets/footer-bg.webp')}
           alt=""
           width={1920}
           height={500}

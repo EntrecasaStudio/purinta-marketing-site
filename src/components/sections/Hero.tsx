@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from 'motion/react'
 import { Plus } from 'lucide-react'
 import Nav from '@/components/Nav'
 import { Button } from '@/components/ui/button'
+import { asset } from '@/lib/utils'
 
 /**
  * Hero — Figma node 384:2207 ("Purinta - Desktop 1440px").
@@ -40,7 +41,7 @@ export default function Hero() {
           it paints OVER Features' bg plane (z-auto). The Features
           title / cards have z-40+ so they stay above the hill. */}
       <img
-        src="/assets/figma/hill-ellipse.svg"
+        src={asset('/assets/figma/hill-ellipse.svg')}
         alt=""
         aria-hidden
         className="pointer-events-none absolute left-1/2 z-30 h-[1312.311px] w-[2485.428px] max-w-none -translate-x-1/2"
@@ -64,7 +65,7 @@ export default function Hero() {
               top while the mascots / hill / shadows stay anchored at
               their original positions. */}
           <motion.img
-            src="/assets/figma/background.webp"
+            src={asset('/assets/figma/background.webp')}
             alt=""
             width={1920}
             height={1462}
@@ -79,7 +80,7 @@ export default function Hero() {
 
           {/* Drop shadows under mascots */}
           <img
-            src="/assets/figma/shadows.svg"
+            src={asset('/assets/figma/shadows.svg')}
             alt=""
             className="absolute top-[784px] left-[600.63px] h-[74.208px] w-[747.384px] mix-blend-multiply"
             data-node-id="384:2213"
@@ -94,7 +95,7 @@ export default function Hero() {
             data-node-id="384:2222"
           >
             <img
-              src="/assets/figma/mascots-sprite.png"
+              src={asset('/assets/figma/mascots-sprite.png')}
               alt="Pepe the frog"
               className="absolute top-0 left-[-127.71%] h-full w-[645.9%] max-w-none"
             />
@@ -106,7 +107,7 @@ export default function Hero() {
             data-node-id="384:2220"
           >
             <img
-              src="/assets/figma/mascots-sprite.png"
+              src={asset('/assets/figma/mascots-sprite.png')}
               alt="Shiba the dog"
               className="absolute top-0 left-[-326.81%] h-full w-[511.93%] max-w-none"
             />
@@ -127,7 +128,7 @@ export default function Hero() {
             data-node-id="384:2224"
           >
             <img
-              src="/assets/figma/hero-mascot.svg"
+              src={asset('/assets/figma/hero-mascot.svg')}
               alt="Purinta mascot"
               className="block h-full w-full"
             />

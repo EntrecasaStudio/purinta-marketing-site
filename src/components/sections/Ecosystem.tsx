@@ -1,3 +1,5 @@
+import { asset } from '@/lib/utils'
+
 const pillars = [
   { title: 'Morpho', body: 'Battle-tested lending infrastructure' },
   { title: 'Api3', body: 'First-party oracle feeds with OEV' },
@@ -20,7 +22,7 @@ export default function Ecosystem() {
           <div className="flex justify-center">
             <div style={{ animation: 'float 4s ease-in-out infinite' }}>
               <img
-                src="/assets/mascot-layer.webp"
+                src={asset('/assets/mascot-layer.webp')}
                 alt="Purinta ecosystem"
                 width={208}
                 height={208}

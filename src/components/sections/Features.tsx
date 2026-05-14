@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { ChevronRight } from 'lucide-react'
+import { asset } from '@/lib/utils'
 
 /**
  * Features — Figma node 383:4066 ("Why Degens Love Purinta").
@@ -54,7 +55,7 @@ const CARDS: CardData[] = [
     title: 'Borrow Against Memes',
     titleCollapsed: 'Borrow\nAgainst Memes',
     body: 'Lock your PEPE, SHIB, or any supported memecoin as collateral and borrow USDC without selling your bags. Your memes stay yours — you just unlock their liquidity.',
-    mascot: '/assets/figma/features/borrow.png',
+    mascot: asset('/assets/figma/features/borrow.png'),
     /* Source PNG is exported @2x — divide by 2 for design size. */
     mascotSize: { w: 127, h: 156 },
     accent: {
@@ -69,7 +70,7 @@ const CARDS: CardData[] = [
     title: 'Best APY on the Market',
     titleCollapsed: 'Best APY\non the Market',
     body: 'Competitive rates powered by efficient market design. Lenders earn real yield from memecoin borrowers, while borrowers get the best rates available anywhere.',
-    mascot: '/assets/figma/features/apy.png',
+    mascot: asset('/assets/figma/features/apy.png'),
     mascotSize: { w: 113, h: 103 },
     accent: {
       bg: 'var(--color-success-50)',
@@ -85,7 +86,7 @@ const CARDS: CardData[] = [
     title: 'Built on Morpho',
     titleCollapsed: 'Built on\nMorpho',
     body: "Purinta is built on Morpho's battle-tested lending infrastructure — the same protocol securing billions in DeFi. No shortcuts on security.",
-    mascot: '/assets/figma/features/morpho.png',
+    mascot: asset('/assets/figma/features/morpho.png'),
     mascotSize: { w: 161, h: 140 },
     accent: {
       bg: 'var(--color-warning-50)',
@@ -100,7 +101,7 @@ const CARDS: CardData[] = [
     title: 'Mainnet Native',
     titleCollapsed: 'Mainnet\nNative',
     body: 'Live on Ethereum mainnet from day one. Deep liquidity, real security, no testnet games. Your memes deserve the real thing.',
-    mascot: '/assets/figma/features/mainnet.png',
+    mascot: asset('/assets/figma/features/mainnet.png'),
     mascotSize: { w: 126, h: 160 },
     accent: {
       bg: 'var(--color-info-50)',
@@ -116,7 +117,7 @@ const CARDS: CardData[] = [
     title: 'Powered by Api3',
     titleCollapsed: 'Powered\nby Api3',
     body: 'First-party oracle feeds with OEV capture. Accurate pricing for your memecoins, with value flowing back to the protocol.',
-    mascot: '/assets/figma/features/api3.png',
+    mascot: asset('/assets/figma/features/api3.png'),
     mascotSize: { w: 123, h: 134 },
     accent: {
       bg: 'var(--color-green-50)',
@@ -395,7 +396,7 @@ function Star({ card, isActive }: { card: CardData; isActive: boolean }) {
    * SVG render at its full visual size. */
   return (
     <motion.img
-      src={`/assets/figma/features/star-${card.id}.svg`}
+      src={asset(`/assets/figma/features/star-${card.id}.svg`)}
       alt=""
       aria-hidden
       className="pointer-events-none absolute z-10 block max-w-none"
@@ -585,11 +586,11 @@ function Mascot({
         aria-hidden
         className="absolute"
         style={{
-          WebkitMaskImage: `url(/assets/figma/features/blob-${card.id}.svg)`,
+          WebkitMaskImage: `url(${asset(`/assets/figma/features/blob-${card.id}.svg`)})`,
           WebkitMaskSize: 'contain',
           WebkitMaskRepeat: 'no-repeat',
           WebkitMaskPosition: 'center',
-          maskImage: `url(/assets/figma/features/blob-${card.id}.svg)`,
+          maskImage: `url(${asset(`/assets/figma/features/blob-${card.id}.svg`)})`,
           maskSize: 'contain',
           maskRepeat: 'no-repeat',
           maskPosition: 'center',
