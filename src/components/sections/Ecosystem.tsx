@@ -3,14 +3,12 @@ import { asset } from '@/lib/utils'
 /**
  * Ecosystem ("Built on Giants") — Figma node 495:11656.
  *
- * Section structure:
- *   - Soft white → Blush/100 → white vertical gradient bg
- *   - Decorative layer behind: large isometric "squares" pattern (top
- *     and bottom), floating dollar-bill graphics, vertical "PURINTA"
- *     wordmark, central mascot stamp
- *   - Foreground: H2 title + subtitle + 4 "pillar" feature cards in
- *     a flex row, each card with the signature 3-rounded-corner shape
- *     and sticker-style offset drop shadow (Mint/100)
+ * The decorative layer is laid out inside a fixed 1920×1596 reference
+ * frame (the Figma artboard) centered horizontally, so every absolute
+ * offset below is a 1:1 copy of the Figma coordinates. On narrow
+ * viewports the frame crops via the section's `overflow-hidden`; below
+ * `md` the decoration is hidden entirely and only the copy + cards
+ * stack.
  */
 
 type Pillar = {
@@ -25,25 +23,25 @@ const pillars: Pillar[] = [
   {
     title: 'Morpho',
     body: 'Battle-tested lending\ninfrastructure',
-    logo: asset('/assets/figma/ecosystem/logo-morpho.png'),
+    logo: asset('/assets/figma/ecosystem/logo-morpho.svg'),
     logoSize: { w: 60, h: 56 },
   },
   {
     title: 'Api3',
     body: 'First-party oracle feeds with OEV',
-    logo: asset('/assets/figma/ecosystem/logo-api3.png'),
+    logo: asset('/assets/figma/ecosystem/logo-api3.svg'),
     logoSize: { w: 64, h: 56 },
   },
   {
     title: 'Ethereum',
     body: 'Mainnet native,\ndeep liquidity',
-    logo: asset('/assets/figma/ecosystem/logo-eth.png'),
+    logo: asset('/assets/figma/ecosystem/logo-eth.svg'),
     logoSize: { w: 44, h: 72 },
   },
   {
     title: 'USDC',
     body: 'Borrow the most trusted stablecoin',
-    logo: asset('/assets/figma/ecosystem/logo-usdc.png'),
+    logo: asset('/assets/figma/ecosystem/logo-usdc.svg'),
     logoSize: { w: 56, h: 56 },
   },
 ]
@@ -52,7 +50,7 @@ export default function Ecosystem() {
   return (
     <section
       id="ecosystem"
-      className="relative w-full overflow-hidden py-32"
+      className="relative w-full overflow-hidden"
       /* Per Figma: subtle gradient peaks at Blush/100 around 86 % of
        * the section height, fading back to Neutral/50 at top and bottom
        * so the blush tint sits below the cards near the mascot zone. */
@@ -62,71 +60,111 @@ export default function Ecosystem() {
       }}
     >
       {/* ---------- Decorative background layer ----------
-       *  All elements `pointer-events-none` and behind the content
-       *  (z-0). Positions are absolute pixel offsets calibrated for
-       *  the ~1440 px Figma frame; on narrower viewports they crop
-       *  naturally via the section's `overflow-hidden`. */}
-      <div className="pointer-events-none absolute inset-0 z-0">
+       *  A fixed 1920×1596 reference frame, centered horizontally.
+       *  Every child uses absolute pixel offsets copied straight from
+       *  the Figma artboard. Hidden below `md` to avoid a tall empty
+       *  band on mobile. */}
+      <div className="pointer-events-none absolute top-0 left-1/2 z-0 hidden h-[1596px] w-[1920px] -translate-x-1/2 md:block">
         {/* Top isometric squares pattern (rotated 180° per Figma) */}
         <img
-          src={asset('/assets/figma/ecosystem/squares-top.png')}
+          src={asset('/assets/figma/ecosystem/squares-top.svg')}
           alt=""
           aria-hidden
-          className="absolute -top-10 left-1/2 h-[1085px] w-[1435px] max-w-none -translate-x-1/2 rotate-180"
+          className="absolute top-[52px] left-[242px] h-[1085px] w-[1436px] max-w-none rotate-180"
         />
         {/* Bottom isometric squares pattern */}
         <img
-          src={asset('/assets/figma/ecosystem/squares-bottom.png')}
+          src={asset('/assets/figma/ecosystem/squares-bottom.svg')}
           alt=""
           aria-hidden
-          className="absolute -bottom-5 left-1/2 h-[839px] w-[1435px] max-w-none -translate-x-1/2"
+          className="absolute top-[776px] left-[242px] h-[839px] w-[1436px] max-w-none"
         />
 
+        {/* Decorative katakana "プ" mark, top-left */}
+        <img
+          src={asset('/assets/figma/ecosystem/katakana.svg')}
+          alt=""
+          aria-hidden
+          className="absolute top-[71px] left-[342px] h-[182px] w-[174px] max-w-none"
+        />
         {/* Vertical "PURINTA" wordmark on the left */}
         <img
-          src={asset('/assets/figma/ecosystem/purinta-vertical.png')}
+          src={asset('/assets/figma/ecosystem/purinta-vertical.svg')}
           alt=""
           aria-hidden
-          className="absolute top-[180px] left-[160px] h-[519px] w-[34px] max-w-none"
+          className="absolute top-[274px] left-[361px] h-[519px] w-[34px] max-w-none"
         />
 
-        {/* Floating dollar bills — 4 of them at hand-placed angles */}
+        {/* Floating dollar bill — top right */}
         <img
-          src={asset('/assets/figma/ecosystem/bill-1.png')}
+          src={asset('/assets/figma/ecosystem/bill-1.svg')}
           alt=""
           aria-hidden
-          className="absolute top-[60px] right-[80px] w-[220px] max-w-none rotate-[-12deg]"
+          className="absolute top-[370px] left-[1334px] h-[283px] w-[375px] max-w-none rotate-[-11.69deg]"
         />
+        {/* Composite bill tucked behind bill-1 */}
         <img
-          src={asset('/assets/figma/ecosystem/bill-2.png')}
+          src={asset('/assets/figma/ecosystem/bill-comp-base.svg')}
           alt=""
           aria-hidden
-          className="absolute top-[680px] left-[420px] w-[200px] max-w-none rotate-[34deg]"
-        />
-        <img
-          src={asset('/assets/figma/ecosystem/bill-3.png')}
-          alt=""
-          aria-hidden
-          className="absolute top-[700px] left-[760px] w-[210px] max-w-none rotate-[34deg]"
-        />
-        <img
-          src={asset('/assets/figma/ecosystem/bill-4.png')}
-          alt=""
-          aria-hidden
-          className="absolute top-[900px] left-[440px] w-[280px] max-w-none rotate-[-6deg]"
+          className="absolute top-[156px] left-[1191px] h-[140px] w-[244px] max-w-none rotate-[34.06deg]"
         />
 
-        {/* Central tofu mascot — peeking out from the squares bg */}
+        {/* Isometric stepped platform under the mascot — 3 stacked
+         * cubes, drawn back-to-front so each lower tier overlaps the
+         * one behind it. */}
         <img
-          src={asset('/assets/figma/ecosystem/mascot.png')}
+          src={asset('/assets/figma/ecosystem/cube-side.svg')}
           alt=""
           aria-hidden
-          className="absolute top-[640px] left-1/2 w-[260px] max-w-none -translate-x-1/2"
+          className="absolute top-[1096px] left-[774px] h-[216px] w-[373px] max-w-none"
+        />
+        <img
+          src={asset('/assets/figma/ecosystem/cube-side.svg')}
+          alt=""
+          aria-hidden
+          className="absolute top-[1158px] left-[774px] h-[216px] w-[373px] max-w-none"
+        />
+        <img
+          src={asset('/assets/figma/ecosystem/cube-side.svg')}
+          alt=""
+          aria-hidden
+          className="absolute top-[1220px] left-[774px] h-[216px] w-[373px] max-w-none"
+        />
+
+        {/* Floating dollar bills around the platform */}
+        <img
+          src={asset('/assets/figma/ecosystem/bill-2.svg')}
+          alt=""
+          aria-hidden
+          className="absolute top-[922px] left-[541px] h-[106px] w-[185px] max-w-none rotate-[34.06deg]"
+        />
+        <img
+          src={asset('/assets/figma/ecosystem/bill-3.svg')}
+          alt=""
+          aria-hidden
+          className="absolute top-[1075px] left-[1009px] h-[574px] w-[588px] max-w-none rotate-[34.06deg]"
+        />
+
+        {/* Central tofu mascot — standing on the cube platform */}
+        <img
+          src={asset('/assets/figma/ecosystem/mascot.svg')}
+          alt=""
+          aria-hidden
+          className="absolute top-[872px] left-[796px] h-[303px] w-[305px] max-w-none"
+        />
+
+        {/* Foreground dollar bill — overlaps the mascot's feet */}
+        <img
+          src={asset('/assets/figma/ecosystem/bill-4.svg')}
+          alt=""
+          aria-hidden
+          className="absolute top-[1190px] left-[523px] h-[150px] w-[262px] max-w-none rotate-[-6.34deg]"
         />
       </div>
 
       {/* ---------- Foreground content ---------- */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col items-center gap-[72px] px-6">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col items-center gap-[72px] px-6 py-24 md:h-[1596px] md:justify-start md:py-0 md:pt-[207px]">
         {/* Copy block — title + subtitle */}
         <div className="flex w-full flex-col items-center gap-4">
           <h2 className="reveal reveal-up text-center font-display text-[68px] leading-[68px] font-bold tracking-[0.76px] text-[#185229] md:text-[76px] md:leading-[76px]">

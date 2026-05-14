@@ -66,8 +66,9 @@ const steps: Step[] = [
      * the PNG export). */
     mascot: asset('/assets/figma/how-it-works/step-1.png'),
     /* Manual nudge: -100 left from Figma's 0 to pull the mascot
-     * further toward the title column's left edge. */
-    mascotPosition: { top: 40, left: -100, width: 296 },
+     * further toward the title column's left edge; +96 top to drop it
+     * down into the bottom curve of the "1". */
+    mascotPosition: { top: 136, left: -100, width: 296 },
     numberPosition: { top: 0, left: 126 },
   },
   {
