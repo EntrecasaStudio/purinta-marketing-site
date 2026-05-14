@@ -1,8 +1,36 @@
 import { useRef } from 'react'
-import { motion, useScroll, useTransform } from 'motion/react'
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from 'motion/react'
 import { Plus } from 'lucide-react'
 import Nav from '@/components/Nav'
 import { Button } from '@/components/ui/button'
+
+/* ============================================================
+ * Entrance cascade timeline (seconds from mount):
+ *
+ *   t=0.00 →  BG illustration (scene + mascots + hill ellipse + shadows)
+ *             starts fading in over 1.2 s — longer than the other
+ *             steps so the artwork has a deliberate, hand-drawn reveal
+ *             instead of snapping in.
+ *   t=0.50 →  Nav drops in from a few px above
+ *   t=0.95 →  Headline rises + fades
+ *   t=1.08 →  Subtitle rises + fades
+ *   t=1.21 →  Launch App CTA rises + fades
+ *
+ * Each subsequent element starts mid-way through the previous one so
+ * the page reads as a single sweep top-to-bottom, not as 6 disjoint
+ * fades. prefers-reduced-motion skips every entrance and snaps the
+ * page to its rest state.
+ * ============================================================ */
+const BG_FADE = { duration: 1.2, ease: 'easeOut' } as const
+const NAV_RISE = { duration: 0.55, delay: 0.5, ease: 'easeOut' } as const
+const CONTENT_BASE_DELAY = 0.95
+const CONTENT_STAGGER = 0.13
+const CONTENT_RISE_DURATION = 0.55
 
 /**
  * Hero — Figma node 384:2207 ("Purinta - Desktop 1440px").
@@ -17,6 +45,7 @@ import { Button } from '@/components/ui/button'
  */
 export default function Hero() {
   const ref = useRef<HTMLElement>(null)
+  const reduceMotion = useReducedMotion()
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start start', 'end start'],
@@ -29,6 +58,22 @@ export default function Hero() {
   const contentY = useTransform(scrollYProgress, [0, 1], ['0%', '-30%'])
   const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0])
 
+  /* When the user prefers reduced motion, skip all entrance fades —
+   * `initial={false}` jumps each element straight to its rest state. */
+  const bgInitial = reduceMotion ? false : { opacity: 0 }
+  const navInitial = reduceMotion ? false : { opacity: 0, y: -8 }
+  const contentInitial = reduceMotion ? false : { opacity: 0, y: 16 }
+  const bgTransition = reduceMotion ? { duration: 0 } : BG_FADE
+  const navTransition = reduceMotion ? { duration: 0 } : NAV_RISE
+  const contentTransition = (index: number) =>
+    reduceMotion
+      ? { duration: 0 }
+      : ({
+          duration: CONTENT_RISE_DURATION,
+          delay: CONTENT_BASE_DELAY + index * CONTENT_STAGGER,
+          ease: 'easeOut',
+        } as const)
+
   return (
     <section
       ref={ref}
@@ -39,12 +84,15 @@ export default function Hero() {
           can have overflow-visible. Positioned absolutely with z-30 so
           it paints OVER Features' bg plane (z-auto). The Features
           title / cards have z-40+ so they stay above the hill. */}
-      <img
+      <motion.img
         src="/assets/figma/hill-ellipse.svg"
         alt=""
         aria-hidden
         className="pointer-events-none absolute left-1/2 z-30 h-[1312.311px] w-[2485.428px] max-w-none -translate-x-1/2"
         style={{ top: 839.17 }}
+        initial={bgInitial}
+        animate={{ opacity: 1 }}
+        transition={bgTransition}
         data-node-id="384:2217"
       />
       {/* ---------- BG layer (1920×1462, overflow-clip) ----------
@@ -54,6 +102,9 @@ export default function Hero() {
           decide how much of the scene is visible at each viewport. */}
       <motion.div
         style={{ y: sceneY }}
+        initial={bgInitial}
+        animate={{ opacity: 1 }}
+        transition={bgTransition}
         className="pointer-events-none absolute top-0 left-1/2 z-[1] -translate-x-1/2"
       >
         <div className="relative h-[1462px] w-[1920px] overflow-hidden">
@@ -139,9 +190,14 @@ export default function Hero() {
       <div className="h-[48px] w-full" />
 
       {/* ---------- Nav ---------- */}
-      <div className="relative z-50 w-full px-4">
+      <motion.div
+        className="relative z-50 w-full px-4"
+        initial={navInitial}
+        animate={{ opacity: 1, y: 0 }}
+        transition={navTransition}
+      >
         <Nav />
-      </div>
+      </motion.div>
 
       {/* ---------- Hero content (1280 × 668, pt-58 pb-148) ---------- */}
       <div className="relative z-10 flex w-full flex-col items-center">
@@ -151,40 +207,54 @@ export default function Hero() {
         >
           <div className="flex w-full flex-col items-center gap-[16px]">
             <div className="flex flex-col items-center gap-[10px]">
-              {/* Headline */}
-              <h1
+              {/* Headline — first cascade step */}
+              <motion.h1
                 className="text-center font-display text-[76px] leading-[76px] font-bold tracking-[0.76px] text-[#333]"
                 style={{
                   textShadow: '2px 2px 8px rgba(254, 254, 254, 0.52)',
                   width: '731.684px',
                   maxWidth: '100%',
                 }}
+                initial={contentInitial}
+                animate={{ opacity: 1, y: 0 }}
+                transition={contentTransition(0)}
                 data-node-id="384:2313"
               >
                 Deposit Memes,
                 <br />
                 <span className="text-[var(--color-green-500)]">Print</span>{' '}
                 USDC.
-              </h1>
+              </motion.h1>
 
-              {/* Sub */}
-              <p
+              {/* Sub — second cascade step */}
+              <motion.p
                 className="text-center font-body text-[20px] leading-[32px] font-medium tracking-[0.2px] text-[var(--color-neutral-900)]"
+                initial={contentInitial}
+                animate={{ opacity: 1, y: 0 }}
+                transition={contentTransition(1)}
                 data-node-id="384:2315"
               >
                 The first lending protocol for memecoin degens —
                 <br />
                 lock your bags, borrow USDC, keep the upside.
-              </p>
+              </motion.p>
             </div>
 
-            {/* CTA — shared Button from purinta-app DS (primary, lg) */}
-            <Button variant="primary" size="lg" asChild>
-              <a href="https://app.purinta.xyz" data-node-id="384:2316">
-                <Plus className="btn-icon" strokeWidth={2.5} />
-                Launch App
-              </a>
-            </Button>
+            {/* CTA — third cascade step. Wrap the shared Button in a
+             * motion.div so we don't have to thread motion props into
+             * the design-system component itself. */}
+            <motion.div
+              initial={contentInitial}
+              animate={{ opacity: 1, y: 0 }}
+              transition={contentTransition(2)}
+            >
+              <Button variant="primary" size="lg" asChild>
+                <a href="https://app.purinta.xyz" data-node-id="384:2316">
+                  <Plus className="btn-icon" strokeWidth={2.5} />
+                  Launch App
+                </a>
+              </Button>
+            </motion.div>
           </div>
         </motion.div>
       </div>

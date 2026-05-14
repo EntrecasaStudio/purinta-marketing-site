@@ -20,7 +20,7 @@ const links = [
 export default function Nav() {
   return (
     <nav
-      className="fade-in-on-load relative z-50 mx-auto hidden h-[84px] w-full max-w-[1280px] items-center justify-center rounded-[64px] bg-[#FEFEFE] px-[40px] py-[24px] shadow-[0_4px_24px_rgba(24,82,41,0.06)] md:flex"
+      className="relative z-50 mx-auto hidden h-[84px] w-full max-w-[1280px] items-center justify-center rounded-[64px] bg-[#FEFEFE] px-[40px] py-[24px] shadow-[0_4px_24px_rgba(24,82,41,0.06)] md:flex"
       data-node-id="384:2293"
     >
       <div className="flex w-full items-center justify-between pl-4">

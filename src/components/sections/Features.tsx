@@ -46,6 +46,22 @@ type CardData = {
   /** Per-card blob rotations from Figma — each card has its own
    * organic ellipse shape oriented differently to feel hand-placed. */
   blobRotate: { collapsed: number; expanded: number }
+  /** Optional per-card overrides for the expanded blob / image anchor
+   * positions. Each value REPLACES the default for that property:
+   *   - right N : element's right edge is N px inside the card's right
+   *   - bottom N: element's bottom edge is N px above the card's bottom
+   * Negative values let the element overhang past the card. */
+  expandedOverride?: {
+    blob?: { right?: number; bottom?: number }
+    image?: { right?: number; bottom?: number }
+  }
+  /** Same shape as `expandedOverride` but applied when the card is in
+   * its COLLAPSED state. Use when a card's mascot reads off-center
+   * against the narrow pill. */
+  collapsedOverride?: {
+    blob?: { right?: number; bottom?: number }
+    image?: { right?: number; bottom?: number }
+  }
 }
 
 const CARDS: CardData[] = [
@@ -63,6 +79,14 @@ const CARDS: CardData[] = [
       blob: 'var(--color-blush-300)',
     },
     blobRotate: { collapsed: -32.4, expanded: 68.88 },
+    /* Defaults are blob {right:28,bottom:48} / image {right:-8,bottom:-34}.
+     * Borrow's mascot is taller than the others (127×156 vs ~110×140),
+     * so the blob needs to sit lower-and-rightward, and the polaroid
+     * pulls 16 px leftward to land balanced against the title column. */
+    expandedOverride: {
+      blob: { right: 16, bottom: 33 },
+      image: { right: 8 },
+    },
   },
   {
     id: 'apy',
@@ -77,6 +101,22 @@ const CARDS: CardData[] = [
       blob: 'var(--color-success-200)',
     },
     blobRotate: { collapsed: 49.81, expanded: 49.81 },
+    /* APY's mascot is the shortest (113×103) so it floats too low and
+     * the blob sits too high relative to the polaroid. Pull the image
+     * up 30 and left 32 (16 + another 16); drop the blob 16 so they
+     * recompose. (The blob stays put — only the mascot shifts further
+     * left to balance against the title column.) */
+    expandedOverride: {
+      blob: { bottom: 32 },
+      image: { right: 24, bottom: -4 },
+    },
+    /* Collapsed: bump the mascot up 32 px from the default (60 → 92)
+     * so the shorter 103 px-tall polaroid sits at a similar visual
+     * height to the taller mascots on the neighbouring cards. The
+     * blob keeps its default 75 px bottom — only the image moves. */
+    collapsedOverride: {
+      image: { bottom: 92 },
+    },
   },
   {
     /* Per Figma node 383:4368: Morpho card uses the Warning palette
@@ -93,6 +133,11 @@ const CARDS: CardData[] = [
       blob: 'var(--color-warning-200)',
     },
     blobRotate: { collapsed: 156.39, expanded: 49.81 },
+    /* Lift the polaroid 32 px in expanded (default bottom -34 → -2)
+     * so the butterfly composition isn't half-cut by the card edge. */
+    expandedOverride: {
+      image: { bottom: -2 },
+    },
   },
   {
     /* Per Figma node 383:4769: Mainnet card uses the Info palette (blue). */
@@ -108,6 +153,12 @@ const CARDS: CardData[] = [
       blob: 'var(--color-info-200)',
     },
     blobRotate: { collapsed: 68.38, expanded: 49.81 },
+    /* Mainnet expanded: pull the polaroid 32 px LEFT (right -8 → 24)
+     * so the crystal/cloud illustration balances against the title
+     * column instead of bleeding past the right edge. */
+    expandedOverride: {
+      image: { right: 24 },
+    },
   },
   {
     /* Per Figma node 383:5010: Api3 card uses Green (the brand color),
@@ -124,6 +175,12 @@ const CARDS: CardData[] = [
       blob: 'var(--color-green-100)',
     },
     blobRotate: { collapsed: -9.47, expanded: 49.81 },
+    /* Api3 expanded: shift the polaroid 32 px LEFT and 32 px UP from
+     * the default expanded anchor so the flexing-arms pose sits
+     * centered against the title column, not hugging the corner. */
+    expandedOverride: {
+      image: { right: 24, bottom: -2 },
+    },
   },
 ]
 
@@ -189,8 +246,11 @@ export default function Features() {
       data-node-id="383:4066"
     >
       <div className="relative z-40 mx-auto w-full max-w-[1024px] px-6">
-        {/* Section title — Rubik Medium 46/46 per Figma. */}
-        <h2 className="text-center font-body text-[44px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
+        {/* Section title — Rubik Medium 46/46 per Figma. The
+         * `reveal reveal-up` classes hook into the global useReveal
+         * hook in App.tsx for the original-reference-site entrance
+         * (fade in + slight rise on intersection). */}
+        <h2 className="reveal reveal-up text-center font-body text-[44px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
           Why Degens Love Purinta
         </h2>
       </div>
@@ -214,6 +274,7 @@ export default function Features() {
               card={card}
               isActive={i === activeIdx}
               onSelect={() => handleSelect(i)}
+              index={i}
             />
           ))}
         </div>
@@ -237,39 +298,59 @@ type CardProps = {
   card: CardData
   isActive: boolean
   onSelect: () => void
+  /** Position of this card in the row (0..4) — drives the entrance
+   * stagger so the cards appear one after the other as the user
+   * scrolls them into view. */
+  index: number
 }
 
-function Card({ card, isActive, onSelect }: CardProps) {
+function Card({ card, isActive, onSelect, index }: CardProps) {
   const ref = useRef<HTMLButtonElement>(null)
 
   return (
-    <motion.button
-      ref={ref}
-      role="tab"
-      type="button"
-      aria-selected={isActive}
-      aria-controls={`feature-panel-${card.id}`}
-      id={`feature-tab-${card.id}`}
-      onClick={onSelect}
-      animate={{
-        /* Collapsed cards stay at the Figma 198 px width even when a
-         * sibling is active — even though the row total then exceeds
-         * the 1024 px safe content area by ~180 px, the user signed
-         * off on letting it overflow. */
-        width: isActive ? 384 : 198,
-      }}
-      /* Spring tuned to the original snappy feel (~350 ms). Both
-       * directions share the same 130 ms delay so the opening and the
-       * closing cards start widening / shrinking at the EXACT same
-       * moment — that way the row stays exactly 1024 px wide throughout
-       * the transition instead of momentarily collapsing under that. */
+    /* Wrapper drives the SCROLL-IN entrance animation (opacity + rise)
+     * with a staggered delay per `index`. It's the flex item — the
+     * button inside resizes (width animate) within the wrapper, so
+     * the entrance and the auto-cycle width transitions don't fight
+     * each other (each owns a distinct property + transition). */
+    <motion.div
+      className="shrink-0"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
       transition={{
-        type: 'spring',
-        stiffness: 180,
-        damping: 24,
-        delay: 0.13,
+        duration: 0.55,
+        delay: index * 0.08,
+        ease: 'easeOut',
       }}
-      className="relative h-[416px] shrink-0 cursor-pointer overflow-hidden rounded-[24px] border border-solid bg-white text-left transition-colors duration-500 outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+    >
+      <motion.button
+        ref={ref}
+        role="tab"
+        type="button"
+        aria-selected={isActive}
+        aria-controls={`feature-panel-${card.id}`}
+        id={`feature-tab-${card.id}`}
+        onClick={onSelect}
+        animate={{
+          /* Collapsed cards are 152 px wide (Figma node 454:8821).
+           * With 1 expanded (384) + 4 collapsed (152) + 4 gaps (8 each)
+           * the row totals exactly 1024 px — fitting the safe content
+           * area perfectly without the overflow the 198 variant had. */
+          width: isActive ? 384 : 152,
+        }}
+        /* Spring tuned to the original snappy feel (~350 ms). Both
+         * directions share the same 130 ms delay so the opening and the
+         * closing cards start widening / shrinking at the EXACT same
+         * moment — that way the row stays exactly 1024 px wide throughout
+         * the transition instead of momentarily collapsing under that. */
+        transition={{
+          type: 'spring',
+          stiffness: 180,
+          damping: 24,
+          delay: 0.13,
+        }}
+        className="relative h-[416px] cursor-pointer rounded-[24px] border border-solid bg-white text-left transition-colors duration-500 outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
         backgroundColor: isActive ? card.accent.bg : '#FEFEFE',
         borderColor: card.accent.border,
@@ -280,17 +361,29 @@ function Card({ card, isActive, onSelect }: CardProps) {
           changes, instead of unmounting and remounting. That way nothing
           "leaves and re-enters" between auto-cycle ticks; only what is
           truly different (body text per card) fades in place. */}
-      <CollapsedContent isActive={isActive} />
-      <ExpandedContent card={card} isActive={isActive} />
+      {/* Clip-wrapper — masks any content that would otherwise spill
+       * past the card's rounded boundary (notably the expanded h3
+       * title, which is wider than the collapsed pill and overflows
+       * during the width-expand animation). Everything inside is
+       * clipped to the rounded card shape; the polaroid IMAGE is
+       * rendered OUTSIDE this wrapper so it can still float past the
+       * card edge in the active state. */}
+      <div className="absolute inset-0 overflow-hidden rounded-[24px]">
+        <CollapsedContent isActive={isActive} />
+        <ExpandedContent card={card} isActive={isActive} />
+        {/* Blob lives BEHIND the text layers — Star + Title + Divider
+         * sit on top via z-10. */}
+        <MascotBlob card={card} isActive={isActive} />
+        <Star card={card} isActive={isActive} />
+        <Title card={card} isActive={isActive} />
+        <Divider card={card} isActive={isActive} />
+      </div>
 
-      {/* Mascot lives BEHIND the text so the polaroid + blob never
-          cover the body / Learn more / title. Star + Title + Divider
-          + content layers sit on top via z-10. */}
-      <Mascot card={card} isActive={isActive} />
-      <Star card={card} isActive={isActive} />
-      <Title card={card} isActive={isActive} />
-      <Divider card={card} isActive={isActive} />
-    </motion.button>
+      {/* Polaroid — outside the clip wrapper so it can float past the
+       * card boundary as a sticker in the expanded state. */}
+      <MascotImage card={card} isActive={isActive} />
+      </motion.button>
+    </motion.div>
   )
 }
 
@@ -376,29 +469,61 @@ function ExpandedContent({
  * a visual size of ~35×35 (collapsed) / ~52×52 (expanded), with
  * the SVG's viewBox 35.0772 × 35.077.
  * ============================================================ */
+/* Per-card stroke colors for the star outline — matches each Figma
+ * star-*.svg file's `stroke="..."` hardcoded value. Kept as a const
+ * table (instead of on CardData) because the stroke is tied to the
+ * SVG shape itself, not the card's broader accent system. */
+const STAR_STROKES: Record<string, string> = {
+  borrow: '#FEAAA4', // Blush/500
+  apy: '#41C8BD', // Success/500
+  morpho: '#F98C4B', // Warning/500
+  mainnet: '#669FFF', // Info/400
+  api3: '#57A053', // Green/400
+}
+
+/* Path data for the 25% star — identical across all card-specific
+ * star-*.svg files (only the fill / stroke colors differ between
+ * them), so we inline the geometry once and let `motion.path`
+ * animate the fill between states. */
+const STAR_FILL_PATH =
+  'M17.3998 8.30777C17.2328 8.31472 17.1007 8.40515 17.0589 8.54428L15.3824 13.6502L15.3338 13.8033L15.1877 13.8659L9.74782 16.1406C9.58782 16.2102 9.53217 16.3354 9.53913 16.4467C9.54608 16.558 9.61565 16.6832 9.7826 16.7388L15.0625 18.4223L15.2085 18.471L15.2711 18.617L17.678 24.0986C17.7406 24.2378 17.8798 24.3143 18.0537 24.3073C18.2206 24.3004 18.3528 24.203 18.3945 24.0639L20.1267 18.2414L20.1823 18.0675L20.3562 18.0118L25.2952 16.4049C25.4691 16.3493 25.5387 16.2171 25.5387 16.0989C25.5387 15.9806 25.4691 15.8554 25.2952 15.7928L20.3771 14.1998L20.231 14.1511L20.1684 14.005L17.7685 8.52341L17.7476 8.46776C17.678 8.35646 17.5528 8.30081 17.3998 8.31472V8.30777Z'
+const STAR_STROKE_PATH =
+  'M17.3805 7.84683C17.0611 7.86017 16.7281 8.04505 16.6178 8.4103L14.9596 13.4601L9.56994 15.715L9.56408 15.7169C9.22644 15.8637 9.05962 16.17 9.07873 16.4757C9.09695 16.7655 9.28265 17.0589 9.63635 17.1769L9.64221 17.1789L14.8668 18.8439L17.2555 24.2843L17.2574 24.2882C17.4115 24.6302 17.7469 24.7816 18.0719 24.7687H18.0729C18.4085 24.7547 18.7306 24.5494 18.8365 24.1964V24.1955L20.5514 18.4328L25.4362 16.8439C25.7619 16.7395 25.9491 16.4854 25.9908 16.215L26.0006 16.0988L25.9908 15.9787C25.9472 15.7042 25.7544 15.4676 25.4518 15.3585L25.4371 15.3537L20.5738 13.7785L18.194 8.3439L18.1793 8.30581L18.1393 8.2228C17.9847 7.97551 17.7313 7.86176 17.4762 7.85269C17.4448 7.84742 17.4127 7.84548 17.3805 7.84683Z'
+
 function Star({ card, isActive }: { card: CardData; isActive: boolean }) {
   const reduceMotion = useReducedMotion()
+  /* No delay — the star repositions IN PARALLEL with the divider's
+   * disappearing scaleX (both start at t=0), instead of waiting for
+   * the 130 ms pill delay like the mascot does. That keeps the upper
+   * card area visually coordinated during state changes. */
   const transition = reduceMotion
     ? { duration: 0 }
-    : ({
-        type: 'spring',
-        stiffness: 180,
-        damping: 24,
-        delay: isActive ? 0.13 : 0,
-      } as const)
+    : ({ type: 'spring', stiffness: 180, damping: 24 } as const)
+  const fillTransition = reduceMotion
+    ? { duration: 0 }
+    : ({ duration: 0.45, ease: 'easeOut' } as const)
 
-  /* Anchor box per Figma was 16 (collapsed) / 24 (expanded) at the
-   * top-left, but the visible star glyph extends past it via negative
-   * insets, giving an actual visual size of 35×35 / 52.7×52.7. We
-   * just position the rendered <img> directly at those coordinates
-   * (anchor_left + inset_left, anchor_top + inset_top) and let the
-   * SVG render at its full visual size. */
+  /* Star is rendered as an inline `<motion.svg>` so the stroke (a
+   * separate colored path) is preserved while the inner fill path can
+   * animate its `fill` attribute between states. Per the Figma design:
+   *   collapsed → fill = light accent.blob shade + stroke outline
+   *   expanded  → fill = white (#FEFEFE) + same stroke outline
+   *
+   * Anchor box was 16 (collapsed) / 24 (expanded) at the top-left in
+   * Figma but the visible star glyph extends past it via negative
+   * insets, giving an actual visual size of 35×35 / 52.7×52.7. */
   return (
-    <motion.img
-      src={`/assets/figma/features/star-${card.id}.svg`}
-      alt=""
+    <motion.svg
       aria-hidden
-      className="pointer-events-none absolute z-10 block max-w-none"
+      viewBox="0 0 35.0772 35.077"
+      fill="none"
+      preserveAspectRatio="none"
+      className="pointer-events-none absolute z-10"
+      style={{
+        /* Matches the original SVG drop-shadow filter (Cream/500 at
+         * 30 % alpha, soft 4.3 px blur, 1.2 px y-offset). */
+        filter: 'drop-shadow(0 1.23px 4.31px rgba(214, 210, 178, 0.3))',
+      }}
       animate={{
         top: isActive ? 19.5 : 31.7,
         left: isActive ? 17.7 : 6.5,
@@ -406,7 +531,20 @@ function Star({ card, isActive }: { card: CardData; isActive: boolean }) {
         height: isActive ? 52.66 : 35.08,
       }}
       transition={transition}
-    />
+    >
+      <motion.path
+        d={STAR_FILL_PATH}
+        initial={false}
+        animate={{ fill: isActive ? '#FEFEFE' : card.accent.blob }}
+        transition={fillTransition}
+      />
+      <path
+        d={STAR_STROKE_PATH}
+        stroke={STAR_STROKES[card.id] ?? card.accent.border}
+        strokeWidth="0.923085"
+        strokeLinejoin="round"
+      />
+    </motion.svg>
   )
 }
 
@@ -459,12 +597,18 @@ function Title({ card, isActive }: { card: CardData; isActive: boolean }) {
         aria-hidden={isActive}
         className="pointer-events-none absolute z-10 m-0 font-display font-semibold whitespace-pre-line text-[var(--color-neutral-900)]"
         style={{
+          /* Smaller (16/16) per the 152 px-wide collapsed card spec
+           * but kept at top:80 (same as the original 198 variant) so
+           * the cross-fade between the collapsed and expanded title
+           * variants stays smooth — pushing top down to 120 made the
+           * two variants too far apart in the viewport and the fade
+           * read as a visible jump. */
           top: 80,
           left: 16,
           width: 120,
-          fontSize: 25,
-          lineHeight: '25px',
-          letterSpacing: '0.5px',
+          fontSize: 16,
+          lineHeight: '16px',
+          letterSpacing: '0.32px',
           willChange: 'opacity, transform',
         }}
         initial={false}
@@ -537,26 +681,27 @@ function Divider({
 }
 
 /* ============================================================
- * Mascot — Figma blob SVG behind the polaroid-style illustration.
- * Lives at the Card level (outside the AnimatePresence text swap)
- * so it stays mounted across collapsed ↔ expanded transitions and
- * just animates position / size / rotation.
+ * Mascot pieces — SPLIT INTO TWO COMPONENTS so the Card can render
+ * the blob INSIDE a clip-wrapper (clipped to the card's rounded
+ * boundary along with the text layers) while keeping the polaroid
+ * image OUTSIDE the clip so it can still float past the card edge:
  *
- * The Card pill itself has overflow-hidden so the mascot can sit
- * flush with the bottom edge.
+ *   <Card>
+ *     <ClipWrapper overflow-hidden rounded>
+ *       …text + <MascotBlob />…   ← all clipped to card
+ *     </ClipWrapper>
+ *     <MascotImage />              ← floats freely past card
+ *   </Card>
+ *
+ * Each card has a unique blob shape (Figma ellipse-107..111) and
+ * rotation per state, plus a polaroid mascot at its natural pixel
+ * size scaled 1.4× when expanded.
  * ============================================================ */
-function Mascot({
-  card,
-  isActive,
-}: {
-  card: CardData
-  isActive: boolean
-}) {
+function useMascotTransition(isActive: boolean) {
   const reduceMotion = useReducedMotion()
-
-  /* Single spring keeps the mascot + blob + polaroid feel coherent —
-   * position, size and rotation all share the same transition curve. */
-  const transition = reduceMotion
+  /* Shared spring so the blob + polaroid feel coherent — position,
+   * size and rotation all use the same curve in both pieces. */
+  return reduceMotion
     ? { duration: 0 }
     : ({
         type: 'spring',
@@ -564,65 +709,106 @@ function Mascot({
         damping: 24,
         delay: isActive ? 0.13 : 0,
       } as const)
+}
+
+function MascotBlob({
+  card,
+  isActive,
+}: {
+  card: CardData
+  isActive: boolean
+}) {
+  const transition = useMascotTransition(isActive)
+
+  /* Anchor insets — per-card overrides applied on top of defaults.
+   * Collapsed defaults center the 135 px-wide blob horizontally in
+   * the new 152 px card ((152-135)/2 ≈ 9) and lift it up to ~75 px
+   * from the bottom so it sits centered-ish under the title rather
+   * than tucked into the bottom-right corner. */
+  const right = isActive
+    ? (card.expandedOverride?.blob?.right ?? 28)
+    : (card.collapsedOverride?.blob?.right ?? 9)
+  const bottom = isActive
+    ? (card.expandedOverride?.blob?.bottom ?? 48)
+    : (card.collapsedOverride?.blob?.bottom ?? 75)
 
   return (
     <motion.div
-      className="pointer-events-none absolute bottom-0 flex items-center justify-center"
+      aria-hidden
+      className="pointer-events-none absolute"
+      style={{
+        WebkitMaskImage: `url(/assets/figma/features/blob-${card.id}.svg)`,
+        WebkitMaskSize: 'contain',
+        WebkitMaskRepeat: 'no-repeat',
+        WebkitMaskPosition: 'center',
+        maskImage: `url(/assets/figma/features/blob-${card.id}.svg)`,
+        maskSize: 'contain',
+        maskRepeat: 'no-repeat',
+        maskPosition: 'center',
+      }}
       animate={{
-        right: isActive ? 12 : 1,
-        width: isActive ? 180 : 150,
-        height: isActive ? 180 : 150,
+        right,
+        bottom,
+        width: isActive ? 170 : 135,
+        height: isActive ? 150 : 120,
+        backgroundColor: isActive ? card.accent.blob : card.accent.bg,
+        rotate: isActive
+          ? card.blobRotate.expanded
+          : card.blobRotate.collapsed,
       }}
       transition={transition}
-    >
-      {/* Background blob — each card uses its OWN unique organic
-       * ellipse shape (Figma assets ellipse-107..111). The shape comes
-       * via mask-image so we can animate background-color between the
-       * collapsed (bg-50, lighter) and the expanded (blob, darker)
-       * shades, matching the Figma behavior. Rotation also animates
-       * per-card to match the hand-placed feel of the design. */}
-      <motion.div
-        aria-hidden
-        className="absolute"
-        style={{
-          WebkitMaskImage: `url(/assets/figma/features/blob-${card.id}.svg)`,
-          WebkitMaskSize: 'contain',
-          WebkitMaskRepeat: 'no-repeat',
-          WebkitMaskPosition: 'center',
-          maskImage: `url(/assets/figma/features/blob-${card.id}.svg)`,
-          maskSize: 'contain',
-          maskRepeat: 'no-repeat',
-          maskPosition: 'center',
-        }}
-        animate={{
-          backgroundColor: isActive ? card.accent.blob : card.accent.bg,
-          rotate: isActive
-            ? card.blobRotate.expanded
-            : card.blobRotate.collapsed,
-          width: isActive ? 170 : 135,
-          height: isActive ? 150 : 120,
-        }}
-        transition={transition}
-      />
+    />
+  )
+}
 
-      {/* Polaroid mascot illustration — rendered at its NATURAL pixel
-       * dimensions in both states (per-card mascotSize from CardData),
-       * so the artwork prints at 100% of its source size. The card
-       * pill has overflow-hidden, so the bits that exceed the 198 px
-       * collapsed width are clipped gracefully. */}
-      <motion.img
-        src={card.mascot}
-        alt=""
-        width={card.mascotSize.w}
-        height={card.mascotSize.h}
-        className="relative max-w-none flex-none drop-shadow-[0_8px_8px_rgba(0,0,0,0.15)]"
-        animate={{
-          width: card.mascotSize.w,
-          height: card.mascotSize.h,
-          rotate: isActive ? 6 : 0,
-        }}
-        transition={transition}
-      />
-    </motion.div>
+function MascotImage({
+  card,
+  isActive,
+}: {
+  card: CardData
+  isActive: boolean
+}) {
+  const transition = useMascotTransition(isActive)
+
+  /* Collapsed `right` is computed per-card so the polaroid is
+   * horizontally CENTERED in the 152 px card regardless of its
+   * natural width: right = (152 - mascot.w) / 2. The wider morpho
+   * mascot (161) goes slightly negative — its arms intentionally
+   * extend past the card edge per the Figma design.
+   * Collapsed `bottom` lifts the polaroid 60 px above the card's
+   * bottom so it sits near the lower-middle of the card under the
+   * title block, instead of flush with the bottom edge. */
+  const right = isActive
+    ? (card.expandedOverride?.image?.right ?? -8)
+    : (card.collapsedOverride?.image?.right ??
+       Math.round((152 - card.mascotSize.w) / 2))
+  const bottom = isActive
+    ? (card.expandedOverride?.image?.bottom ?? -34)
+    : (card.collapsedOverride?.image?.bottom ?? 60)
+
+  return (
+    /* Polaroid scales 1.4× when expanded (Figma 454:8816 — polaroid
+     * 177×221 vs collapsed 127×156 = 1.39× linear). Origin bottom-right
+     * so scale grows up-and-left from a fixed anchor; in expanded the
+     * anchor is OUTSIDE the card so the polaroid floats past the
+     * boundary, in collapsed it tucks into the bottom-right corner. */
+    <motion.img
+      src={card.mascot}
+      alt=""
+      aria-hidden
+      width={card.mascotSize.w}
+      height={card.mascotSize.h}
+      className="pointer-events-none absolute max-w-none drop-shadow-[0_8px_8px_rgba(0,0,0,0.15)]"
+      style={{ transformOrigin: 'bottom right' }}
+      animate={{
+        right,
+        bottom,
+        width: card.mascotSize.w,
+        height: card.mascotSize.h,
+        rotate: isActive ? 6 : 0,
+        scale: isActive ? 1.4 : 1,
+      }}
+      transition={transition}
+    />
   )
 }

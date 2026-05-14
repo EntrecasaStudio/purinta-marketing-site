@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 374.741 218.006" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="cube-group">
+<path id="top-face" d="M141.753 12.8602C166.947 -1.6855 207.794 -1.68553 232.988 12.8602L353.894 82.6655C379.088 97.2112 379.088 120.795 353.894 135.34L232.988 205.146C207.794 219.691 166.947 219.691 141.753 205.146L20.8464 135.34C-4.34754 120.795 -4.34759 97.2113 20.8463 82.6656L141.753 12.8602Z" fill="url(#paint0_linear_0_219)" stroke="var(--stroke-0, #C8E6D0)" stroke-width="3.90183"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_219" x1="293.44" y1="47.764" x2="187.369" y2="231.484" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFEEED"/>
+<stop offset="1" stop-color="#FFFDF3"/>
+</linearGradient>
+</defs>
+</svg>
