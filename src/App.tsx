@@ -16,8 +16,18 @@ function App() {
      * the gradient is ONE continuous fill across all sections and
      * doesn't reset at every section boundary. */
     <div
+      /* overflow-x: clip clips the wide absolute layers in the Hero
+       * (the 1920 px background scene + the 2485 px hill ellipse,
+       * both centered with -translate-x-1/2) so they don't trigger a
+       * horizontal scrollbar on viewports < 2485 px. Unlike
+       * `overflow: hidden`, `clip` does NOT establish a scroll
+       * container, so `position: sticky` in HowItWorks keeps
+       * pinning to the viewport correctly. */
       className="min-h-screen"
-      style={{ backgroundImage: 'var(--gradient-bg)' }}
+      style={{
+        backgroundImage: 'var(--gradient-bg)',
+        overflowX: 'clip',
+      }}
     >
       <NavMobile />
       <Hero />
