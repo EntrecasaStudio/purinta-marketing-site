@@ -179,8 +179,12 @@ export default function Ecosystem() {
           </p>
         </div>
 
-        {/* Pillar cards — 4 in a row, stack on narrow viewports */}
-        <div className="flex w-full flex-col gap-6 md:flex-row md:items-stretch">
+        {/* Pillar cards — 4 in a row, stack on narrow viewports.
+         * `md:-mx-6 md:w-[calc(100%+3rem)]` cancels the foreground's
+         * `px-6` mobile gutter on desktop so the row spans the full
+         * 1024 px Figma width — without it the cards are 12 px narrower
+         * each and "Battle-tested lending" wraps to a 2nd line. */}
+        <div className="flex w-full flex-col gap-6 md:-mx-6 md:w-[calc(100%+3rem)] md:flex-row md:items-stretch">
           {pillars.map((p, i) => (
             <div
               key={p.title}

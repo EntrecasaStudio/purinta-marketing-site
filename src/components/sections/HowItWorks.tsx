@@ -6,6 +6,7 @@ import {
   useScroll,
   useTransform,
 } from 'motion/react'
+import { ChevronRight } from 'lucide-react'
 import { asset } from '@/lib/utils'
 
 /**
@@ -55,6 +56,11 @@ type Step = {
    * at x=0 within the number column (454:7100 / 7181 / 7195) — so only
    * the vertical offset varies per step. */
   numberTop: number
+  /** Per-step accent colors from Figma — the giant numeral and the
+   * panel title. Each step keys to its own palette family (green /
+   * cream / blush). */
+  numberColor: string
+  titleColor: string
 }
 
 const steps: Step[] = [
@@ -71,6 +77,8 @@ const steps: Step[] = [
      * the centered "1" moved, so the number + mascot stay a unit. */
     mascotPosition: { top: 120, left: -129, width: 296 },
     numberTop: 0,
+    numberColor: '#498746', // Green/500
+    titleColor: '#57A053', // Green/400
   },
   {
     num: '2',
@@ -89,6 +97,8 @@ const steps: Step[] = [
      * the centered "2" moved, so the number + mascot stay a unit. */
     mascotPosition: { top: 94, left: -129, width: 353 },
     numberTop: 16,
+    numberColor: '#8B8765', // Cream/900
+    titleColor: '#8B8765', // Cream/900
   },
   {
     num: '3',
@@ -103,14 +113,16 @@ const steps: Step[] = [
      * unit. */
     mascotPosition: { top: 105, left: -70, width: 256 },
     numberTop: 0,
+    numberColor: '#CC5550', // Blush/700
+    titleColor: '#CC5550', // Blush/700
   },
 ]
 
-/* Per-panel backgrounds from Figma (454:7098 / 7179 / 7193). */
+/* Per-panel backgrounds from Figma (495:11062 / 11099 / 11113). */
 const BG_COLORS = [
   '#FEFEFE', // Neutral/50  — Step 1
-  '#E7F4EC', // Mint/100   — Step 2
-  '#C8E6D0', // Mint/300   — Step 3
+  '#F0EDD4', // Cream/300   — Step 2
+  '#FEC4C0', // Blush/400   — Step 3
 ] as const
 
 /* Active-step thresholds. The flip happens slightly BEFORE each panel
@@ -204,7 +216,7 @@ export default function HowItWorks() {
     return (
       <section id="how-it-works" className="relative w-full">
         <div className="py-12 text-center">
-          <h2 className="font-body text-[44px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
+          <h2 className="font-body text-[39px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)]">
             How It Works
           </h2>
         </div>
@@ -268,7 +280,7 @@ export default function HowItWorks() {
               className="shrink-0"
               style={{ width: NUMBER_COL_FLOW_WIDTH }}
             />
-            <h2 className="reveal reveal-up font-body text-[44px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
+            <h2 className="reveal reveal-up font-body text-[39px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)]">
               How It Works
             </h2>
           </div>
@@ -320,14 +332,17 @@ export default function HowItWorks() {
         {/* ---------- Bottom: docs link (persistent across panels) ----------
          *  A flex child (not absolute) so it bookends the track — the
          *  panel content centers in the gap between this row and the
-         *  title row above. */}
+         *  title row above. Styled per Figma (node 495:11195): Rubik
+         *  Medium 15/20, Green/600, no underline, chevron-right icon,
+         *  sitting 40 px off the viewport bottom. */}
         <a
           href="https://docs.purinta.xyz/"
           target="_blank"
           rel="noopener noreferrer"
-          className="z-10 mb-8 shrink-0 self-center font-body text-[15px] leading-[20px] text-[var(--color-neutral-800)] underline underline-offset-4 transition-opacity hover:opacity-70"
+          className="z-10 mb-10 flex shrink-0 items-center gap-[2px] self-center font-body text-[15px] leading-[20px] font-medium text-[var(--color-green-600)] transition-opacity hover:opacity-70"
         >
-          Learn more in the docs →
+          Learn more in the docs
+          <ChevronRight className="size-5" strokeWidth={2.5} />
         </a>
       </motion.div>
     </section>
@@ -376,7 +391,7 @@ function PanelContent({ step, isActive }: { step: Step; isActive: boolean }) {
             lineHeight: 1,
             fontWeight: 500,
             letterSpacing: '-21.87px',
-            color: '#498746',
+            color: step.numberColor,
           }}
         >
           {step.num}
@@ -428,8 +443,9 @@ function PanelContent({ step, isActive }: { step: Step; isActive: boolean }) {
          * the bounce reads as the title "popping up" from the baseline
          * rather than scaling from its own center. */}
         <motion.h3
-          className="font-display font-bold whitespace-pre-line text-[#57A053]"
+          className="font-display font-bold whitespace-pre-line"
           style={{
+            color: step.titleColor,
             fontSize: 95,
             lineHeight: '95px',
             letterSpacing: '0.95px',

@@ -5,7 +5,6 @@ import {
   useScroll,
   useTransform,
 } from 'motion/react'
-import { Plus } from 'lucide-react'
 import Nav from '@/components/Nav'
 import { Button } from '@/components/ui/button'
 import { asset } from '@/lib/utils'
@@ -223,8 +222,7 @@ export default function Hero() {
               >
                 Deposit Memes,
                 <br />
-                <span className="text-[var(--color-green-500)]">Print</span>{' '}
-                USDC.
+                Print USDC.
               </motion.h1>
 
               {/* Sub — second cascade step */}
@@ -251,7 +249,6 @@ export default function Hero() {
             >
               <Button variant="primary" size="lg" asChild>
                 <a href="https://app.purinta.xyz" data-node-id="384:2316">
-                  <Plus className="btn-icon" strokeWidth={2.5} />
                   Launch App
                 </a>
               </Button>

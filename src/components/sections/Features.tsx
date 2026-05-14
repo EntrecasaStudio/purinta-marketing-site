@@ -247,11 +247,11 @@ export default function Features() {
       data-node-id="383:4066"
     >
       <div className="relative z-40 mx-auto w-full max-w-[1024px] px-6">
-        {/* Section title — Rubik Medium 46/46 per Figma. The
-         * `reveal reveal-up` classes hook into the global useReveal
+        {/* Section title — Rubik Medium 39px per Figma (UI/2xl-medium).
+         * The `reveal reveal-up` classes hook into the global useReveal
          * hook in App.tsx for the original-reference-site entrance
          * (fade in + slight rise on intersection). */}
-        <h2 className="reveal reveal-up text-center font-body text-[44px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
+        <h2 className="reveal reveal-up text-center font-body text-[39px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)]">
           Why Degens Love Purinta
         </h2>
       </div>
