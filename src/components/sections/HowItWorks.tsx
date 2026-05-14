@@ -6,6 +6,7 @@ import {
   useScroll,
   useTransform,
 } from 'motion/react'
+import { asset } from '@/lib/utils'
 
 /**
  * HowItWorks — Figma node 454:7091.
@@ -63,7 +64,7 @@ const steps: Step[] = [
     /* Figma node 454:7100. Number at ml-126 mt-0; mascot wrapper at
      * ml-0 mt-40.17 with rotation -12.65° (rotation already baked into
      * the PNG export). */
-    mascot: '/assets/figma/how-it-works/step-1.png',
+    mascot: asset('/assets/figma/how-it-works/step-1.png'),
     /* Manual nudge: -100 left from Figma's 0 to pull the mascot
      * further toward the title column's left edge. */
     mascotPosition: { top: 40, left: -100, width: 296 },
@@ -79,7 +80,7 @@ const steps: Step[] = [
      * wrapper (311×284) because the character's arms overflow LEFT of
      * the wrapper bounds, so we shift left by -42 to keep the wrapper
      * origin aligned with the column origin. */
-    mascot: '/assets/figma/how-it-works/step-2.png',
+    mascot: asset('/assets/figma/how-it-works/step-2.png'),
     /* Manual nudge: +82 top from Figma's 0 to drop the mascot down
      * so it sits aligned with the bottom hump of the "2". */
     mascotPosition: { top: 82, left: -42, width: 353 },
@@ -91,7 +92,7 @@ const steps: Step[] = [
     body: 'Use your USDC anywhere. When ready, repay your loan and get your memecoins back. Moon mission intact.',
     /* Figma node 454:7195. Number at ml-97.47 mt-0; mascot frame at
      * ml-0 mt-34.54 (no outer rotation). */
-    mascot: '/assets/figma/how-it-works/step-3.png',
+    mascot: asset('/assets/figma/how-it-works/step-3.png'),
     /* Manual nudge: +70 top and -16 left from Figma's 35,0 — drops
      * the peaceful mascot lower into the bottom curve of the "3" and
      * shifts it slightly leftward to keep the composition centered. */

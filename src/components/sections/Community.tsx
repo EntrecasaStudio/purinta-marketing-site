@@ -1,4 +1,5 @@
 import { XIcon, DiscordIcon } from '@/components/icons/Social'
+import { asset } from '@/lib/utils'
 
 export default function Community() {
   return (
@@ -20,7 +21,7 @@ export default function Community() {
           <div className="reveal reveal-scale">
             <div style={{ animation: 'float 4s ease-in-out infinite' }}>
               <img
-                src="/assets/mascot-wave.webp"
+                src={asset('/assets/mascot-wave.webp')}
                 alt="Purinta waving"
                 width={288}
                 height={288}

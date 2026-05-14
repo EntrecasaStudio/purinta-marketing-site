@@ -1,3 +1,5 @@
+import { asset } from '@/lib/utils'
+
 /**
  * Ecosystem ("Built on Giants") — Figma node 495:11656.
  *
@@ -23,25 +25,25 @@ const pillars: Pillar[] = [
   {
     title: 'Morpho',
     body: 'Battle-tested lending\ninfrastructure',
-    logo: '/assets/figma/ecosystem/logo-morpho.png',
+    logo: asset('/assets/figma/ecosystem/logo-morpho.png'),
     logoSize: { w: 60, h: 56 },
   },
   {
     title: 'Api3',
     body: 'First-party oracle feeds with OEV',
-    logo: '/assets/figma/ecosystem/logo-api3.png',
+    logo: asset('/assets/figma/ecosystem/logo-api3.png'),
     logoSize: { w: 64, h: 56 },
   },
   {
     title: 'Ethereum',
     body: 'Mainnet native,\ndeep liquidity',
-    logo: '/assets/figma/ecosystem/logo-eth.png',
+    logo: asset('/assets/figma/ecosystem/logo-eth.png'),
     logoSize: { w: 44, h: 72 },
   },
   {
     title: 'USDC',
     body: 'Borrow the most trusted stablecoin',
-    logo: '/assets/figma/ecosystem/logo-usdc.png',
+    logo: asset('/assets/figma/ecosystem/logo-usdc.png'),
     logoSize: { w: 56, h: 56 },
   },
 ]
@@ -67,14 +69,14 @@ export default function Ecosystem() {
       <div className="pointer-events-none absolute inset-0 z-0">
         {/* Top isometric squares pattern (rotated 180° per Figma) */}
         <img
-          src="/assets/figma/ecosystem/squares-top.png"
+          src={asset('/assets/figma/ecosystem/squares-top.png')}
           alt=""
           aria-hidden
           className="absolute -top-10 left-1/2 h-[1085px] w-[1435px] max-w-none -translate-x-1/2 rotate-180"
         />
         {/* Bottom isometric squares pattern */}
         <img
-          src="/assets/figma/ecosystem/squares-bottom.png"
+          src={asset('/assets/figma/ecosystem/squares-bottom.png')}
           alt=""
           aria-hidden
           className="absolute -bottom-5 left-1/2 h-[839px] w-[1435px] max-w-none -translate-x-1/2"
@@ -82,7 +84,7 @@ export default function Ecosystem() {
 
         {/* Vertical "PURINTA" wordmark on the left */}
         <img
-          src="/assets/figma/ecosystem/purinta-vertical.png"
+          src={asset('/assets/figma/ecosystem/purinta-vertical.png')}
           alt=""
           aria-hidden
           className="absolute top-[180px] left-[160px] h-[519px] w-[34px] max-w-none"
@@ -90,25 +92,25 @@ export default function Ecosystem() {
 
         {/* Floating dollar bills — 4 of them at hand-placed angles */}
         <img
-          src="/assets/figma/ecosystem/bill-1.png"
+          src={asset('/assets/figma/ecosystem/bill-1.png')}
           alt=""
           aria-hidden
           className="absolute top-[60px] right-[80px] w-[220px] max-w-none rotate-[-12deg]"
         />
         <img
-          src="/assets/figma/ecosystem/bill-2.png"
+          src={asset('/assets/figma/ecosystem/bill-2.png')}
           alt=""
           aria-hidden
           className="absolute top-[680px] left-[420px] w-[200px] max-w-none rotate-[34deg]"
         />
         <img
-          src="/assets/figma/ecosystem/bill-3.png"
+          src={asset('/assets/figma/ecosystem/bill-3.png')}
           alt=""
           aria-hidden
           className="absolute top-[700px] left-[760px] w-[210px] max-w-none rotate-[34deg]"
         />
         <img
-          src="/assets/figma/ecosystem/bill-4.png"
+          src={asset('/assets/figma/ecosystem/bill-4.png')}
           alt=""
           aria-hidden
           className="absolute top-[900px] left-[440px] w-[280px] max-w-none rotate-[-6deg]"
@@ -116,7 +118,7 @@ export default function Ecosystem() {
 
         {/* Central tofu mascot — peeking out from the squares bg */}
         <img
-          src="/assets/figma/ecosystem/mascot.png"
+          src={asset('/assets/figma/ecosystem/mascot.png')}
           alt=""
           aria-hidden
           className="absolute top-[640px] left-1/2 w-[260px] max-w-none -translate-x-1/2"
