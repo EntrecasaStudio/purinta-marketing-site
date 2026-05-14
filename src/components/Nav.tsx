@@ -9,7 +9,7 @@ const links = [
   { href: '#features', label: 'Features' },
   { href: '#how-it-works', label: 'How It Works' },
   { href: '#ecosystem', label: 'Ecosystem' },
-  { href: '#community', label: 'Community' },
+  // { href: '#community', label: 'Community' }, // section hidden for now
 ]
 
 /**

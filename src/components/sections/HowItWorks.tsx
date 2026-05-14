@@ -49,11 +49,12 @@ type Step = {
    * captures the rotated frame's bounding box, so just render at this
    * exact pixel size and position. */
   mascotPosition: { top: number; left: number; width: number }
-  /** Absolute offsets for the numeral within the column (px) — mirrors
-   * the Figma `ml-X mt-Y` values on each step's number node so the
-   * digit and the mascot stamp land in their hand-placed positions
-   * rather than centered. */
-  numberPosition: { top: number; left: number }
+  /** Vertical nudge of the numeral within the column (px). The digit
+   * itself is a fixed 256.11 px text-centered box pinned to the
+   * column's left edge — in Figma every step's "Front" text node sits
+   * at x=0 within the number column (454:7100 / 7181 / 7195) — so only
+   * the vertical offset varies per step. */
+  numberTop: number
 }
 
 const steps: Step[] = [
@@ -61,44 +62,47 @@ const steps: Step[] = [
     num: '1',
     title: 'Deposit\nyour memes',
     body: 'Connect your wallet, pick a market (PEPE, SHIB, etc.), and deposit your memecoins as collateral.',
-    /* Figma node 454:7100. Number at ml-126 mt-0; mascot wrapper at
-     * ml-0 mt-40.17 with rotation -12.65° (rotation already baked into
-     * the PNG export). */
+    /* Figma node 454:7100. The "1" sits at x=0 in the number column;
+     * mascot wrapper at ml-0 mt-40.17 with rotation -12.65° (rotation
+     * already baked into the PNG export). */
     mascot: asset('/assets/figma/how-it-works/step-1.png'),
-    /* Manual nudge: -84 left from Figma's 0 to pull the mascot
-     * further toward the title column's left edge; +80 top to drop it
-     * down into the bottom curve of the "1". */
-    mascotPosition: { top: 120, left: -84, width: 296 },
-    numberPosition: { top: 0, left: 126 },
+    /* Manual nudge: top +80 to drop the mascot into the bottom curve of
+     * the "1". `left` tracks the digit — it's shifted the same -45 px
+     * the centered "1" moved, so the number + mascot stay a unit. */
+    mascotPosition: { top: 120, left: -129, width: 296 },
+    numberTop: 0,
   },
   {
     num: '2',
     title: 'Borrow USDC',
     body: 'Choose how much USDC to borrow — up to 62.5% of your collateral value with built-in safety buffers.',
-    /* Figma node 454:7181. Number at ml-123.95 mt-15.83; mascot
-     * wrapper at ml-0 mt-0 with rotation +19.62° (baked into PNG).
-     * The screenshot canvas (353×284) is 42 px wider than the Figma
-     * wrapper (311×284) because the character's arms overflow LEFT of
-     * the wrapper bounds, so we shift left by -42 to keep the wrapper
-     * origin aligned with the column origin. */
+    /* Figma node 454:7181. The "2" sits at x=0 in the number column,
+     * nudged ~16 px down; mascot wrapper at ml-0 mt-0 with rotation
+     * +19.62° (baked into PNG). The screenshot canvas (353×284) is
+     * 42 px wider than the Figma wrapper (311×284) because the
+     * character's arms overflow LEFT of the wrapper bounds, so we
+     * shift left by -42 to keep the wrapper origin aligned with the
+     * column origin. */
     mascot: asset('/assets/figma/how-it-works/step-2.png'),
-    /* Manual nudge: +94 top from Figma's 0 to drop the mascot down
-     * so it sits aligned with the bottom hump of the "2". */
-    mascotPosition: { top: 94, left: -42, width: 353 },
-    numberPosition: { top: 16, left: 124 },
+    /* Manual nudge: top +94 to align the mascot with the bottom hump of
+     * the "2". `left` tracks the digit — it's shifted the same -87 px
+     * the centered "2" moved, so the number + mascot stay a unit. */
+    mascotPosition: { top: 94, left: -129, width: 353 },
+    numberTop: 16,
   },
   {
     num: '3',
     title: 'Chill',
     body: 'Use your USDC anywhere. When ready, repay your loan and get your memecoins back. Moon mission intact.',
-    /* Figma node 454:7195. Number at ml-97.47 mt-0; mascot frame at
-     * ml-0 mt-34.54 (no outer rotation). */
+    /* Figma node 454:7195. The "3" sits at x=0 in the number column;
+     * mascot frame at ml-0 mt-34.54 (no outer rotation). */
     mascot: asset('/assets/figma/how-it-works/step-3.png'),
-    /* Manual nudge: +70 top and -16 left from Figma's 35,0 — drops
-     * the peaceful mascot lower into the bottom curve of the "3" and
-     * shifts it slightly leftward to keep the composition centered. */
-    mascotPosition: { top: 105, left: -16, width: 256 },
-    numberPosition: { top: 0, left: 97 },
+    /* Manual nudge: top +70 to drop the peaceful mascot into the bottom
+     * curve of the "3". `left` tracks the digit — it's shifted the same
+     * -54 px the centered "3" moved, so the number + mascot stay a
+     * unit. */
+    mascotPosition: { top: 105, left: -70, width: 256 },
+    numberTop: 0,
   },
 ]
 
@@ -109,11 +113,21 @@ const BG_COLORS = [
   '#C8E6D0', // Mint/300   — Step 3
 ] as const
 
-/* Active-step thresholds. The flip happens slightly BEFORE the panel
- * reaches its exact geometric center so the title pop + bg crossfade
- * land just as the numeral snaps into place (not lagged after). */
-const STEP_2_THRESHOLD = 0.46
-const STEP_3_THRESHOLD = 0.96
+/* Active-step thresholds. The flip happens slightly BEFORE each panel
+ * finishes landing so the title pop + bg crossfade land just as the
+ * numeral snaps into place (not lagged after). Both sit below their
+ * panel's dwell-end fraction (0.5 / 1.0) so `activeStep` holds steady
+ * through the entire dwell. */
+const STEP_2_THRESHOLD = 0.42
+const STEP_3_THRESHOLD = 0.92
+
+/* Flow-width of each panel's number column. The number + mascot are
+ * absolutely positioned inside it, so this value only controls where
+ * the sibling text column starts. It's tuned so the text column's
+ * left edge lands on the same x as the centered "How It Works" title
+ * — and the title is rendered through the SAME grid (number-column
+ * spacer + gap) so the two stay aligned at any viewport width. */
+const NUMBER_COL_FLOW_WIDTH = 221
 
 export default function HowItWorks() {
   const ref = useRef<HTMLElement>(null)
@@ -131,8 +145,23 @@ export default function HowItWorks() {
   })
 
   /* Horizontal slide: 3 panels stacked horizontally in a flex track.
-   * Sliding by -66.6667% of the 300%-wide track exposes panel 3. */
-  const x = useTransform(scrollYProgress, [0, 1], ['0%', '-66.6667%'])
+   * Sliding by -66.6667% of the 300%-wide track exposes panel 3.
+   *
+   * The mapping is stepped, not linear, so panels 2 and 3 DWELL — they
+   * hold stationary for a stretch of continued scroll once they land,
+   * giving the user time to read. The section's 292vh scroll range
+   * (see the section height note) breaks down as:
+   *   130vh  slide  panel 1 → 2
+   *    16vh  DWELL  panel 2 held   (~145–175 px on desktop)
+   *   130vh  slide  panel 2 → 3
+   *    16vh  DWELL  panel 3 held
+   * The plateau keyframes (repeated output values) are the holds:
+   *   0.4452 = 130/292, 0.5 = 146/292, 0.9452 = 276/292. */
+  const x = useTransform(
+    scrollYProgress,
+    [0, 0.4452, 0.5, 0.9452, 1],
+    ['0%', '-33.3333%', '-33.3333%', '-66.6667%', '-66.6667%'],
+  )
 
   /* Active step (1/2/3) — discrete flips, NOT a smooth interpolation,
    * because the title + bg are supposed to "land" with a snap rather
@@ -201,11 +230,13 @@ export default function HowItWorks() {
        * top of HowItWorks. Without this, the ellipse would render on
        * top of the title + first panel during the entry phase. */
       className="relative z-40 w-full"
-      /* 3.6× viewport gives the user a comfortable amount of scroll
-       * to move through three panels. The title rides up from below
-       * INSIDE the sticky pin, together with step 1's content, exactly
-       * like the Figma layout (title is the header of step 1's panel). */
-      style={{ height: '360vh' }}
+      /* 3.92× viewport. The sticky pin eats 100vh, leaving a 292vh
+       * scroll range: 130vh + 130vh to slide between the three panels,
+       * plus two 16vh DWELL stretches where panels 2 and 3 hold
+       * stationary so the user can read (see the `x` transform note).
+       * The title rides up from below INSIDE the sticky pin, together
+       * with step 1's content, like the Figma layout. */
+      style={{ height: '392vh' }}
     >
       <motion.div
         className="sticky top-0 flex h-screen w-full flex-col overflow-hidden"
@@ -218,16 +249,29 @@ export default function HowItWorks() {
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
         {/* ---------- Top: "How It Works" title ----------
-         *  Lives INSIDE the sticky pin so it rides up from below together
-         *  with step 1's content as the section enters the viewport.
+         *  A flex child at the top of the sticky pin; the docs-link row
+         *  is a matching flex child at the bottom. The track sits
+         *  `flex-1` between them, so the panel content centers in the
+         *  exact gap between the title and the docs CTA — not against
+         *  the full viewport.
          *  The `reveal reveal-up` classes hook into the global useReveal
          *  hook in App.tsx — same fade+rise entrance pattern as the
          *  original reference site's main titles (see Community.tsx,
          *  Ecosystem.tsx for the existing usage). */}
-        <div className="relative z-10 flex shrink-0 items-center justify-center pt-12 pb-6">
-          <h2 className="reveal reveal-up font-body text-[44px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
-            How It Works
-          </h2>
+        <div className="relative z-10 flex shrink-0 justify-center pt-12">
+          {/* Title rides the same grid as the panels — a number-column
+           * spacer + 40 px gap — so its left edge lands exactly on the
+           * panels' title/body text column. */}
+          <div className="flex w-full max-w-[1232px] items-center gap-[40px] pl-[208px]">
+            <div
+              aria-hidden
+              className="shrink-0"
+              style={{ width: NUMBER_COL_FLOW_WIDTH }}
+            />
+            <h2 className="reveal reveal-up font-body text-[44px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)] md:text-[46px]">
+              How It Works
+            </h2>
+          </div>
         </div>
 
         {/* ---------- Horizontal track ---------- */}
@@ -239,11 +283,12 @@ export default function HowItWorks() {
             <div
               key={step.num}
               /* Each panel is 1/3 of the 300% track = 100vw effective.
-               * `items-center` centers the panel content vertically in
-               * the track's available height (viewport minus the title
-               * block). `pt-8` is kept as a minimum gap below the title
-               * so centering can never pull the content up against it. */
-              className="flex h-full w-1/3 shrink-0 items-center justify-center px-10 pt-8"
+               * The track is `flex-1` between the title row and the
+               * docs-link row, so `items-center` centers the content in
+               * the exact gap between them. `py-8` is symmetric (no
+               * vertical bias) — it only acts as a min gap on very short
+               * viewports, it doesn't shift the resting position. */
+              className="flex h-full w-1/3 shrink-0 items-center justify-center px-10 py-8"
             >
               {/* Whole-panel fade gated on `revealed` — this covers
                * the giant numeral (which has no isActive animation of
@@ -272,12 +317,15 @@ export default function HowItWorks() {
           ))}
         </motion.div>
 
-        {/* ---------- Bottom: docs link (persistent across panels) ---------- */}
+        {/* ---------- Bottom: docs link (persistent across panels) ----------
+         *  A flex child (not absolute) so it bookends the track — the
+         *  panel content centers in the gap between this row and the
+         *  title row above. */}
         <a
           href="https://docs.purinta.xyz/"
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 font-body text-[15px] leading-[20px] text-[var(--color-neutral-800)] underline underline-offset-4 transition-opacity hover:opacity-70"
+          className="z-10 mb-8 shrink-0 self-center font-body text-[15px] leading-[20px] text-[var(--color-neutral-800)] underline underline-offset-4 transition-opacity hover:opacity-70"
         >
           Learn more in the docs →
         </a>
@@ -295,25 +343,35 @@ export default function HowItWorks() {
  * pops with a jelly spring and the body fades in slightly after.
  *
  * Layout per Figma:
- *  - Numeral column is 400×332. Inside it the number and the mascot
- *    are absolutely positioned at the exact ml/mt offsets from Figma
- *    (numeral pushed right, mascot anchored at the left edge so they
- *    overlap visually with the mascot peeking out beside the digit).
+ *  - Numeral column: NUMBER_COL_FLOW_WIDTH × 332. The digit is a fixed
+ *    256.11 px text-centered box at the column's left edge (Figma
+ *    pins the "Front" text node at x=0 in every step); the mascot is
+ *    absolutely positioned over it at its own ml/mt offsets. The
+ *    column's flow width is decoupled from both — tuned purely for
+ *    where the sibling text column starts.
  *  - Then a 40 px gap to the title+body column (1 fr).
  * ============================================================ */
 function PanelContent({ step, isActive }: { step: Step; isActive: boolean }) {
   return (
     <div className="flex w-full max-w-[1232px] items-center justify-center gap-[40px] pl-[208px]">
-      {/* ---------- Number column (absolute positioning per Figma) ---------- */}
+      {/* ---------- Number column (absolute positioning per Figma) ----------
+       *  Shifted up 70 px so the number + mascot sit higher than the
+       *  text column, matching the Figma composition. The translate is
+       *  visual-only — it doesn't affect the column's flow width (which
+       *  still drives where the text column starts). */}
       <div
-        className="relative shrink-0"
-        style={{ width: 400, height: 332 }}
+        className="relative shrink-0 -translate-y-[70px]"
+        style={{ width: NUMBER_COL_FLOW_WIDTH, height: 332 }}
       >
+        {/* The digit is a fixed 256.11 px text-centered box pinned to
+         * the column's left edge — exactly the Figma "Front" text node,
+         * which sits at x=0 within the number column in every step. */}
         <span
-          className="absolute font-display"
+          className="absolute font-display text-center"
           style={{
-            top: step.numberPosition.top,
-            left: step.numberPosition.left,
+            top: step.numberTop,
+            left: 0,
+            width: 256.11,
             fontSize: 437,
             lineHeight: 1,
             fontWeight: 500,
