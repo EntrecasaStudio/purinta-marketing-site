@@ -65,10 +65,10 @@ const steps: Step[] = [
      * ml-0 mt-40.17 with rotation -12.65° (rotation already baked into
      * the PNG export). */
     mascot: asset('/assets/figma/how-it-works/step-1.png'),
-    /* Manual nudge: -100 left from Figma's 0 to pull the mascot
-     * further toward the title column's left edge; +96 top to drop it
+    /* Manual nudge: -84 left from Figma's 0 to pull the mascot
+     * further toward the title column's left edge; +80 top to drop it
      * down into the bottom curve of the "1". */
-    mascotPosition: { top: 136, left: -100, width: 296 },
+    mascotPosition: { top: 120, left: -84, width: 296 },
     numberPosition: { top: 0, left: 126 },
   },
   {
@@ -82,9 +82,9 @@ const steps: Step[] = [
      * the wrapper bounds, so we shift left by -42 to keep the wrapper
      * origin aligned with the column origin. */
     mascot: asset('/assets/figma/how-it-works/step-2.png'),
-    /* Manual nudge: +82 top from Figma's 0 to drop the mascot down
+    /* Manual nudge: +94 top from Figma's 0 to drop the mascot down
      * so it sits aligned with the bottom hump of the "2". */
-    mascotPosition: { top: 82, left: -42, width: 353 },
+    mascotPosition: { top: 94, left: -42, width: 353 },
     numberPosition: { top: 16, left: 124 },
   },
   {
@@ -239,11 +239,11 @@ export default function HowItWorks() {
             <div
               key={step.num}
               /* Each panel is 1/3 of the 300% track = 100vw effective.
-               * `items-start pt-8` aligns the panel content NEAR the
-               * top of the track (just below the title block) instead
-               * of vertically centered — keeps the spacing tight per
-               * the user spec ("estan muy abajo" with center alignment). */
-              className="flex h-full w-1/3 shrink-0 items-start justify-center px-10 pt-8"
+               * `items-center` centers the panel content vertically in
+               * the track's available height (viewport minus the title
+               * block). `pt-8` is kept as a minimum gap below the title
+               * so centering can never pull the content up against it. */
+              className="flex h-full w-1/3 shrink-0 items-center justify-center px-10 pt-8"
             >
               {/* Whole-panel fade gated on `revealed` — this covers
                * the giant numeral (which has no isActive animation of
