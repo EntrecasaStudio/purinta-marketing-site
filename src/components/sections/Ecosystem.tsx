@@ -76,42 +76,42 @@ const bills: Record<string, BillSpec> = {
     src: asset('/assets/figma/ecosystem/bill-1.svg'),
     pos: 'top-[373px] left-[1334px] h-[283px] w-[375px]',
     rotate: -11.69,
-    speed: 65,
+    speed: 145,
   },
   // mid-left small bill
   bill2: {
     src: asset('/assets/figma/ecosystem/bill-2.svg'),
     pos: 'top-[927px] left-[541px] h-[106px] w-[185px]',
     rotate: 34.06,
-    speed: 28,
+    speed: 60,
   },
   // mid-right small bill
   bill3: {
     src: asset('/assets/figma/ecosystem/bill-3.svg'),
     pos: 'top-[939px] left-[1686px] h-[106px] w-[185px]',
     rotate: 34.06,
-    speed: 28,
+    speed: 60,
   },
   // far-left small bill
   bill4: {
     src: asset('/assets/figma/ecosystem/bill-4.svg'),
     pos: 'top-[949px] left-[55px] h-[106px] w-[185px]',
     rotate: -28.23,
-    speed: 28,
+    speed: 60,
   },
   // big foreground bill — fastest
   bill5: {
     src: asset('/assets/figma/ecosystem/bill-5.svg'),
     pos: 'top-[1082px] left-[1009px] h-[574px] w-[588px]',
     rotate: 34.06,
-    speed: 100,
+    speed: 220,
   },
   // bill overlapping the mascot's feet — medium
   bill6: {
     src: asset('/assets/figma/ecosystem/bill-6.svg'),
     pos: 'top-[1196px] left-[523px] h-[150px] w-[262px]',
     rotate: -6.34,
-    speed: 45,
+    speed: 100,
   },
 }
 
@@ -138,7 +138,7 @@ function Bill({
  * front bill) that read as one object, so they parallax together as a
  * single small/slow unit. */
 function CompositeBill({ progress }: { progress: MotionValue<number> }) {
-  const y = useTransform(progress, [0, 1], [24, -24])
+  const y = useTransform(progress, [0, 1], [50, -50])
   return (
     <motion.div className="absolute inset-0" style={{ y }}>
       <img
