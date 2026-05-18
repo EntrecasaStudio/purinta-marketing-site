@@ -170,17 +170,22 @@ function CompositeBill({ progress }: { progress: MotionValue<number> }) {
   )
 }
 
-/* Mascot — Figma vector export `ecosystem-v2/mascot.svg` (node
- * 551:41112;567:37160). Native viewBox 363×395, placed at the exact
- * Figma offset within the 1920×1604 reference frame. Static, no
- * vertical parallax. */
+/* Mascot — animated embed from `public/mascot-animated.html`. Same
+ * illustration as `ecosystem-v2/mascot.svg` (Figma node 551:41112;
+ * 567:37160), but with JS-driven breath / blink / sway / hand motion
+ * baked in by the embed script. The iframe is isolated so the embed's
+ * defs + animation script can't collide with the host page. Size +
+ * offset match the static placement (363×395 at top 748 / left 774).
+ * Static slot, no vertical parallax. */
 function Mascot() {
   return (
-    <img
-      src={v2('mascot.svg')}
-      alt=""
+    <iframe
+      src={asset('/mascot-animated.html')}
+      title=""
       aria-hidden
-      className="absolute top-[748px] left-[774px] h-[395px] w-[363px] max-w-none"
+      tabIndex={-1}
+      scrolling="no"
+      className="absolute top-[748px] left-[774px] h-[395px] w-[363px] max-w-none border-0 bg-transparent pointer-events-none"
     />
   )
 }
