@@ -113,8 +113,8 @@ const steps: Step[] = [
      * unit. */
     mascotPosition: { top: 105, left: -70, width: 256 },
     numberTop: 0,
-    numberColor: '#CC5550', // Blush/700
-    titleColor: '#CC5550', // Blush/700
+    numberColor: '#498A70', // Mint/700
+    titleColor: '#498A70', // Mint/700
   },
 ]
 
@@ -122,7 +122,7 @@ const steps: Step[] = [
 const BG_COLORS = [
   '#FEFEFE', // Neutral/50  — Step 1
   '#F0EDD4', // Cream/300   — Step 2
-  '#FEC4C0', // Blush/400   — Step 3
+  '#C8E6D0', // Mint/300    — Step 3
 ] as const
 
 /* Active-step thresholds. The flip happens slightly BEFORE each panel
