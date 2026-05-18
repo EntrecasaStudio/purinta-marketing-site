@@ -53,7 +53,7 @@ export default function Nav() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Purinta on X"
-                className="flex size-[32px] items-center justify-center text-[#B0B2B5] transition-colors hover:text-[var(--color-green-600)]"
+                className="flex size-[32px] items-center justify-center text-[#666666] transition-colors hover:text-[var(--color-green-600)]"
               >
                 <XIcon width={20} height={18} />
               </a>
@@ -62,7 +62,7 @@ export default function Nav() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Purinta on Discord"
-                className="flex size-[32px] items-center justify-center text-[#B0B2B5] transition-colors hover:text-[var(--color-green-600)]"
+                className="flex size-[32px] items-center justify-center text-[#666666] transition-colors hover:text-[var(--color-green-600)]"
               >
                 <DiscordIcon width={24} height={18.5} />
               </a>
