@@ -1,72 +1,97 @@
 import { XIcon, DiscordIcon } from '@/components/icons/Social'
+import { Button } from '@/components/ui/button'
 import { asset } from '@/lib/utils'
+
+/**
+ * Community — Figma node 551:41113 ("04_Community").
+ *
+ * Pixel-perfect at the 1440 px reference width:
+ *   - Section pads 80 / 83 vertical, 24 horizontal (Figma DS Space/24)
+ *   - Content column max-w 1080 px, 72 px gap between blocks
+ *   - h2: Rubik Medium 39 / 55, color Neutral-900 (#333)
+ *   - Body: Rubik Regular 25 / 38, color Neutral-800 (#4C4C4C), 700 px wide
+ *   - CTAs reuse the shared <Button> (btn-primary / btn-secondary) so
+ *     hover & active states match the dapp source of truth (Hero uses
+ *     the same component). Primary lifts + scales with the green-500
+ *     stamp shadow; secondary lifts + scales with the green-300 stamp
+ *     shadow.
+ *
+ * Decorative flowers sit anchored to the section's bottom, hidden
+ * below md so they don't crowd the mobile copy.
+ */
+
+const flowersSprite = asset('/assets/figma/community/flowers-sprite.png')
 
 export default function Community() {
   return (
     <section
       id="community"
-      className="relative overflow-hidden py-24 md:py-32"
+      className="relative w-full overflow-hidden px-6 pt-20 pb-[83px] md:min-h-[638px] md:px-[var(--ds-space-24,24px)] md:pt-[80px]"
     >
-      <div className="pattern-scanlines absolute inset-0" />
-      <div className="relative z-10 container mx-auto px-6">
-        <div className="flex flex-col items-center gap-8 text-center">
-          <div className="reveal reveal-up">
-            <h2 className="font-display text-primary mb-6 text-4xl leading-tight font-black md:text-5xl">
-              The Meme Lending
-              <br />
-              Community
-            </h2>
-          </div>
-
-          <div className="reveal reveal-scale">
-            <div style={{ animation: 'float 4s ease-in-out infinite' }}>
-              <img
-                src={asset('/assets/mascot-wave.webp')}
-                alt="Purinta waving"
-                width={288}
-                height={288}
-                loading="lazy"
-                decoding="async"
-                className="w-56 drop-shadow-2xl md:w-72"
-              />
-            </div>
-          </div>
-
-          <p className="font-body text-muted-foreground mx-auto mb-2 max-w-lg text-center text-lg leading-relaxed">
-            Join thousands of degens already using Purinta. Get alpha, share
-            strategies, and be part of the meme lending revolution. Your bags
-            deserve better.
+      <div className="relative z-10 mx-auto flex w-full max-w-[1080px] flex-col items-center gap-[72px]">
+        {/* Heading + body — 700 px column at md+, fluid below */}
+        <div className="reveal reveal-up flex w-full max-w-[700px] flex-col items-center gap-6 text-center">
+          <h2 className="w-full font-body text-[32px] leading-[44px] font-medium tracking-[-0.16px] text-[var(--color-neutral-900)] md:text-[39px] md:leading-[55px] md:tracking-[-0.195px]">
+            <span className="block">The Meme Lending</span>
+            <span className="block">Community</span>
+          </h2>
+          <p className="w-full font-body text-[18px] leading-[28px] font-normal tracking-[0.18px] text-[var(--color-neutral-800)] md:text-[25px] md:leading-[38px] md:tracking-[0.25px]">
+            Join thousands of degens already using Purinta. Get alpha,
+            share strategies, and be part of the meme lending
+            revolution. Your bags deserve better.
           </p>
-
-          <div className="reveal reveal-up">
-            <div className="flex flex-col items-center gap-4 sm:flex-row">
-              <a
-                href="https://app.purinta.xyz"
-                className="bg-primary text-primary-foreground font-display shadow-purinta-green/20 rounded-full px-8 py-4 text-sm font-bold shadow-lg transition-opacity hover:opacity-90"
-              >
-                Launch App
-              </a>
-              <a
-                href="https://x.com/purintaxyz"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border-border bg-card text-primary font-display hover:bg-muted inline-flex items-center gap-2 rounded-full border-2 px-8 py-4 text-sm font-bold transition-colors"
-              >
-                <XIcon width={16} height={16} />
-                X / Twitter
-              </a>
-              <a
-                href="https://discord.gg/purinta"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border-border bg-card text-primary font-display hover:bg-muted inline-flex items-center gap-2 rounded-full border-2 px-8 py-4 text-sm font-bold transition-colors"
-              >
-                <DiscordIcon width={16} height={16} />
-                Discord
-              </a>
-            </div>
-          </div>
         </div>
+
+        {/* Buttons — reuse the shared <Button> so hover / focus / active
+         * match Hero and the dapp (btn-primary stamp shadow + scale,
+         * btn-secondary stamp shadow + scale). */}
+        <div className="reveal reveal-up flex w-full flex-col items-center justify-center gap-4 sm:flex-row sm:flex-wrap">
+          <Button variant="primary" size="lg" asChild>
+            <a href="https://app.purinta.xyz">Launch App</a>
+          </Button>
+          <Button variant="secondary" size="lg" asChild>
+            <a
+              href="https://x.com/purintaxyz"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <XIcon className="btn-icon" />
+              Follow on X
+            </a>
+          </Button>
+          <Button variant="secondary" size="lg" asChild>
+            <a
+              href="https://discord.gg/purinta"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <DiscordIcon className="btn-icon" />
+              Join Discord
+            </a>
+          </Button>
+        </div>
+
+      </div>
+
+      {/* Decorative flowers — Figma exports a 1361×261 cluster of 5
+       * sprite crops, but the sprite itself (2840×539) already has
+       * flowers laid out at the same horizontal anchors that Figma is
+       * cropping to. Rendering the sprite as a single band anchored
+       * to the section's bottom reproduces the same visual cluster
+       * with one image. Width is capped below the section so the
+       * flower band stays shorter than the gap between the buttons
+       * and the section base, keeping the cluster strictly *below*
+       * the CTAs (per Figma). Hidden below md so it doesn't crowd
+       * the mobile copy. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-[20px] hidden select-none md:block"
+      >
+        <img
+          src={flowersSprite}
+          alt=""
+          className="mx-auto block h-auto w-[1100px] max-w-none opacity-90"
+        />
       </div>
     </section>
   )

@@ -204,12 +204,15 @@ export default function Ecosystem() {
       ref={ref}
       className="relative w-full overflow-hidden"
       /* Per Figma: subtle gradient peaks at Blush/100 around 86 % of
-       * the section height, fading back to Neutral/50 at top and
-       * bottom so the blush tint sits below the cards near the mascot
-       * zone. */
+       * the section height, fading back toward Neutral/50 above and
+       * to fully transparent at the bottom. Letting the bottom go
+       * transparent removes the seam against Community below — that
+       * section is also transparent over the page-level diagonal
+       * gradient, so when Ecosystem fades out the two sections share
+       * the exact same boundary color at every x. */
       style={{
         background:
-          'linear-gradient(to bottom, #FEFEFE 0%, #FFF5F4 86%, #FEFEFE 100%)',
+          'linear-gradient(to bottom, #FEFEFE 0%, #FFF5F4 86%, rgba(254,254,254,0) 100%)',
       }}
     >
       {/* ---------- Decorative background layer ----------

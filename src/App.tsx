@@ -3,7 +3,7 @@ import Hero from '@/components/sections/Hero'
 import Features from '@/components/sections/Features'
 import HowItWorks from '@/components/sections/HowItWorks'
 import Ecosystem from '@/components/sections/Ecosystem'
-// import Community from '@/components/sections/Community' // hidden for now
+import Community from '@/components/sections/Community'
 // import Footer from '@/components/sections/Footer' // hidden for now
 import { useReveal } from '@/hooks/useReveal'
 
@@ -34,7 +34,7 @@ function App() {
       <Features />
       <HowItWorks />
       <Ecosystem />
-      {/* <Community /> hidden for now */}
+      <Community />
       {/* <Footer /> hidden for now */}
     </div>
   )
