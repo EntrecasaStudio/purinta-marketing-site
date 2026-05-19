@@ -326,6 +326,42 @@
   animation: fade-in 1s ease-out 100ms backwards;
 }
 
+/* ---------- Footer scene wrapper ----------
+ * 1920-wide Figma frame, centered. On viewports ≥ 768 (md) it
+ * renders 1:1 (Hero pattern) so 1440–1920 fills / clips the meadow;
+ * below md it scales by 100vw / 1920px so the mascot stays in frame.
+ * The `px` denominator keeps the calc valid (length / length →
+ * unitless <number>) — Lightning CSS silently dropped a unit-less
+ * divisor.
+ *
+ * Two layouts:
+ *   md+ : wrapper is 916 tall (Figma scene 740 + band area 176). Band
+ *         overlays the bottom 176 px so the radial gradient sits ON
+ *         the meadow — exactly the Figma intent.
+ *   < md: wrapper is just the 740 scene; the band is rendered BELOW
+ *         the scaled scene at native size, so the logo / text stay
+ *         legible at phone widths. Section height adds the unscaled
+ *         band to the scaled scene height. */
+@layer components {
+  .footer-scene-wrap {
+    transform: translateX(-50%) scale(calc(100vw / 1920px));
+    transform-origin: top center;
+    height: 740px;
+  }
+  .footer-section {
+    height: calc(100vw * 740 / 1920 + 176px);
+  }
+  @media (min-width: 768px) {
+    .footer-scene-wrap {
+      transform: translateX(-50%);
+      height: 916px;
+    }
+    .footer-section {
+      height: 916px;
+    }
+  }
+}
+
 /* ---------- Keyframes ---------- */
 @keyframes fade-in {
   0% {

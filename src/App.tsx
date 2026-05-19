@@ -4,7 +4,7 @@ import Features from '@/components/sections/Features'
 import HowItWorks from '@/components/sections/HowItWorks'
 import Ecosystem from '@/components/sections/Ecosystem'
 import Community from '@/components/sections/Community'
-// import Footer from '@/components/sections/Footer' // hidden for now
+import Footer from '@/components/sections/Footer'
 import { useReveal } from '@/hooks/useReveal'
 
 function App() {
@@ -35,7 +35,7 @@ function App() {
       <HowItWorks />
       <Ecosystem />
       <Community />
-      {/* <Footer /> hidden for now */}
+      <Footer />
     </div>
   )
 }
