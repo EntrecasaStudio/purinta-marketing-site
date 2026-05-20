@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import {
   motion,
   useReducedMotion,
@@ -46,6 +46,13 @@ const CONTENT_RISE_DURATION = 0.55
 export default function Hero() {
   const ref = useRef<HTMLElement>(null)
   const reduceMotion = useReducedMotion()
+  /* Gate the entrance fade on the bg image's load event so the small
+   * SVG mascots can't render alone while the heavy 1920×1462 webp is
+   * still downloading. The <link rel="preload"> in index.html starts
+   * the fetch before React mounts, and `fetchpriority="high"` makes
+   * the browser prioritise it — for a returning visitor the cache
+   * hit fires onLoad almost immediately. */
+  const [bgLoaded, setBgLoaded] = useState(false)
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start start', 'end start'],
@@ -91,7 +98,7 @@ export default function Hero() {
         className="pointer-events-none absolute left-1/2 z-30 h-[1312.311px] w-[2485.428px] max-w-none -translate-x-1/2"
         style={{ top: 839.17 }}
         initial={bgInitial}
-        animate={{ opacity: 1 }}
+        animate={{ opacity: bgLoaded || reduceMotion ? 1 : 0 }}
         transition={bgTransition}
         data-node-id="384:2217"
       />
@@ -103,7 +110,7 @@ export default function Hero() {
       <motion.div
         style={{ y: sceneY }}
         initial={bgInitial}
-        animate={{ opacity: 1 }}
+        animate={{ opacity: bgLoaded || reduceMotion ? 1 : 0 }}
         transition={bgTransition}
         className="pointer-events-none absolute top-0 left-1/2 z-[1] -translate-x-1/2"
       >
@@ -119,6 +126,16 @@ export default function Hero() {
             alt=""
             width={1920}
             height={1462}
+            /* fetchpriority + decoding hints so the bg lands in
+             * memory before the entrance fade starts and the mascot
+             * doesn't render alone during the initial paint. The
+             * <link rel="preload"> in index.html schedules the
+             * download; these attrs make sure the browser actually
+             * decodes the bytes ASAP. */
+            fetchPriority="high"
+            decoding="async"
+            loading="eager"
+            onLoad={() => setBgLoaded(true)}
             style={{ scale: sceneScale }}
             className="absolute top-[-220px] left-0 block h-auto w-[1920px] max-w-none"
             data-node-id="430:4341"

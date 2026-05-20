@@ -12,7 +12,16 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap"
     />
-    <link rel="preload" as="image" href="/assets/hero-scene.webp" fetchpriority="high" />
+    <!-- Hero background: preloaded so it lands in the browser cache
+         before the entrance fade starts, otherwise the small SVG
+         mascots become visible while the heavy 1920×1462 webp is
+         still downloading. -->
+    <link
+      rel="preload"
+      as="image"
+      href="/assets/figma/background.webp"
+      fetchpriority="high"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Purinta</title>
     <meta
