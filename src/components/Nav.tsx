@@ -311,10 +311,14 @@ export function NavMobile() {
                       className="size-4 shrink-0"
                     />
                   </span>
+                  {/* Text block sizes to the word (not flex-1), so the
+                   * "Home" underline rule spans only the label width —
+                   * per Figma, where the divider is w-full of a
+                   * shrink-to-content text block. */}
                   <a
                     href={l.href}
                     onClick={handleNavClick(l.href)}
-                    className="flex h-[61px] flex-1 flex-col gap-2 pt-[10px]"
+                    className="flex h-[61px] flex-col gap-2 pt-[10px]"
                   >
                     <span className="font-body text-[20px] leading-[32px] font-normal tracking-[0.2px] text-[#333]">
                       {l.label}
