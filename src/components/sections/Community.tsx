@@ -1,6 +1,6 @@
+import CommunityFlowers from '@/components/sections/CommunityFlowers'
 import { XIcon, DiscordIcon } from '@/components/icons/Social'
 import { Button } from '@/components/ui/button'
-import { asset } from '@/lib/utils'
 
 /**
  * Community — Figma node 551:41113 ("04_Community").
@@ -16,17 +16,19 @@ import { asset } from '@/lib/utils'
  *     stamp shadow; secondary lifts + scales with the green-300 stamp
  *     shadow.
  *
- * Decorative flowers sit anchored to the section's bottom, hidden
- * below md so they don't crowd the mobile copy.
+ * Decorative flowers (<CommunityFlowers />) are a scatter of individual
+ * Figma instances anchored to the section's bottom; several deliberately
+ * overflow downward across the boundary into the Footer meadow, so the
+ * section uses `overflow-visible` (not `overflow-hidden`) — clipping
+ * would cut the cluster in half at the boundary. Hidden below md so the
+ * scatter never crowds the mobile copy.
  */
-
-const flowersSprite = asset('/assets/figma/community/flowers-sprite.png')
 
 export default function Community() {
   return (
     <section
       id="community"
-      className="relative w-full overflow-hidden px-6 pt-20 pb-[83px] md:min-h-[638px] md:px-[var(--ds-space-24,24px)] md:pt-[80px]"
+      className="relative w-full overflow-visible px-6 pt-20 pb-[83px] md:min-h-[638px] md:px-[var(--ds-space-24,24px)] md:pt-[80px]"
     >
       <div className="relative z-10 mx-auto flex w-full max-w-[1080px] flex-col items-center gap-[72px]">
         {/* Heading + body — 700 px column at md+, fluid below */}
@@ -73,26 +75,10 @@ export default function Community() {
 
       </div>
 
-      {/* Decorative flowers — Figma exports a 1361×261 cluster of 5
-       * sprite crops, but the sprite itself (2840×539) already has
-       * flowers laid out at the same horizontal anchors that Figma is
-       * cropping to. Rendering the sprite as a single band anchored
-       * to the section's bottom reproduces the same visual cluster
-       * with one image. Width is capped below the section so the
-       * flower band stays shorter than the gap between the buttons
-       * and the section base, keeping the cluster strictly *below*
-       * the CTAs (per Figma). Hidden below md so it doesn't crowd
-       * the mobile copy. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-[20px] hidden select-none md:block"
-      >
-        <img
-          src={flowersSprite}
-          alt=""
-          className="mx-auto block h-auto w-[1100px] max-w-none opacity-90"
-        />
-      </div>
+      {/* Decorative flower scatter — Figma group 726:40370. Rendered as
+       * individually-positioned instances that flow from the lower part
+       * of Community across the boundary into the Footer meadow. */}
+      <CommunityFlowers />
     </section>
   )
 }
