@@ -209,11 +209,17 @@ export function NavMobile() {
       transition: reduce
         ? { duration: 0.12 }
         : {
-            clipPath: { duration: 0.26, ease: [0.4, 0, 1, 1] },
-            scale: { duration: 0.26, ease: [0.4, 0, 1, 1] },
-            opacity: { duration: 0.2, ease: 'easeIn', delay: 0.06 },
-            staggerChildren: 0.035,
+            /* Reverse of the open sequence: the children (links →
+             * social → button) exit FIRST, staggered in reverse
+             * order; only once they are all gone does the panel /
+             * background collapse. `when: 'afterChildren'` gates the
+             * panel's own clip-path + fade on the children finishing. */
+            when: 'afterChildren',
+            staggerChildren: 0.05,
             staggerDirection: -1,
+            clipPath: { duration: 0.3, ease: [0.4, 0, 1, 1] },
+            scale: { duration: 0.3, ease: [0.4, 0, 1, 1] },
+            opacity: { duration: 0.22, ease: 'easeIn' },
           },
     },
     open: {
@@ -385,8 +391,10 @@ export function NavMobile() {
        * viewport over the full-screen panel (body scroll is locked
        * anyway, so there is no visible jump). */}
       <nav
-        className={`fade-in-on-load top-6 right-6 left-6 z-[70] flex h-[52px] items-center justify-between rounded-[64px] border border-solid border-[#9ECF84] bg-[#FEFEFE] px-6 shadow-[0_4px_24px_rgba(24,82,41,0.06)] ${
-          open ? 'fixed' : 'absolute'
+        className={`fade-in-on-load top-6 right-6 left-6 z-[70] flex h-[52px] items-center justify-between rounded-[64px] border border-solid border-[#9ECF84] bg-[#FEFEFE] px-6 ${
+          open
+            ? 'fixed'
+            : 'absolute shadow-[0_4px_24px_rgba(24,82,41,0.06)]'
         }`}
       >
         {/* Logo built inline at the Figma mobile-pill size (84.237 × 20
