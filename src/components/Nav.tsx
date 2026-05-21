@@ -1,8 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import {
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+  type Variants,
+} from 'motion/react'
 import Logo from '@/components/Logo'
 import { XIcon, DiscordIcon } from '@/components/icons/Social'
-import { Menu, X as Close, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { asset } from '@/lib/utils'
 
 const links = [
   { href: '#', label: 'Home', active: true },
@@ -10,6 +16,14 @@ const links = [
   { href: '#how-it-works', label: 'How It Works' },
   { href: '#ecosystem', label: 'Ecosystem' },
   // { href: '#community', label: 'Community' }, // section hidden for now
+]
+
+/* Mobile menu links — matches Figma node 773:40693 (Menu-Mobile-Content). */
+const mobileLinks = [
+  { href: '#', label: 'Home', active: true },
+  { href: '#features', label: 'Features' },
+  { href: '#how-it-works', label: 'How It Works' },
+  { href: '#community', label: 'Community' },
 ]
 
 /**
@@ -85,70 +99,278 @@ export default function Nav() {
   )
 }
 
-/**
- * Mobile navigation — simpler menu since the Figma desktop pill doesn't
- * collapse cleanly on small viewports. Kept until we get a mobile design.
- */
+/* ============================================================
+ * Mobile menu — Figma node 773:40693 ("Menu-Mobile-Content").
+ *
+ * A full-screen overlay panel: white pill at the top (logo + a
+ * morphing hamburger ⇄ X icon), four star-bulleted nav links, a
+ * social row and a full-width "Launch App" CTA, over a soft green
+ * gradient (mint-50 → green-100).
+ *
+ * Motion (designed against the site's existing vocabulary):
+ *  - Panel: clip-path circle reveal blooming out of the icon, plus a
+ *    fast opacity fade and a micro-scale settle — calm 180/24 spring.
+ *  - Content: 6 staggered children (4 links + social + button) on a
+ *    70 ms cadence, each a 360/12/0.7 "jelly pop"; the star icons
+ *    pop-spin in just after their row.
+ *  - Close: ~40 % faster, tween-out (no bounce), reversed stagger.
+ *  - prefers-reduced-motion: all of it collapses to a 0.15 s fade.
+ * ============================================================ */
+
+const starGreen = asset('/assets/figma/menu/star.svg')
+const starWhite = asset('/assets/figma/menu/star2.svg')
+
+/** Hamburger ⇄ X — three bars; top/bottom rotate to the X, mid fades. */
+function MenuIcon({ open, reduce }: { open: boolean; reduce: boolean }) {
+  const t = reduce
+    ? { duration: 0 }
+    : ({ type: 'spring', stiffness: 300, damping: 20 } as const)
+  const bar =
+    'absolute left-0 h-[2px] w-full rounded-full bg-[#666666]'
+  return (
+    <span className="relative block h-[16px] w-[20px]">
+      <motion.span
+        className={bar}
+        style={{ top: 'calc(50% - 1px)' }}
+        initial={false}
+        animate={open ? { y: 0, rotate: 45 } : { y: -6, rotate: 0 }}
+        transition={t}
+      />
+      <motion.span
+        className={bar}
+        style={{ top: 'calc(50% - 1px)' }}
+        initial={false}
+        animate={open ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
+        transition={t}
+      />
+      <motion.span
+        className={bar}
+        style={{ top: 'calc(50% - 1px)' }}
+        initial={false}
+        animate={open ? { y: 0, rotate: -45 } : { y: 6, rotate: 0 }}
+        transition={t}
+      />
+    </span>
+  )
+}
+
 export function NavMobile() {
   const [open, setOpen] = useState(false)
+  const reduce = useReducedMotion() ?? false
+
+  /* Lock body scroll + wire Escape-to-close while the menu is open. */
+  useEffect(() => {
+    if (!open) return
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prevOverflow
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  /* ---- Motion variants (UX spec) ---- */
+  const panelVariants: Variants = {
+    closed: {
+      opacity: 0,
+      scale: 0.98,
+      clipPath: 'circle(0% at calc(100% - 44px) 50px)',
+      transition: reduce
+        ? { duration: 0.12 }
+        : {
+            clipPath: { duration: 0.26, ease: [0.4, 0, 1, 1] },
+            scale: { duration: 0.26, ease: [0.4, 0, 1, 1] },
+            opacity: { duration: 0.2, ease: 'easeIn', delay: 0.06 },
+            staggerChildren: 0.035,
+            staggerDirection: -1,
+          },
+    },
+    open: {
+      opacity: 1,
+      scale: 1,
+      clipPath: 'circle(150% at calc(100% - 44px) 50px)',
+      transition: reduce
+        ? { duration: 0.15, staggerChildren: 0, delayChildren: 0 }
+        : {
+            clipPath: { type: 'spring', stiffness: 180, damping: 24 },
+            scale: { type: 'spring', stiffness: 180, damping: 24 },
+            opacity: { duration: 0.18, ease: 'easeOut' },
+            delayChildren: 0.16,
+            staggerChildren: 0.07,
+          },
+    },
+  }
+
+  const itemVariants: Variants = {
+    closed: {
+      opacity: 0,
+      y: 16,
+      scale: 0.96,
+      transition: { duration: 0.18, ease: 'easeIn' },
+    },
+    open: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: reduce
+        ? { duration: 0 }
+        : { type: 'spring', stiffness: 360, damping: 12, mass: 0.7 },
+    },
+  }
+
+  const starVariants: Variants = {
+    closed: { opacity: 0, scale: 0.3, rotate: -90, transition: { duration: 0.12 } },
+    open: {
+      opacity: 1,
+      scale: 1,
+      rotate: 0,
+      transition: reduce
+        ? { duration: 0 }
+        : { type: 'spring', stiffness: 500, damping: 11, mass: 0.6, delay: 0.06 },
+    },
+  } as const
+
   return (
-    <nav className="fade-in-on-load fixed top-2 right-2 left-2 z-50 overflow-hidden rounded-2xl bg-[#FEFEFE] shadow-lg md:hidden">
-      <div className="flex items-center justify-between px-5 py-3">
-        <a href="#" aria-label="Purinta" className="flex shrink-0">
-          <Logo />
+    <div className="md:hidden">
+      {/* ---- Full-screen menu panel ---- */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Main menu"
+            className="fixed inset-0 z-[60] flex flex-col items-center overflow-y-auto overscroll-contain px-6 pt-6 pb-6"
+            style={{
+              transformOrigin: 'top right',
+              backgroundImage:
+                'linear-gradient(4deg, #f2f7f4 1.36%, #c8e4b0 61.84%)',
+            }}
+            variants={panelVariants}
+            initial="closed"
+            animate="open"
+            exit="closed"
+          >
+            {/* Pill spacer — the real pill is fixed on top of the panel */}
+            <div className="h-[52px] w-full shrink-0" />
+
+            {/* Nav links — Figma "Sections" */}
+            <nav
+              aria-label="Mobile"
+              className="mt-10 flex w-full max-w-[360px] flex-col gap-2 px-[10px]"
+            >
+              {mobileLinks.map((l) => (
+                <motion.div
+                  key={l.label}
+                  variants={itemVariants}
+                  className="flex w-full items-start gap-2 pl-[2px]"
+                >
+                  <motion.img
+                    src={l.active ? starGreen : starWhite}
+                    alt=""
+                    aria-hidden
+                    variants={starVariants}
+                    className="mt-[10px] size-4 shrink-0"
+                  />
+                  <a
+                    href={l.href}
+                    onClick={() => setOpen(false)}
+                    className="flex flex-col gap-2 pt-[10px]"
+                  >
+                    <span className="font-body text-[20px] leading-[32px] font-normal tracking-[0.2px] text-[#333]">
+                      {l.label}
+                    </span>
+                    {l.active && (
+                      <span className="block h-px w-full bg-[#B2B2B2]" />
+                    )}
+                  </a>
+                </motion.div>
+              ))}
+            </nav>
+
+            <div className="flex-1" />
+
+            {/* Social row */}
+            <motion.div
+              variants={itemVariants}
+              className="flex w-full max-w-[360px] items-center gap-6 px-[30px] py-[2px]"
+            >
+              <a
+                href="https://x.com/purintaxyz"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Purinta on X"
+                onClick={() => setOpen(false)}
+                className="flex size-7 items-center justify-center text-[#333] transition-opacity hover:opacity-70"
+              >
+                <XIcon width={17} height={15.3} />
+              </a>
+              <a
+                href="https://discord.gg/purinta"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Purinta on Discord"
+                onClick={() => setOpen(false)}
+                className="flex size-7 items-center justify-center text-[#333] transition-opacity hover:opacity-70"
+              >
+                <DiscordIcon width={21.2} height={16.2} />
+              </a>
+            </motion.div>
+
+            {/* Launch App CTA */}
+            <motion.div
+              variants={itemVariants}
+              className="mt-[88px] w-full max-w-[360px] px-[10px]"
+            >
+              <Button
+                variant="primary"
+                fullWidth
+                asChild
+                className="!rounded-full border border-solid border-[#78ba68] !px-[21px] !py-[13px] !text-[16px] tracking-[0.48px]"
+              >
+                <a href="https://app.purinta.xyz">Launch App</a>
+              </Button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ---- Floating pill — always mounted, above the panel ---- */}
+      <nav className="fade-in-on-load fixed top-6 right-6 left-6 z-[70] flex h-[52px] items-center justify-between rounded-[64px] border border-solid border-[#9ECF84] bg-[#FEFEFE] px-6 shadow-[0_4px_24px_rgba(24,82,41,0.06)]">
+        {/* Logo built inline at the Figma mobile-pill size (84.237 × 20
+         * — symbol 17.665 × 20, wordmark 62.458 × 12.373 at 21.73 /
+         * 4.407). The shared <Logo> hard-codes a 40 px symbol. */}
+        <a
+          href="#"
+          aria-label="Purinta"
+          onClick={() => setOpen(false)}
+          className="relative block h-[20px] w-[84.237px] shrink-0"
+        >
+          <img
+            src={asset('/assets/figma/logo-symbol.svg')}
+            alt=""
+            className="absolute top-0 left-0 h-[20px] w-[17.665px]"
+          />
+          <img
+            src={asset('/assets/figma/wordmark.svg')}
+            alt="Purinta"
+            className="absolute top-[4.407px] left-[21.73px] h-[12.373px] w-[62.458px]"
+          />
         </a>
         <button
           type="button"
           aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="-mr-2 inline-flex h-10 w-10 items-center justify-center rounded-lg text-[#333] transition-colors hover:bg-[var(--color-green-50)]"
+          className="-mr-1 inline-flex size-8 items-center justify-center rounded-full text-[#333] transition-colors hover:bg-[var(--color-green-50)]"
         >
-          {open ? <Close size={20} /> : <Menu size={20} />}
+          <MenuIcon open={open} reduce={reduce} />
         </button>
-      </div>
-      {open && (
-        <div className="border-t border-[#E5E1BE]">
-          <div className="flex flex-col gap-1 px-5 py-3">
-            {links.map((l) => (
-              <a
-                key={l.label}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="rounded-md px-3 py-2 font-body text-base text-[#333] hover:bg-[var(--color-green-50)]"
-              >
-                {l.label}
-              </a>
-            ))}
-            <div className="mt-2 flex items-center justify-between gap-3 border-t border-[#E5E1BE] pt-3">
-              <div className="flex gap-4 text-[#181A1F]">
-                <a
-                  href="https://x.com/purintaxyz"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="X"
-                >
-                  <XIcon />
-                </a>
-                <a
-                  href="https://discord.gg/purinta"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Discord"
-                >
-                  <DiscordIcon />
-                </a>
-              </div>
-              <Button variant="primary" size="sm" asChild>
-                <a href="https://app.purinta.xyz">
-                  <Plus className="size-3.5" />
-                  Launch App
-                </a>
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </nav>
+      </nav>
+    </div>
   )
 }
