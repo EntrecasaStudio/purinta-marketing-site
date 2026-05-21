@@ -31,11 +31,18 @@ const sceneBg = asset('/assets/figma/footer/scene-bg.webp')
 
 type FooterLink = { label: string; href: string; external?: boolean }
 
-const links: FooterLink[] = [
-  { label: 'Docs', href: 'https://docs.purinta.xyz/', external: true },
-  { label: 'Terms & Conditions', href: '/terms' },
-  { label: 'X', href: 'https://x.com/purintaxyz', external: true },
-  { label: 'Discord', href: 'https://discord.gg/purinta', external: true },
+/* Footer links — Figma 551:37655: two pipe-separated groups.
+ * Group 1 (773:43242 "Socila"): X | Discord.
+ * Group 2 (773:43139 "T&C"):    Docs | Terms & Conditions. */
+const linkGroups: FooterLink[][] = [
+  [
+    { label: 'X', href: 'https://x.com/purintaxyz', external: true },
+    { label: 'Discord', href: 'https://discord.gg/purinta', external: true },
+  ],
+  [
+    { label: 'Docs', href: 'https://docs.purinta.xyz/', external: true },
+    { label: 'Terms & Conditions', href: '/terms' },
+  ],
 ]
 
 const BAND_H = 176
@@ -179,22 +186,40 @@ export default function Footer() {
               </p>
             </div>
 
-            {/* Footer links — gap-[56px] per Figma 551:37655 */}
+            {/* Footer links — Figma 551:37655: two pipe-separated
+             * groups, gap-[64px] apart; each group gap-[16px] with a
+             * #808080 "|" divider between its two links. */}
             <nav
               aria-label="Footer"
-              className="flex flex-wrap items-center justify-center gap-x-7 gap-y-1.5 md:flex-nowrap md:gap-[56px]"
+              className="flex flex-wrap items-center justify-center gap-x-10 gap-y-2 md:flex-nowrap md:gap-[64px]"
             >
-              {links.map((l) => (
-                <a
-                  key={l.label}
-                  href={l.href}
-                  {...(l.external
-                    ? { target: '_blank', rel: 'noopener noreferrer' }
-                    : {})}
-                  className="font-body text-[16px] leading-[26px] font-medium tracking-[0.16px] whitespace-nowrap text-[#333] transition-opacity hover:opacity-70"
+              {linkGroups.map((group, gi) => (
+                <div
+                  key={gi}
+                  className="flex items-center gap-[16px]"
                 >
-                  {l.label}
-                </a>
+                  {group.map((l, li) => (
+                    <span key={l.label} className="flex items-center gap-[16px]">
+                      <a
+                        href={l.href}
+                        {...(l.external
+                          ? { target: '_blank', rel: 'noopener noreferrer' }
+                          : {})}
+                        className="font-body text-[16px] leading-[26px] font-medium tracking-[0.16px] whitespace-nowrap text-[#333] transition-opacity hover:opacity-70"
+                      >
+                        {l.label}
+                      </a>
+                      {li === 0 && (
+                        <span
+                          aria-hidden
+                          className="font-body text-[16px] leading-[26px] font-medium text-[#808080]"
+                        >
+                          |
+                        </span>
+                      )}
+                    </span>
+                  ))}
+                </div>
               ))}
             </nav>
           </div>

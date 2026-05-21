@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { type MouseEvent as ReactMouseEvent, useEffect, useState } from 'react'
 import {
   motion,
   AnimatePresence,
@@ -157,6 +157,33 @@ function MenuIcon({ open, reduce }: { open: boolean; reduce: boolean }) {
 export function NavMobile() {
   const [open, setOpen] = useState(false)
   const reduce = useReducedMotion() ?? false
+  /* Section to scroll to AFTER the close animation finishes — set when
+   * a nav link is tapped so the menu's exit animation plays out fully
+   * before the page jumps to the section. */
+  const [pendingScroll, setPendingScroll] = useState<string | null>(null)
+
+  /* Tapping a link reverses the open animation, then scrolls. The
+   * actual scroll runs in <AnimatePresence onExitComplete>. */
+  const handleNavClick =
+    (href: string) => (e: ReactMouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault()
+      setPendingScroll(href)
+      setOpen(false)
+    }
+
+  /* Runs once the panel's exit animation has fully completed. */
+  const runPendingScroll = () => {
+    if (pendingScroll == null) return
+    const target = pendingScroll
+    setPendingScroll(null)
+    if (target === '#' || target === '') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+    document
+      .querySelector(target)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   /* Lock body scroll + wire Escape-to-close while the menu is open. */
   useEffect(() => {
@@ -237,7 +264,7 @@ export function NavMobile() {
   return (
     <div className="md:hidden">
       {/* ---- Full-screen menu panel ---- */}
-      <AnimatePresence>
+      <AnimatePresence onExitComplete={runPendingScroll}>
         {open && (
           <motion.div
             key="mobile-menu"
@@ -258,34 +285,42 @@ export function NavMobile() {
             {/* Pill spacer — the real pill is fixed on top of the panel */}
             <div className="h-[52px] w-full shrink-0" />
 
-            {/* Nav links — Figma "Sections" */}
+            {/* Nav links — Figma "Sections" (730:30621). Each row is
+             * items-center: the star wrapper carries a 10 px bottom
+             * pad and the 61 px text block a 10 px top pad, so the
+             * star's centre lands on the text's first-line centre
+             * (≈26 px from the row top) — that's the bullet⇄text
+             * alignment. The "Home" divider is a 1.5 px Green/400
+             * (#57A053) rule, full-width. */}
             <nav
               aria-label="Mobile"
-              className="mt-10 flex w-full max-w-[360px] flex-col gap-2 px-[10px]"
+              className="mt-10 flex w-full max-w-[340px] flex-col gap-2 px-[10px]"
             >
               {mobileLinks.map((l) => (
                 <motion.div
                   key={l.label}
                   variants={itemVariants}
-                  className="flex w-full items-start gap-2 pl-[2px]"
+                  className="flex w-full items-center gap-2 pl-[2px]"
                 >
-                  <motion.img
-                    src={l.active ? starGreen : starWhite}
-                    alt=""
-                    aria-hidden
-                    variants={starVariants}
-                    className="mt-[10px] size-4 shrink-0"
-                  />
+                  <span className="flex items-center pb-[10px]">
+                    <motion.img
+                      src={l.active ? starGreen : starWhite}
+                      alt=""
+                      aria-hidden
+                      variants={starVariants}
+                      className="size-4 shrink-0"
+                    />
+                  </span>
                   <a
                     href={l.href}
-                    onClick={() => setOpen(false)}
-                    className="flex flex-col gap-2 pt-[10px]"
+                    onClick={handleNavClick(l.href)}
+                    className="flex h-[61px] flex-1 flex-col gap-2 pt-[10px]"
                   >
                     <span className="font-body text-[20px] leading-[32px] font-normal tracking-[0.2px] text-[#333]">
                       {l.label}
                     </span>
                     {l.active && (
-                      <span className="block h-px w-full bg-[#B2B2B2]" />
+                      <span className="block h-[1.5px] w-full bg-[#57A053]" />
                     )}
                   </a>
                 </motion.div>
@@ -339,15 +374,24 @@ export function NavMobile() {
         )}
       </AnimatePresence>
 
-      {/* ---- Floating pill — always mounted, above the panel ---- */}
-      <nav className="fade-in-on-load fixed top-6 right-6 left-6 z-[70] flex h-[52px] items-center justify-between rounded-[64px] border border-solid border-[#9ECF84] bg-[#FEFEFE] px-6 shadow-[0_4px_24px_rgba(24,82,41,0.06)]">
+      {/* ---- Floating pill ----
+       * Not sticky: when closed it is `absolute`, so it sits at the
+       * top of the page and scrolls away with the hero. While the
+       * menu is open it switches to `fixed` so it stays pinned to the
+       * viewport over the full-screen panel (body scroll is locked
+       * anyway, so there is no visible jump). */}
+      <nav
+        className={`fade-in-on-load top-6 right-6 left-6 z-[70] flex h-[52px] items-center justify-between rounded-[64px] border border-solid border-[#9ECF84] bg-[#FEFEFE] px-6 shadow-[0_4px_24px_rgba(24,82,41,0.06)] ${
+          open ? 'fixed' : 'absolute'
+        }`}
+      >
         {/* Logo built inline at the Figma mobile-pill size (84.237 × 20
          * — symbol 17.665 × 20, wordmark 62.458 × 12.373 at 21.73 /
          * 4.407). The shared <Logo> hard-codes a 40 px symbol. */}
         <a
           href="#"
           aria-label="Purinta"
-          onClick={() => setOpen(false)}
+          onClick={open ? handleNavClick('#') : undefined}
           className="relative block h-[20px] w-[84.237px] shrink-0"
         >
           <img
