@@ -718,15 +718,17 @@ function Divider({
  * ============================================================ */
 function useMascotTransition(isActive: boolean) {
   const reduceMotion = useReducedMotion()
-  /* Shared spring so the blob + polaroid feel coherent — position,
-   * size and rotation all use the same curve in both pieces. */
+  /* Matches the card width tween exactly so the polaroid + blob grow
+   * (size, position, rotation) in lockstep with the card pill — the
+   * mascot reaches its expanded size and final position at the SAME
+   * frame the card finishes growing, instead of springing into place
+   * AFTER the card has already settled. */
   return reduceMotion
     ? { duration: 0 }
     : ({
-        type: 'spring',
-        stiffness: 180,
-        damping: 24,
+        duration: 0.42,
         delay: isActive ? 0.13 : 0,
+        ease: [0.32, 0.72, 0, 1],
       } as const)
 }
 

@@ -5,10 +5,10 @@ import { asset } from '@/lib/utils'
  * Purinta", 360 wide). Unlike the desktop auto-cycling card row, the
  * mobile design is five static stacked cards, each fully expanded.
  *
- * Card illustrations are flattened Figma exports (the mascot/blob
- * compositions are far too many vector parts to recreate by hand);
- * everything else — colours, copy, the star bullet, the "Learn more"
- * link — is live markup.
+ * Card illustrations reuse the desktop mascot PNGs at their natural
+ * Figma 1x size (same files used by the desktop card row, transparent
+ * background). Everything else — colours, copy, the star bullet, the
+ * "Learn more" link — is live markup.
  *
  * Responsive: the section background is full-bleed; only the cards
  * are capped at 480 px wide (centred, margins grow past that).
@@ -23,8 +23,10 @@ type Card = {
   border: string
   star: string
   illu: string
-  /** Natural width of the flattened illustration export. */
+  /** Natural pixel dimensions of the mascot PNG (Figma 1x).
+   * Source PNG is exported @2x; these are the rendered @1x sizes. */
   illuW: number
+  illuH: number
 }
 
 const cards: Card[] = [
@@ -35,8 +37,9 @@ const cards: Card[] = [
     bg: '#FFFAFA',
     border: '#FEC4C0',
     star: asset('/assets/figma/features/star-borrow.svg'),
-    illu: asset('/assets/figma/features/card-borrow.webp'),
-    illuW: 123,
+    illu: asset('/assets/figma/features/borrow.png'),
+    illuW: 127,
+    illuH: 156,
   },
   {
     key: 'apy',
@@ -45,8 +48,9 @@ const cards: Card[] = [
     bg: '#F2F8F7',
     border: '#6ECFC6',
     star: asset('/assets/figma/features/star-apy.svg'),
-    illu: asset('/assets/figma/features/card-apy.webp'),
-    illuW: 150,
+    illu: asset('/assets/figma/features/apy.png'),
+    illuW: 113,
+    illuH: 103,
   },
   {
     key: 'morpho',
@@ -55,8 +59,9 @@ const cards: Card[] = [
     bg: '#FFF5ED',
     border: '#FFA466',
     star: asset('/assets/figma/features/star-morpho.svg'),
-    illu: asset('/assets/figma/features/card-morpho.webp'),
-    illuW: 153,
+    illu: asset('/assets/figma/features/morpho.png'),
+    illuW: 161,
+    illuH: 140,
   },
   {
     key: 'mainnet',
@@ -65,8 +70,9 @@ const cards: Card[] = [
     bg: '#EDF4FF',
     border: '#669FFF',
     star: asset('/assets/figma/features/star-mainnet.svg'),
-    illu: asset('/assets/figma/features/card-mainnet.webp'),
-    illuW: 154,
+    illu: asset('/assets/figma/features/mainnet.png'),
+    illuW: 126,
+    illuH: 160,
   },
   {
     key: 'api3',
@@ -75,8 +81,9 @@ const cards: Card[] = [
     bg: '#F1F3E7',
     border: '#57A053',
     star: asset('/assets/figma/features/star-api3.svg'),
-    illu: asset('/assets/figma/features/card-api3.webp'),
-    illuW: 138,
+    illu: asset('/assets/figma/features/api3.png'),
+    illuW: 123,
+    illuH: 134,
   },
 ]
 
@@ -140,8 +147,10 @@ export default function FeaturesMobile() {
                     aria-hidden
                     loading="lazy"
                     decoding="async"
+                    width={c.illuW}
+                    height={c.illuH}
                     className="absolute right-0 bottom-0 max-w-none"
-                    style={{ width: `${c.illuW}px` }}
+                    style={{ width: `${c.illuW}px`, height: `${c.illuH}px` }}
                   />
                 </div>
               </div>
