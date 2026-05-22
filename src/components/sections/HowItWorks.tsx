@@ -216,8 +216,8 @@ export default function HowItWorks() {
     return (
       <section id="how-it-works" className="relative w-full">
         <div className="py-12 text-center">
-          <h2 className="font-body text-[39px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)]">
-            How It Works
+          <h2 className="font-display text-[39px] leading-[1] font-semibold tracking-[0.88px] text-[var(--color-neutral-900)]">
+            How It Works?
           </h2>
         </div>
         {steps.map((step, i) => (
@@ -280,8 +280,8 @@ export default function HowItWorks() {
               className="shrink-0"
               style={{ width: NUMBER_COL_FLOW_WIDTH }}
             />
-            <h2 className="reveal reveal-up font-body text-[39px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)]">
-              How It Works
+            <h2 className="reveal reveal-up font-display text-[39px] leading-[1] font-semibold tracking-[0.88px] text-[var(--color-neutral-900)]">
+              How It Works?
             </h2>
           </div>
         </div>

@@ -160,27 +160,15 @@ export default function Footer() {
            * md+; on mobile it stacks and centers with looser padding. */}
           <div className="relative mx-auto flex h-full max-w-[1440px] flex-col items-center justify-center gap-4 px-6 py-8 md:flex-row md:items-center md:justify-between md:gap-10 md:px-[156px] md:pt-[88px] md:pb-[56px]">
             {/* Logotype + copyright — gap-[18px] per Figma 551:37651.
-             * The logo is built inline at the Figma footer size
-             * (134.78 × 32 — symbol 28.264 × 32, wordmark 99.932 ×
-             * 19.797 at 34.77 / 7.051). The shared <Logo> component
-             * hard-codes a 40 px symbol, which threw the copyright
-             * line ~4 px off the logo's optical centre. */}
+             * Single combined SVG export (symbol with cut-out "P" +
+             * wordmark, all in Neutral-900 / #333). Natural 135 × 34;
+             * rendered 1:1 so the symbol keeps its 32 px footer height. */}
             <div className="flex flex-col items-center gap-2.5 md:flex-row md:items-center md:gap-[18px]">
-              <div
-                className="relative h-[32px] w-[134.78px] shrink-0"
-                aria-label="Purinta"
-              >
-                <img
-                  src={asset('/assets/figma/logo-symbol.svg')}
-                  alt=""
-                  className="absolute left-0 top-0 h-[32px] w-[28.264px]"
-                />
-                <img
-                  src={asset('/assets/figma/wordmark.svg')}
-                  alt="Purinta"
-                  className="absolute left-[34.77px] top-[7.051px] h-[19.797px] w-[99.932px]"
-                />
-              </div>
+              <img
+                src={asset('/assets/figma/footer/logotype-footer.svg')}
+                alt="Purinta"
+                className="h-[34px] w-[135px] shrink-0"
+              />
               <p className="font-body text-[16px] leading-[26px] font-medium tracking-[0.16px] text-[#333] whitespace-nowrap">
                 © {new Date().getFullYear()} Purinta Inc. All rights reserved.
               </p>

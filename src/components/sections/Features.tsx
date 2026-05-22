@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { ChevronRight } from 'lucide-react'
 import { asset } from '@/lib/utils'
+import FeaturesMobile from '@/components/sections/FeaturesMobile'
 
 /**
  * Features — Figma node 383:4066 ("Why Degens Love Purinta").
@@ -188,7 +189,18 @@ const CARDS: CardData[] = [
 const CYCLE_MS = 5000
 const RESUME_AFTER_INPUT_MS = 10_000
 
+/** Default export renders the desktop card row (≥ md) and the mobile
+ * stacked-card layout (< md) — each is gated by Tailwind breakpoints. */
 export default function Features() {
+  return (
+    <div id="features">
+      <FeaturesDesktop />
+      <FeaturesMobile />
+    </div>
+  )
+}
+
+function FeaturesDesktop() {
   const reduceMotion = useReducedMotion()
   const [activeIdx, setActiveIdx] = useState(0)
   const [hoverPause, setHoverPause] = useState(false)
@@ -233,13 +245,12 @@ export default function Features() {
 
   return (
     <section
-      id="features"
       /* Negative top margin pulls the entire section UP by 200 px so
        * the title + cards sit higher in the page, overlapping the
        * tail of the hero hill ellipse. The cards (z-40) and title
        * (z-40) paint above the hill (z-30), and the Features bg
        * gradient still fades in transparent → Neutral/50 underneath. */
-      className="relative -mt-[200px] w-full pt-[60px] pb-32"
+      className="relative -mt-[200px] hidden w-full pt-[60px] pb-32 md:block"
       style={{
         backgroundImage:
           'linear-gradient(to bottom, transparent 0px, var(--color-neutral-50) 240px)',
@@ -251,8 +262,8 @@ export default function Features() {
          * The `reveal reveal-up` classes hook into the global useReveal
          * hook in App.tsx for the original-reference-site entrance
          * (fade in + slight rise on intersection). */}
-        <h2 className="reveal reveal-up text-center font-body text-[39px] leading-[1] font-medium tracking-[0.88px] text-[var(--color-neutral-900)]">
-          Why Degens Love Purinta
+        <h2 className="reveal reveal-up text-center font-display text-[39px] leading-[1] font-semibold tracking-[0.88px] text-[var(--color-neutral-900)]">
+          Why Purinta?
         </h2>
       </div>
 

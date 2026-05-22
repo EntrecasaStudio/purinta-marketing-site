@@ -84,7 +84,7 @@ export default function Hero() {
   return (
     <section
       ref={ref}
-      className="relative flex min-h-[1300px] w-full flex-col items-center"
+      className="relative flex w-full flex-col items-center md:min-h-[1300px]"
       data-node-id="384:2207"
     >
       {/* Hill ellipse — pulled out of the bg container so the section
@@ -95,7 +95,7 @@ export default function Hero() {
         src={asset('/assets/figma/hill-ellipse.svg')}
         alt=""
         aria-hidden
-        className="pointer-events-none absolute left-1/2 z-30 h-[1312.311px] w-[2485.428px] max-w-none -translate-x-1/2"
+        className="pointer-events-none absolute left-1/2 z-30 hidden h-[1312.311px] w-[2485.428px] max-w-none -translate-x-1/2 md:block"
         style={{ top: 839.17 }}
         initial={bgInitial}
         animate={{ opacity: bgLoaded || reduceMotion ? 1 : 0 }}
@@ -112,7 +112,7 @@ export default function Hero() {
         initial={bgInitial}
         animate={{ opacity: bgLoaded || reduceMotion ? 1 : 0 }}
         transition={bgTransition}
-        className="pointer-events-none absolute top-0 left-1/2 z-[1] -translate-x-1/2"
+        className="pointer-events-none absolute top-0 left-1/2 z-[1] hidden -translate-x-1/2 md:block"
       >
         <div className="relative h-[1462px] w-[1920px] overflow-hidden">
           {/* Scene — Figma node 430:4341 ("Purinta Hero back - 20260512").
@@ -154,31 +154,31 @@ export default function Hero() {
           />
 
           {/* Mascots — direct children of the BG container so their
-              percent insets resolve correctly (no `transform` parent). */}
+              percent insets resolve correctly (no `transform` parent).
 
-          {/* Frog (clipped from mascots-sprite) */}
-          <div
-            className="absolute top-[112.83px] left-[567.32px] h-[790px] w-[216.297px] overflow-hidden"
+              Pepe / Shibu are standalone SVG vector exports. Their box
+              matches the visible footprint of the previous sprite-clipped
+              mascots exactly: same bottom-centre anchor + height, width
+              derived from each SVG's own aspect ratio so the vector is
+              never distorted. */}
+
+          {/* Frog (Pepe) */}
+          <img
+            src={asset('/assets/figma/pepe.svg')}
+            alt="Pepe the frog"
+            className="absolute h-[231.81px] w-[175.07px] max-w-none"
+            style={{ top: '601.91px', left: '592.83px' }}
             data-node-id="384:2222"
-          >
-            <img
-              src={asset('/assets/figma/mascots-sprite.png')}
-              alt="Pepe the frog"
-              className="absolute top-0 left-[-127.71%] h-full w-[645.9%] max-w-none"
-            />
-          </div>
+          />
 
-          {/* Dog (clipped from mascots-sprite) */}
-          <div
-            className="absolute top-[115.83px] left-[1124.96px] h-[790px] w-[272.9px] overflow-hidden"
+          {/* Dog (Shibu) */}
+          <img
+            src={asset('/assets/figma/shibu.svg')}
+            alt="Shiba the dog"
+            className="absolute h-[269.75px] w-[205.77px] max-w-none"
+            style={{ top: '585.16px', left: '1130.44px' }}
             data-node-id="384:2220"
-          >
-            <img
-              src={asset('/assets/figma/mascots-sprite.png')}
-              alt="Shiba the dog"
-              className="absolute top-0 left-[-326.81%] h-full w-[511.93%] max-w-none"
-            />
-          </div>
+          />
 
           {/* Tofu / Hero mascot — single flattened SVG export from Figma.
               Bounding box mirrors the original Figma frame inset:
@@ -204,11 +204,11 @@ export default function Hero() {
       </motion.div>
 
       {/* ---------- Top spacer (Bg flex item, 48px) ---------- */}
-      <div className="h-[48px] w-full" />
+      <div className="hidden h-[48px] w-full md:block" />
 
       {/* ---------- Nav ---------- */}
       <motion.div
-        className="relative z-50 w-full px-4"
+        className="relative z-50 hidden w-full px-4 md:block"
         initial={navInitial}
         animate={{ opacity: 1, y: 0 }}
         transition={navTransition}
@@ -216,8 +216,48 @@ export default function Hero() {
         <Nav />
       </motion.div>
 
+      {/* ---------- Mobile Hero — Figma 665:59178 ("00_Hero", 360 wide).
+       * Scene (lake + 3 mascots) flattened from Figma node 665:56488.
+       *
+       * Responsive rule: the background scene is FULL-BLEED — it always
+       * spans the viewport width and never crops. Only the copy column
+       * (headline / paragraph / CTA) is capped at 480 px and centred.
+       * The copy overlay uses `pt-[39%]` (% of the full-bleed scene
+       * width) so it tracks the scene's sky as the scene scales. */}
+      <div className="relative w-full md:hidden">
+        <img
+          src={asset('/assets/figma/hero-mobile-scene.webp')}
+          alt=""
+          aria-hidden
+          fetchPriority="high"
+          decoding="async"
+          className="block w-full"
+        />
+        <div className="absolute inset-x-0 top-0 pt-[39%]">
+          <div className="mx-auto flex w-full max-w-[480px] flex-col items-center gap-4 px-6">
+            <div className="flex flex-col items-center gap-2">
+              <h1
+                className="text-center font-display text-[39px] leading-[43px] font-bold tracking-[0.78px] text-[#333]"
+                style={{ textShadow: '0.5px 0.5px 2px rgba(254,254,254,0.52)' }}
+              >
+                Deposit Memes,
+                <br />
+                Print USDC.
+              </h1>
+              <p className="text-center font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] text-[#333]">
+                The first lending protocol for memecoin believers. Lock
+                your bags, borrow USDC, and keep the upside.
+              </p>
+            </div>
+            <Button variant="primary" size="sm" asChild>
+              <a href="https://app.purinta.xyz">Launch App</a>
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {/* ---------- Hero content (1280 × 668, pt-58 pb-148) ---------- */}
-      <div className="relative z-10 flex w-full flex-col items-center">
+      <div className="relative z-10 hidden w-full flex-col items-center md:flex">
         <motion.div
           style={{ y: contentY, opacity: contentOpacity }}
           className="flex h-[668px] w-full max-w-[1280px] flex-col items-start px-6 pt-[58px] pb-[148px]"

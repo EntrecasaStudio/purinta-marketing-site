@@ -287,7 +287,7 @@ export default function Ecosystem() {
         {/* Copy block — title + subtitle */}
         <div className="flex w-full flex-col items-center gap-4">
           <h2 className="reveal reveal-up text-center font-display text-[68px] leading-[68px] font-bold tracking-[0.76px] text-[#185229] md:text-[76px] md:leading-[76px]">
-            Built on Giants
+            The Stack
           </h2>
           <p className="reveal reveal-up text-center font-body text-[20px] leading-[32px] tracking-[0.25px] text-[#4C4C4C] md:text-[25px] md:leading-[38px]">
             Purinta combines the best DeFi primitives into one

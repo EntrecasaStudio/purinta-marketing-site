@@ -33,7 +33,7 @@ export default function Community() {
       <div className="relative z-10 mx-auto flex w-full max-w-[1080px] flex-col items-center gap-[72px]">
         {/* Heading + body — 700 px column at md+, fluid below */}
         <div className="reveal reveal-up flex w-full max-w-[700px] flex-col items-center gap-6 text-center">
-          <h2 className="w-full font-body text-[32px] leading-[44px] font-medium tracking-[-0.16px] text-[var(--color-neutral-900)] md:text-[39px] md:leading-[55px] md:tracking-[-0.195px]">
+          <h2 className="w-full font-display text-[25px] leading-[33px] font-semibold tracking-[-0.16px] text-[var(--color-neutral-900)] md:text-[39px] md:leading-[43px] md:tracking-[-0.195px]">
             <span className="block">The Meme Lending</span>
             <span className="block">Community</span>
           </h2>
