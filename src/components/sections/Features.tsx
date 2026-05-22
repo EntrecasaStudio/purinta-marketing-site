@@ -11,10 +11,16 @@ import FeaturesMobile from '@/components/sections/FeaturesMobile'
  * time (~384px wide), the other four are collapsed (~152px wide).
  * Total row width: 1024px (the safe container of the marketing site).
  *
+ * OPTION B — "test de hover desktop" (Figma 830:100682, "Cards Hover").
+ * Collapsed cards REST in cream (cream-100 bg / cream-500 border, white
+ * star, cream divider, cream-300 blob) and fade up to their full accent
+ * colour while hovered, fading back out on roll-out. The expanded/active
+ * card is unchanged. Mobile is untouched.
+ *
  * Interaction (per UX spec):
  *  - Auto-advances every 5s through the 5 cards.
  *  - Hover on any card pauses the timer while hovered, resumes on
- *    mouse-leave.
+ *    mouse-leave; the hovered collapsed card colours in (fade in/out).
  *  - Click/focus pauses for 10s of inactivity, then resumes.
  *  - prefers-reduced-motion: no cycling, first card expanded by default.
  *  - Subtle progress bar at the bottom of the expanded card shows the
@@ -318,6 +324,11 @@ type CardProps = {
 
 function Card({ card, isActive, onSelect, index }: CardProps) {
   const ref = useRef<HTMLButtonElement>(null)
+  /* Option B — collapsed cards rest in cream and fade to their accent
+   * colour while hovered. `colored` is the merged "show accent" flag:
+   * true when the card is active (expanded) OR hovered. */
+  const [isHovered, setIsHovered] = useState(false)
+  const colored = isActive || isHovered
 
   return (
     /* Wrapper drives the SCROLL-IN entrance animation (opacity + rise)
@@ -344,6 +355,8 @@ function Card({ card, isActive, onSelect, index }: CardProps) {
         aria-controls={`feature-panel-${card.id}`}
         id={`feature-tab-${card.id}`}
         onClick={onSelect}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         animate={{
           /* Collapsed cards are 152 px wide (Figma node 454:8821).
            * With 1 expanded (384) + 4 collapsed (152) + 4 gaps (8 each)
@@ -364,8 +377,17 @@ function Card({ card, isActive, onSelect, index }: CardProps) {
         }}
         className="relative h-[416px] cursor-pointer rounded-[24px] border border-solid bg-white text-left transition-colors duration-500 outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
-        backgroundColor: isActive ? card.accent.bg : '#FEFEFE',
-        borderColor: card.accent.border,
+        /* Rest = cream-100 / cream-500 border. Hover = white + accent
+         * border. Active = accent.bg. The `transition-colors` class on
+         * the button crossfades these over 500ms (fade in / out). */
+        backgroundColor: isActive
+          ? card.accent.bg
+          : isHovered
+            ? '#FEFEFE'
+            : 'var(--color-cream-100)',
+        borderColor: colored
+          ? card.accent.border
+          : 'var(--color-cream-500)',
       }}
     >
       {/* Both content layers stay MOUNTED at all times — the body /
@@ -385,10 +407,10 @@ function Card({ card, isActive, onSelect, index }: CardProps) {
         <ExpandedContent card={card} isActive={isActive} />
         {/* Blob lives BEHIND the text layers — Star + Title + Divider
          * sit on top via z-10. */}
-        <MascotBlob card={card} isActive={isActive} />
-        <Star card={card} isActive={isActive} />
+        <MascotBlob card={card} isActive={isActive} isHovered={isHovered} />
+        <Star card={card} isActive={isActive} isHovered={isHovered} />
         <Title card={card} isActive={isActive} />
-        <Divider card={card} isActive={isActive} />
+        <Divider card={card} isActive={isActive} colored={colored} />
       </div>
 
       {/* Polaroid — outside the clip wrapper so it can float past the
@@ -502,7 +524,15 @@ const STAR_FILL_PATH =
 const STAR_STROKE_PATH =
   'M17.3805 7.84683C17.0611 7.86017 16.7281 8.04505 16.6178 8.4103L14.9596 13.4601L9.56994 15.715L9.56408 15.7169C9.22644 15.8637 9.05962 16.17 9.07873 16.4757C9.09695 16.7655 9.28265 17.0589 9.63635 17.1769L9.64221 17.1789L14.8668 18.8439L17.2555 24.2843L17.2574 24.2882C17.4115 24.6302 17.7469 24.7816 18.0719 24.7687H18.0729C18.4085 24.7547 18.7306 24.5494 18.8365 24.1964V24.1955L20.5514 18.4328L25.4362 16.8439C25.7619 16.7395 25.9491 16.4854 25.9908 16.215L26.0006 16.0988L25.9908 15.9787C25.9472 15.7042 25.7544 15.4676 25.4518 15.3585L25.4371 15.3537L20.5738 13.7785L18.194 8.3439L18.1793 8.30581L18.1393 8.2228C17.9847 7.97551 17.7313 7.86176 17.4762 7.85269C17.4448 7.84742 17.4127 7.84548 17.3805 7.84683Z'
 
-function Star({ card, isActive }: { card: CardData; isActive: boolean }) {
+function Star({
+  card,
+  isActive,
+  isHovered,
+}: {
+  card: CardData
+  isActive: boolean
+  isHovered: boolean
+}) {
   const reduceMotion = useReducedMotion()
   /* No delay — the star repositions IN PARALLEL with the divider's
    * disappearing scaleX (both start at t=0), instead of waiting for
@@ -544,15 +574,28 @@ function Star({ card, isActive }: { card: CardData; isActive: boolean }) {
       }}
       transition={transition}
     >
+      {/* Fill — white at rest (cream state) and when expanded; the
+       * accent.blob tint only fills in while the collapsed card is
+       * hovered. */}
       <motion.path
         d={STAR_FILL_PATH}
         initial={false}
-        animate={{ fill: isActive ? '#FEFEFE' : card.accent.blob }}
+        animate={{
+          fill: isHovered && !isActive ? card.accent.blob : '#FEFEFE',
+        }}
         transition={fillTransition}
       />
-      <path
+      {/* Stroke — cream-500 at rest, accent stroke once coloured. */}
+      <motion.path
         d={STAR_STROKE_PATH}
-        stroke={STAR_STROKES[card.id] ?? card.accent.border}
+        initial={false}
+        animate={{
+          stroke:
+            isActive || isHovered
+              ? (STAR_STROKES[card.id] ?? card.accent.border)
+              : 'var(--color-cream-500)',
+        }}
+        transition={fillTransition}
         strokeWidth="0.923085"
         strokeLinejoin="round"
       />
@@ -672,9 +715,11 @@ function Title({ card, isActive }: { card: CardData; isActive: boolean }) {
 function Divider({
   card,
   isActive,
+  colored,
 }: {
   card: CardData
   isActive: boolean
+  colored: boolean
 }) {
   return (
     <motion.div
@@ -684,9 +729,15 @@ function Divider({
         top: 170,
         left: 16,
         right: 16,
-        borderColor: card.accent.border,
       }}
-      animate={{ scaleX: isActive ? 0 : 1 }}
+      initial={false}
+      animate={{
+        scaleX: isActive ? 0 : 1,
+        /* cream-500 at rest, accent border once the card colours in. */
+        borderColor: colored
+          ? card.accent.border
+          : 'var(--color-cream-500)',
+      }}
       transition={{ duration: 0.45, ease: [0.65, 0, 0.35, 1] }}
     />
   )
@@ -726,9 +777,11 @@ function useMascotTransition(isActive: boolean) {
 function MascotBlob({
   card,
   isActive,
+  isHovered,
 }: {
   card: CardData
   isActive: boolean
+  isHovered: boolean
 }) {
   const transition = useMascotTransition(isActive)
 
@@ -763,7 +816,13 @@ function MascotBlob({
         bottom,
         width: isActive ? 170 : 135,
         height: isActive ? 150 : 120,
-        backgroundColor: isActive ? card.accent.blob : card.accent.bg,
+        /* cream-300 at rest, accent.bg while hovered, accent.blob when
+         * the card is expanded. */
+        backgroundColor: isActive
+          ? card.accent.blob
+          : isHovered
+            ? card.accent.bg
+            : 'var(--color-cream-300)',
         rotate: isActive
           ? card.blobRotate.expanded
           : card.blobRotate.collapsed,
