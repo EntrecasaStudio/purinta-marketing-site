@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { ChevronRight } from 'lucide-react'
 import { asset } from '@/lib/utils'
@@ -7,26 +7,21 @@ import FeaturesMobile from '@/components/sections/FeaturesMobile'
 /**
  * Features — Figma node 383:4066 ("Why Degens Love Purinta").
  *
- * Auto-cycling tab row of 5 themed cards. One card is expanded at any
- * time (~384px wide), the other four are collapsed (~152px wide).
+ * Tab row of 5 themed cards. One card is expanded at any time
+ * (~384px wide), the other four are collapsed (~152px wide).
  * Total row width: 1024px (the safe container of the marketing site).
  *
- * OPTION B — "test de hover desktop" (Figma 830:100682, "Cards Hover").
- * Collapsed cards REST in cream (cream-100 bg / cream-500 border, white
- * star, cream divider, cream-300 blob) and fade up to their full accent
- * colour while hovered, fading back out on roll-out. The expanded/active
+ * Hover behaviour (Figma 830:100682, "Cards Hover"): collapsed cards
+ * rest in cream (cream-100 bg / cream-500 border, white star, cream
+ * divider, cream-300 blob) and fade up to their full accent colour
+ * while hovered, fading back out on roll-out. The expanded/active
  * card is unchanged. Mobile is untouched.
  *
- * Interaction (per UX spec):
- *  - Auto-advances every 5s through the 5 cards.
- *  - Hover on any card pauses the timer while hovered, resumes on
- *    mouse-leave; the hovered collapsed card colours in (fade in/out).
- *  - Click/focus pauses for 10s of inactivity, then resumes.
- *  - prefers-reduced-motion: no cycling, first card expanded by default.
- *  - Subtle progress bar at the bottom of the expanded card shows the
- *    remaining time until the next advance.
+ * Interaction:
+ *  - Click/focus a collapsed card to expand it; the previously active
+ *    card collapses simultaneously. No auto-cycling.
  *  - aria-live="polite" announces the active card's title + body when
- *    it changes (auto or user-driven).
+ *    it changes.
  *  - Each card is a <button role="tab"> with aria-selected; keyboard
  *    Tab/Enter/Space activate.
  */
@@ -192,9 +187,6 @@ const CARDS: CardData[] = [
   },
 ]
 
-const CYCLE_MS = 5000
-const RESUME_AFTER_INPUT_MS = 10_000
-
 /** Default export renders the desktop card row (≥ md) and the mobile
  * stacked-card layout (< md) — each is gated by Tailwind breakpoints. */
 export default function Features() {
@@ -207,44 +199,10 @@ export default function Features() {
 }
 
 function FeaturesDesktop() {
-  const reduceMotion = useReducedMotion()
   const [activeIdx, setActiveIdx] = useState(0)
-  const [hoverPause, setHoverPause] = useState(false)
-  /** Counter incremented on every deliberate user interaction.
-   * Pairs with an effect that auto-resumes the cycle after
-   * RESUME_AFTER_INPUT_MS of no further input. */
-  const [inputPauseTick, setInputPauseTick] = useState(0)
-  const [inputPaused, setInputPaused] = useState(false)
-
-  const paused = reduceMotion || hoverPause || inputPaused
-
-  /** Resume auto-cycle 10s after the last user input. */
-  useEffect(() => {
-    if (inputPauseTick === 0) return
-    setInputPaused(true)
-    const t = setTimeout(() => setInputPaused(false), RESUME_AFTER_INPUT_MS)
-    return () => clearTimeout(t)
-  }, [inputPauseTick])
-
-  /** Cycle timer driven by a single RAF loop. Resets whenever
-   * `activeIdx` or `paused` change so the progress bar restarts on
-   * advance and on pause/resume. */
-  useEffect(() => {
-    if (paused) {
-      // Keep current progress visible while paused (do not reset).
-      return
-    }
-    const t = setTimeout(() => {
-      setActiveIdx((i) => (i + 1) % CARDS.length)
-    }, CYCLE_MS)
-    return () => clearTimeout(t)
-  }, [activeIdx, paused])
 
   const handleSelect = (idx: number) => {
-    if (idx !== activeIdx) {
-      setActiveIdx(idx)
-    }
-    setInputPauseTick((n) => n + 1)
+    if (idx !== activeIdx) setActiveIdx(idx)
   }
 
   const active = CARDS[activeIdx]
@@ -283,8 +241,6 @@ function FeaturesDesktop() {
           role="tablist"
           aria-label="Purinta features"
           className="flex gap-[8px]"
-          onMouseEnter={() => setHoverPause(true)}
-          onMouseLeave={() => setHoverPause(false)}
         >
           {CARDS.map((card, i) => (
             <Card
@@ -364,16 +320,16 @@ function Card({ card, isActive, onSelect, index }: CardProps) {
            * area perfectly without the overflow the 198 variant had. */
           width: isActive ? 384 : 152,
         }}
-        /* Spring tuned to the original snappy feel (~350 ms). Both
-         * directions share the same 130 ms delay so the opening and the
-         * closing cards start widening / shrinking at the EXACT same
-         * moment — that way the row stays exactly 1024 px wide throughout
-         * the transition instead of momentarily collapsing under that. */
+        /* Tween (not a spring) so the card GROWS smoothly into place
+         * without the snap-and-settle that a spring produces at the
+         * beginning of the motion. Both directions share the same
+         * 130 ms delay so the opening and the closing cards start
+         * widening / shrinking at the EXACT same moment, keeping the
+         * row at 1024 px wide throughout the transition. */
         transition={{
-          type: 'spring',
-          stiffness: 180,
-          damping: 24,
+          duration: 0.42,
           delay: 0.13,
+          ease: [0.32, 0.72, 0, 1],
         }}
         className="relative h-[416px] cursor-pointer rounded-[24px] border border-solid bg-white text-left transition-colors duration-500 outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
