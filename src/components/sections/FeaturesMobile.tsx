@@ -23,8 +23,12 @@ type Card = {
   border: string
   star: string
   illu: string
-  /** Natural pixel dimensions of the mascot PNG (Figma 1x).
-   * Source PNG is exported @2x; these are the rendered @1x sizes. */
+  /** Rendered size of the mascot in the mobile card. Scaled down
+   * from the natural Figma 1x sizes (which range 113-161 px wide,
+   * 103-160 px tall) so the mascot fits inside the 120×76 slot
+   * with only a slight overhang above. Height is held near 90 px
+   * across all cards for visual consistency; width follows the
+   * mascot's natural aspect ratio. */
   illuW: number
   illuH: number
 }
@@ -38,8 +42,9 @@ const cards: Card[] = [
     border: '#FEC4C0',
     star: asset('/assets/figma/features/star-borrow.svg'),
     illu: asset('/assets/figma/features/borrow.png'),
-    illuW: 127,
-    illuH: 156,
+    /* natural 127×156 → scaled to fit ~90 px tall */
+    illuW: 73,
+    illuH: 90,
   },
   {
     key: 'apy',
@@ -49,8 +54,9 @@ const cards: Card[] = [
     border: '#6ECFC6',
     star: asset('/assets/figma/features/star-apy.svg'),
     illu: asset('/assets/figma/features/apy.png'),
-    illuW: 113,
-    illuH: 103,
+    /* natural 113×103 → scaled to fit ~90 px tall */
+    illuW: 99,
+    illuH: 90,
   },
   {
     key: 'morpho',
@@ -60,8 +66,9 @@ const cards: Card[] = [
     border: '#FFA466',
     star: asset('/assets/figma/features/star-morpho.svg'),
     illu: asset('/assets/figma/features/morpho.png'),
-    illuW: 161,
-    illuH: 140,
+    /* natural 161×140 → scaled to fit ~90 px tall */
+    illuW: 103,
+    illuH: 90,
   },
   {
     key: 'mainnet',
@@ -71,8 +78,9 @@ const cards: Card[] = [
     border: '#669FFF',
     star: asset('/assets/figma/features/star-mainnet.svg'),
     illu: asset('/assets/figma/features/mainnet.png'),
-    illuW: 126,
-    illuH: 160,
+    /* natural 126×160 → scaled to fit ~90 px tall */
+    illuW: 71,
+    illuH: 90,
   },
   {
     key: 'api3',
@@ -82,8 +90,9 @@ const cards: Card[] = [
     border: '#57A053',
     star: asset('/assets/figma/features/star-api3.svg'),
     illu: asset('/assets/figma/features/api3.png'),
-    illuW: 123,
-    illuH: 134,
+    /* natural 123×134 → scaled to fit ~90 px tall */
+    illuW: 83,
+    illuH: 90,
   },
 ]
 
