@@ -8,6 +8,7 @@ import {
 } from 'motion/react'
 import { ChevronRight } from 'lucide-react'
 import { asset } from '@/lib/utils'
+import HowItWorksMobile from '@/components/sections/HowItWorksMobile'
 
 /**
  * HowItWorks — Figma node 454:7091.
@@ -141,7 +142,21 @@ const STEP_3_THRESHOLD = 0.92
  * spacer + gap) so the two stay aligned at any viewport width. */
 const NUMBER_COL_FLOW_WIDTH = 221
 
+/** Default export renders the desktop scroll-pinned panels (≥ md) and
+ * the mobile stacked layout (< md) — each is gated by Tailwind
+ * breakpoints. The `id="how-it-works"` anchor sits on the wrapper
+ * (instead of the inner sections) so there's only one in the DOM
+ * for the Nav scroll target. */
 export default function HowItWorks() {
+  return (
+    <div id="how-it-works">
+      <HowItWorksDesktop />
+      <HowItWorksMobile />
+    </div>
+  )
+}
+
+function HowItWorksDesktop() {
   const ref = useRef<HTMLElement>(null)
   const reduceMotion = useReducedMotion()
 
@@ -214,7 +229,7 @@ export default function HowItWorks() {
    * with their flat Figma backgrounds, no scroll pin, no slide. */
   if (reduceMotion) {
     return (
-      <section id="how-it-works" className="relative w-full">
+      <section className="relative hidden w-full md:block">
         <div className="py-12 text-center">
           <h2 className="font-display text-[39px] leading-[1] font-semibold tracking-[0.88px] text-[var(--color-neutral-900)]">
             How It Works?
@@ -235,13 +250,12 @@ export default function HowItWorks() {
 
   return (
     <section
-      id="how-it-works"
       ref={ref}
       /* z-40 lifts the whole section above the Hero's hill ellipse
        * (z-30) which extends ~300 px PAST Features' bottom into the
        * top of HowItWorks. Without this, the ellipse would render on
        * top of the title + first panel during the entry phase. */
-      className="relative z-40 w-full"
+      className="relative z-40 hidden w-full md:block"
       /* 3.92× viewport. The sticky pin eats 100vh, leaving a 292vh
        * scroll range: 130vh + 130vh to slide between the three panels,
        * plus two 16vh DWELL stretches where panels 2 and 3 hold
