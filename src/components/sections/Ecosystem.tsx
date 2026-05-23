@@ -283,28 +283,39 @@ export default function Ecosystem() {
       </div>
 
       {/* ---------- Foreground content ---------- */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col items-center gap-[72px] px-6 py-24 md:h-[1604px] md:justify-start md:py-0 md:pt-[136px]">
-        {/* Copy block — title + subtitle */}
-        <div className="flex w-full flex-col items-center gap-4">
-          <h2 className="reveal reveal-up text-center font-display text-[68px] leading-[68px] font-bold tracking-[0.76px] text-[#185229] md:text-[76px] md:leading-[76px]">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col items-center gap-6 px-6 py-16 md:h-[1604px] md:justify-start md:gap-[72px] md:py-0 md:pt-[136px]">
+        {/* Copy block — title + subtitle. Mobile sizing (Figma
+         * 773:40687): h2 31/37 Bold, p 13/21 Regular. Desktop keeps
+         * the original 76/76 + 25/38. */}
+        <div className="flex w-full flex-col items-center gap-2 md:gap-4">
+          <h2 className="reveal reveal-up text-center font-display text-[31px] leading-[37px] font-bold tracking-[0.62px] text-[#185229] md:text-[76px] md:leading-[76px] md:tracking-[0.76px]">
             The Stack
           </h2>
-          <p className="reveal reveal-up text-center font-body text-[20px] leading-[32px] tracking-[0.25px] text-[#4C4C4C] md:text-[25px] md:leading-[38px]">
-            Purinta combines the best DeFi primitives into one
-            <br />
-            seamless memecoin lending experience.
-            <br />
-            No shortcuts, no compromises.
+          <p className="reveal reveal-up text-center font-body text-[13px] leading-[21px] tracking-[0.26px] text-[#333] md:text-[25px] md:leading-[38px] md:tracking-[0.25px] md:text-[#4C4C4C]">
+            <span className="md:hidden">
+              Purinta combines the best DeFi primitives into one
+              seamless memecoin lending experience.
+              <br />
+              No shortcuts, no compromises.
+            </span>
+            <span className="hidden md:inline">
+              Purinta combines the best DeFi primitives into one
+              <br />
+              seamless memecoin lending experience.
+              <br />
+              No shortcuts, no compromises.
+            </span>
           </p>
         </div>
 
-        {/* Pillar cards — 4 in a row, stack on narrow viewports.
+        {/* Pillar cards — desktop: 4 across, big vertical cards.
          * `md:-mx-6 md:w-[calc(100%+3rem)]` cancels the foreground's
          * `px-6` mobile gutter on desktop so the row spans the full
          * 1024 px Figma width — without it the cards are 12 px
          * narrower each and "Battle-tested lending" wraps to a 2nd
-         * line. */}
-        <div className="flex w-full flex-col gap-6 md:-mx-6 md:w-[calc(100%+3rem)] md:flex-row md:items-stretch">
+         * line. Hidden on mobile (the mobile layout below renders
+         * a more compact horizontal-card variant). */}
+        <div className="hidden md:-mx-6 md:flex md:w-[calc(100%+3rem)] md:flex-row md:items-stretch md:gap-6">
           {pillars.map((p, i) => (
             <div
               key={p.title}
@@ -341,6 +352,64 @@ export default function Ecosystem() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Mobile pillar cards — compact horizontal layout per Figma
+         * 773:40687: 312 px wide, 60 px logo square on the left,
+         * 16/26 Medium title + 10/16 Regular body on the right,
+         * sticker drop shadow 2px / 2px in Mint/100 (#E7F4EC). */}
+        <div className="flex w-full max-w-[480px] flex-col gap-6 md:hidden">
+          {pillars.map((p) => (
+            <div
+              key={p.title}
+              /* Same signature shape as desktop: sharp top-left, 8 px
+               * radius on the other three corners. Lighter 2/2 sticker
+               * shadow vs desktop's 4/4 to keep the mobile card feeling
+               * lighter. */
+              className="reveal reveal-up flex w-full items-center gap-2 rounded-tr-[8px] rounded-br-[8px] rounded-bl-[8px] bg-[#FEFEFE] px-6 py-4"
+              style={{
+                filter: 'drop-shadow(2px 2px 0 #E7F4EC)',
+              }}
+            >
+              <div className="flex size-[60px] shrink-0 items-center justify-center">
+                <img
+                  src={p.logo}
+                  alt=""
+                  aria-hidden
+                  /* Mobile logos render ~25% smaller than desktop so
+                   * they fit the 60 px square cleanly. */
+                  style={{
+                    width: p.logoSize.w * 0.75,
+                    height: p.logoSize.h * 0.75,
+                  }}
+                  className="max-w-none object-contain"
+                />
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <h3 className="font-body text-[16px] leading-[26px] font-medium tracking-[0.16px] text-[#185229]">
+                  {p.title}
+                </h3>
+                <p className="font-body text-[10px] leading-[16px] tracking-[0.3px] whitespace-pre-line text-[#333]">
+                  {p.body}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Mascot under the mobile cards — Figma 714:36137 places the
+         * basic-money character below the stack of cards. Reuses the
+         * same animated embed the desktop layer renders (just inline
+         * here instead of absolutely positioned). */}
+        <div className="flex w-full justify-center md:hidden">
+          <iframe
+            src={asset('/mascot-animated.html')}
+            title=""
+            aria-hidden
+            tabIndex={-1}
+            scrolling="no"
+            className="pointer-events-none h-[200px] w-[183px] max-w-none border-0 bg-transparent"
+          />
         </div>
       </div>
     </section>
