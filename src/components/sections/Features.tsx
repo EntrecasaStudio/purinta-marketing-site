@@ -747,23 +747,40 @@ function MascotBlob({
 }) {
   const transition = useMascotTransition()
 
-  /* Anchor insets — per-card overrides applied on top of defaults.
-   * Collapsed defaults center the 135 px-wide blob horizontally in
-   * the new 152 px card ((152-135)/2 ≈ 9) and lift it up to ~75 px
-   * from the bottom so it sits centered-ish under the title rather
-   * than tucked into the bottom-right corner. */
-  const right = isActive
-    ? (card.expandedOverride?.blob?.right ?? 28)
-    : (card.collapsedOverride?.blob?.right ?? 9)
-  const bottom = isActive
-    ? (card.expandedOverride?.blob?.bottom ?? 48)
-    : (card.collapsedOverride?.blob?.bottom ?? 75)
+  /* Safari iOS killer: animating `width` / `height` on an element
+   * that carries `-webkit-mask-image` forces the mask to be
+   * re-rasterised on every frame. That's the main cause of the
+   * stutter the user sees in iPhone Pro Max landscape. We anchor
+   * the blob at its EXPANDED footprint (170×150 at right:baseRight,
+   * bottom:baseBottom) and ride the collapsed → expanded morph
+   * entirely on transforms — scale + translate are GPU-composited
+   * and don't repaint the mask. `will-change: transform` hints
+   * Safari to promote the blob to its own layer ahead of time.
+   *
+   * Transform-origin is center so rotate animates around the blob's
+   * middle (matches the original feel); the translate puts the
+   * scaled blob at the correct collapsed anchor. */
+  const baseRight = card.expandedOverride?.blob?.right ?? 28
+  const baseBottom = card.expandedOverride?.blob?.bottom ?? 48
+  const collapsedRight = card.collapsedOverride?.blob?.right ?? 9
+  const collapsedBottom = card.collapsedOverride?.blob?.bottom ?? 75
+  /* Center-of-expanded minus center-of-collapsed, accounting for the
+   * 35×30 size shrink (the centre moves by half that when the blob
+   * scales down around centre). */
+  const collapsedX = baseRight - collapsedRight + (170 - 135) / 2
+  const collapsedY = baseBottom - collapsedBottom + (150 - 120) / 2
+  const collapsedScale = 135 / 170
 
   return (
     <motion.div
       aria-hidden
       className="pointer-events-none absolute"
       style={{
+        right: baseRight,
+        bottom: baseBottom,
+        width: 170,
+        height: 150,
+        willChange: 'transform',
         WebkitMaskImage: `url(${asset(`/assets/figma/features/blob-${card.id}.svg`)})`,
         WebkitMaskSize: 'contain',
         WebkitMaskRepeat: 'no-repeat',
@@ -774,10 +791,9 @@ function MascotBlob({
         maskPosition: 'center',
       }}
       animate={{
-        right,
-        bottom,
-        width: isActive ? 170 : 135,
-        height: isActive ? 150 : 120,
+        x: isActive ? 0 : collapsedX,
+        y: isActive ? 0 : collapsedY,
+        scale: isActive ? 1 : collapsedScale,
         /* cream-300 at rest, accent.bg while hovered, accent.blob when
          * the card is expanded. */
         backgroundColor: isActive
@@ -847,6 +863,7 @@ function MascotImage({
         right: baseRight,
         bottom: baseBottom,
         transformOrigin: 'bottom right',
+        willChange: 'transform',
       }}
       animate={{
         x: isActive ? 0 : collapsedX,
