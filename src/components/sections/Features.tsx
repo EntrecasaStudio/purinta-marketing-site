@@ -799,28 +799,39 @@ function MascotImage({
 }) {
   const transition = useMascotTransition(isActive)
 
-  /* Collapsed `right` is computed per-card so the polaroid is
-   * horizontally CENTERED in the 152 px card regardless of its
-   * natural width: right = (152 - mascot.w) / 2. The wider morpho
-   * mascot (161) goes slightly negative — its arms intentionally
-   * extend past the card edge per the Figma design.
-   * Collapsed `bottom` lifts the polaroid 60 px above the card's
-   * bottom so it sits near the lower-middle of the card under the
-   * title block, instead of flush with the bottom edge. */
-  const right = isActive
-    ? (card.expandedOverride?.image?.right ?? -8)
-    : (card.collapsedOverride?.image?.right ??
-       Math.round((152 - card.mascotSize.w) / 2))
-  const bottom = isActive
-    ? (card.expandedOverride?.image?.bottom ?? -34)
-    : (card.collapsedOverride?.image?.bottom ?? 60)
+  /* The polaroid is ANCHORED in CSS at its expanded position (so
+   * `right` / `bottom` never change) and the collapsed → expanded
+   * motion runs entirely through CSS transforms (x / y / scale /
+   * rotate). Animating right / bottom alongside scale was the cause
+   * of the "grows first, settles into position after" feeling — those
+   * properties trigger layout on each frame and the browser scheduled
+   * them on the main thread, while scale ran on the compositor (GPU).
+   * Driving everything through transforms keeps the whole composition
+   * synchronized on the compositor for the full 420 ms.
+   *
+   * Collapsed default anchor (centered horizontally in the 152 px
+   * pill, 60 px above the bottom): right = (152 - mascot.w) / 2,
+   * bottom = 60. The translate that puts the polaroid there from
+   * the expanded anchor is computed below. */
+  const baseRight = card.expandedOverride?.image?.right ?? -8
+  const baseBottom = card.expandedOverride?.image?.bottom ?? -34
+  const collapsedRight =
+    card.collapsedOverride?.image?.right ??
+    Math.round((152 - card.mascotSize.w) / 2)
+  const collapsedBottom = card.collapsedOverride?.image?.bottom ?? 60
+  /* Translate from the expanded anchor to the collapsed anchor.
+   * Higher `right` = further from the right edge (i.e. leftward in
+   * screen coords), so x is the NEGATIVE of the right delta. Same
+   * idea for `bottom` → y. */
+  const collapsedX = -(collapsedRight - baseRight)
+  const collapsedY = -(collapsedBottom - baseBottom)
 
   return (
     /* Polaroid scales 1.4× when expanded (Figma 454:8816 — polaroid
      * 177×221 vs collapsed 127×156 = 1.39× linear). Origin bottom-right
      * so scale grows up-and-left from a fixed anchor; in expanded the
      * anchor is OUTSIDE the card so the polaroid floats past the
-     * boundary, in collapsed it tucks into the bottom-right corner. */
+     * boundary, in collapsed the translate tucks it back inside. */
     <motion.img
       src={card.mascot}
       alt=""
@@ -828,12 +839,14 @@ function MascotImage({
       width={card.mascotSize.w}
       height={card.mascotSize.h}
       className="pointer-events-none absolute max-w-none drop-shadow-[0_8px_8px_rgba(0,0,0,0.15)]"
-      style={{ transformOrigin: 'bottom right' }}
+      style={{
+        right: baseRight,
+        bottom: baseBottom,
+        transformOrigin: 'bottom right',
+      }}
       animate={{
-        right,
-        bottom,
-        width: card.mascotSize.w,
-        height: card.mascotSize.h,
+        x: isActive ? 0 : collapsedX,
+        y: isActive ? 0 : collapsedY,
         rotate: isActive ? 6 : 0,
         scale: isActive ? 1.4 : 1,
       }}
