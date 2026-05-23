@@ -325,11 +325,13 @@ function Card({ card, isActive, onSelect, index }: CardProps) {
          * beginning of the motion. Both directions share the same
          * 130 ms delay so the opening and the closing cards start
          * widening / shrinking at the EXACT same moment, keeping the
-         * row at 1024 px wide throughout the transition. */
+         * row at 1024 px wide throughout the transition. Identical
+         * timing + ease to useMascotTransition so the polaroid's
+         * scale + translate ride the card's width perfectly in step. */
         transition={{
-          duration: 0.42,
+          duration: 0.55,
           delay: 0.13,
-          ease: [0.32, 0.72, 0, 1],
+          ease: [0.4, 0, 0.2, 1],
         }}
         className="relative h-[416px] cursor-pointer rounded-[24px] border border-solid bg-white text-left transition-colors duration-500 outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
@@ -716,19 +718,21 @@ function Divider({
  * rotation per state, plus a polaroid mascot at its natural pixel
  * size scaled 1.4× when expanded.
  * ============================================================ */
-function useMascotTransition(isActive: boolean) {
+function useMascotTransition() {
   const reduceMotion = useReducedMotion()
-  /* Matches the card width tween exactly so the polaroid + blob grow
-   * (size, position, rotation) in lockstep with the card pill — the
-   * mascot reaches its expanded size and final position at the SAME
-   * frame the card finishes growing, instead of springing into place
-   * AFTER the card has already settled. */
+  /* Matches the card width tween — same duration, same ease, same
+   * 130 ms delay in BOTH directions so the polaroid and its card
+   * pill start moving on the exact same frame and finish on the
+   * exact same frame. The previous build had `delay: 0` on collapse
+   * which made the closing mascot leave 130 ms before its card
+   * began shrinking — that desync was the "moves after" feel the
+   * user reported. */
   return reduceMotion
     ? { duration: 0 }
     : ({
-        duration: 0.42,
-        delay: isActive ? 0.13 : 0,
-        ease: [0.32, 0.72, 0, 1],
+        duration: 0.55,
+        delay: 0.13,
+        ease: [0.4, 0, 0.2, 1],
       } as const)
 }
 
@@ -741,7 +745,7 @@ function MascotBlob({
   isActive: boolean
   isHovered: boolean
 }) {
-  const transition = useMascotTransition(isActive)
+  const transition = useMascotTransition()
 
   /* Anchor insets — per-card overrides applied on top of defaults.
    * Collapsed defaults center the 135 px-wide blob horizontally in
@@ -797,7 +801,7 @@ function MascotImage({
   card: CardData
   isActive: boolean
 }) {
-  const transition = useMascotTransition(isActive)
+  const transition = useMascotTransition()
 
   /* The polaroid is ANCHORED in CSS at its expanded position (so
    * `right` / `bottom` never change) and the collapsed → expanded
