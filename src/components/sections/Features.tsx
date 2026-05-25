@@ -31,8 +31,14 @@ type Accent = {
   bg: string
   /** Border color shared between collapsed and expanded. */
   border: string
-  /** Soft surface used for the mascot blob behind the illustration. */
+  /** Soft surface used for the mascot blob behind the illustration in
+   * the expanded/active card. */
   blob: string
+  /** Optional override for the blob colour when the card is collapsed
+   * AND hovered. Defaults to `bg` (the card's lightest tint); bump this
+   * up a step when `bg` is too pale to read against the cream-100
+   * collapsed background. */
+  blobHover?: string
 }
 
 type CardData = {
@@ -80,6 +86,10 @@ const CARDS: CardData[] = [
       bg: 'var(--color-blush-50)',
       border: 'var(--color-blush-400)',
       blob: 'var(--color-blush-300)',
+      /* Hover blob — blush-50 was too pale to read against the cream-100
+       * collapsed bg on hover, so bump it to blush-200 (#feece8). The
+       * expanded blob (blush-300) is untouched. */
+      blobHover: 'var(--color-blush-200)',
     },
     blobRotate: { collapsed: -32.4, expanded: 68.88 },
     /* Defaults are blob {right:28,bottom:48} / image {right:-8,bottom:-34}.
@@ -794,12 +804,14 @@ function MascotBlob({
         x: isActive ? 0 : collapsedX,
         y: isActive ? 0 : collapsedY,
         scale: isActive ? 1 : collapsedScale,
-        /* cream-300 at rest, accent.bg while hovered, accent.blob when
-         * the card is expanded. */
+        /* cream-300 at rest, accent.blobHover (fallback accent.bg) while
+         * hovered, accent.blob when the card is expanded. `blobHover`
+         * lets cards override the hover blob when their accent.bg is too
+         * pale to read on the collapsed cream-100 background. */
         backgroundColor: isActive
           ? card.accent.blob
           : isHovered
-            ? card.accent.bg
+            ? (card.accent.blobHover ?? card.accent.bg)
             : 'var(--color-cream-300)',
         rotate: isActive
           ? card.blobRotate.expanded
