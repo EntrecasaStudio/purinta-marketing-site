@@ -34,25 +34,28 @@ type Pillar = {
 const pillars: Pillar[] = [
   {
     title: 'Morpho',
-    body: 'Battle-tested lending\ninfrastructure',
+    /* Single-line on mobile; the desktop card wraps it naturally to
+     * two lines (the text is too wide for the 230 px desktop card
+     * column), matching Figma 551:41112. */
+    body: 'Battle-tested lending infrastructure',
     logo: v2('logo-morpho.svg'),
     logoSize: { w: 60, h: 56 },
   },
   {
     title: 'Api3',
-    body: 'First-party oracle feeds with OEV',
+    body: 'OEV oracle feeds and market curator',
     logo: v2('logo-api3.svg'),
     logoSize: { w: 64, h: 56 },
   },
   {
     title: 'Ethereum',
-    body: 'Mainnet native,\ndeep liquidity',
+    body: 'Mainnet native, deep liquidity',
     logo: v2('logo-eth.svg'),
     logoSize: { w: 44, h: 72 },
   },
   {
     title: 'USDC',
-    body: 'Borrow the most trusted stablecoin',
+    body: 'The most trusted stablecoin',
     logo: v2('logo-usdc.svg'),
     logoSize: { w: 56, h: 56 },
   },
@@ -170,6 +173,85 @@ function CompositeBill({ progress }: { progress: MotionValue<number> }) {
   )
 }
 
+/* ============================================================
+ *  MOBILE bills — Figma 773:40687, positioned in the 960-wide
+ *  Bg-Illustration scene. Same SVG assets as desktop; coords come
+ *  from get_design_context (`ml-X mt-Y` translated to absolute top/left).
+ *  Items outside the 360-viewport are clipped by the section's
+ *  overflow-hidden — Figma intentionally lets several bills crop.
+ * ============================================================ */
+const billsMobile: Record<string, BillSpec> = {
+  // top-right loose bill — Figma "Bill" outer 212×180 rot -11.92,
+  // inner 187.541×144.432
+  bill1: {
+    src: v2('bill-1.svg'),
+    pos: 'top-[173px] left-[667px] h-[144px] w-[188px]',
+    rotate: -11.92,
+    speed: 70,
+  },
+  // mid bills (3 small) — outer 104×96 rot 34.61 / -28.72, inner 91×52
+  bill2: {
+    src: v2('bill-2.svg'),
+    pos: 'top-[437px] left-[271px] h-[52px] w-[92px]',
+    rotate: 34.61,
+    speed: 30,
+  },
+  bill3: {
+    src: v2('bill-3.svg'),
+    pos: 'top-[442px] left-[844px] h-[52px] w-[92px]',
+    rotate: 34.61,
+    speed: 30,
+  },
+  bill4: {
+    src: v2('bill-4.svg'),
+    pos: 'top-[447px] left-[27px] h-[52px] w-[91px]',
+    rotate: -28.72,
+    speed: 30,
+  },
+  // big foreground bill — inner 296×291 rot 34.61
+  bill5: {
+    src: v2('bill-5.svg'),
+    pos: 'top-[534px] left-[492px] h-[291px] w-[296px]',
+    rotate: 34.61,
+    speed: 100,
+  },
+  // foreground bill at mascot feet — inner 130×75 rot -6.47
+  bill6: {
+    src: v2('bill-6.svg'),
+    pos: 'top-[645px] left-[259px] h-[75px] w-[130px]',
+    rotate: -6.47,
+    speed: 50,
+  },
+}
+
+/* Mobile composite bill — same three-layer construction as desktop,
+ * scaled to mobile coordinates (Figma 714:36083, ml-546.73 mt-0). */
+function CompositeBillMobile({ progress }: { progress: MotionValue<number> }) {
+  const y = useTransform(progress, [0, 1], [25, -25])
+  return (
+    <motion.div className="absolute inset-0" style={{ y }}>
+      <img
+        src={v2('bill-comp-base.svg')}
+        alt=""
+        aria-hidden
+        className="absolute top-[24px] left-[588px] h-[52px] w-[90px] max-w-none rotate-[4.16deg]"
+      />
+      <img
+        src={v2('bill-comp-shadow.svg')}
+        alt=""
+        aria-hidden
+        className="absolute top-[42px] left-[622px] h-[42px] w-[62px] max-w-none mix-blend-multiply"
+      />
+      <img
+        src={v2('bill-comp-top.svg')}
+        alt=""
+        aria-hidden
+        className="absolute top-[59px] left-[622px] h-[52px] w-[90px] max-w-none rotate-[34.61deg]"
+      />
+    </motion.div>
+  )
+}
+
 /* Mascot — animated embed from `public/mascot-animated.html`. Same
  * illustration as `ecosystem-v2/mascot.svg` (Figma node 551:41112;
  * 567:37160), but with JS-driven breath / blink / sway / hand motion
@@ -282,6 +364,41 @@ export default function Ecosystem() {
         <Bill spec={bills.bill6} progress={scrollYProgress} />
       </div>
 
+      {/* ---------- Mobile decorative layer ----------
+       *  Figma 773:40687 03_Bg-Illustration. A 960-wide reference scene
+       *  centered in the 360 viewport (same pattern as the footer's
+       *  mobile scene); items outside the viewport are clipped by the
+       *  section's overflow-hidden. */}
+      <div
+        className="pointer-events-none absolute top-0 left-1/2 z-0 h-[1300px] w-[960px] -translate-x-1/2 md:hidden"
+      >
+        {/* Top isometric squares pattern (rotated 180° per Figma) */}
+        <img
+          src={v2('squares-top.svg')}
+          alt=""
+          aria-hidden
+          className="absolute top-[3px] left-0 h-[504px] w-[960px] max-w-none rotate-180"
+        />
+        {/* Bottom isometric squares pattern */}
+        <img
+          src={v2('squares-bottom.svg')}
+          alt=""
+          aria-hidden
+          className="absolute top-[493px] left-0 h-[480px] w-[960px] max-w-none"
+        />
+
+        {/* Parallax bills — same SVGs as desktop, positioned to the
+         * mobile Figma scene. Several land outside the 360-viewport on
+         * purpose and crop into the section bg. */}
+        <Bill spec={billsMobile.bill1} progress={scrollYProgress} />
+        <CompositeBillMobile progress={scrollYProgress} />
+        <Bill spec={billsMobile.bill2} progress={scrollYProgress} />
+        <Bill spec={billsMobile.bill3} progress={scrollYProgress} />
+        <Bill spec={billsMobile.bill4} progress={scrollYProgress} />
+        <Bill spec={billsMobile.bill5} progress={scrollYProgress} />
+        <Bill spec={billsMobile.bill6} progress={scrollYProgress} />
+      </div>
+
       {/* ---------- Foreground content ---------- */}
       <div className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col items-center gap-6 px-6 py-16 md:h-[1604px] md:justify-start md:gap-[72px] md:py-0 md:pt-[136px]">
         {/* Copy block — title + subtitle. Mobile sizing (Figma
@@ -357,8 +474,11 @@ export default function Ecosystem() {
         {/* Mobile pillar cards — compact horizontal layout per Figma
          * 773:40687: 312 px wide, 60 px logo square on the left,
          * 16/26 Medium title + 10/16 Regular body on the right,
-         * sticker drop shadow 2px / 2px in Mint/100 (#E7F4EC). */}
-        <div className="flex w-full max-w-[480px] flex-col gap-6 md:hidden">
+         * sticker drop shadow 2px / 2px in Mint/100 (#E7F4EC). The
+         * stack uses gap-4 (16 px) — visually tighter than the
+         * desktop card row and matches the compact stack seen in the
+         * Figma mobile screenshot. */}
+        <div className="flex w-full max-w-[480px] flex-col gap-4 md:hidden">
           {pillars.map((p) => (
             <div
               key={p.title}
@@ -385,10 +505,14 @@ export default function Ecosystem() {
                   className="max-w-none object-contain"
                 />
               </div>
-              <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
                 <h3 className="font-body text-[16px] leading-[26px] font-medium tracking-[0.16px] text-[#185229]">
                   {p.title}
                 </h3>
+                {/* `whitespace-pre-line` kept so the same body strings
+                 * can still drop a line-break in a future iteration;
+                 * with no \n in the data they read as a single line
+                 * (per Figma 773:40687). */}
                 <p className="font-body text-[10px] leading-[16px] tracking-[0.3px] whitespace-pre-line text-[#333]">
                   {p.body}
                 </p>
@@ -397,19 +521,33 @@ export default function Ecosystem() {
           ))}
         </div>
 
-        {/* Mascot under the mobile cards — Figma 714:36137 places the
-         * basic-money character below the stack of cards. Reuses the
-         * same animated embed the desktop layer renders (just inline
-         * here instead of absolutely positioned). */}
-        <div className="flex w-full justify-center md:hidden">
-          <iframe
-            src={asset('/mascot-animated.html')}
-            title=""
-            aria-hidden
-            tabIndex={-1}
-            scrolling="no"
-            className="pointer-events-none h-[200px] w-[183px] max-w-none border-0 bg-transparent"
-          />
+        {/* Mascot on the isometric steps — Figma 714:36137 (mascot
+         * 181×201) + 714:36018 (steps). Steps tucked UP under the
+         * mascot so the character's feet rest on the top step (~50%
+         * of mascot height overlap, matching the desktop scene
+         * composition where the steps span the mascot's bottom half). */}
+        <div className="flex w-full justify-center -mt-2 md:hidden md:mt-0">
+          <div className="relative h-[295px] w-[260px]">
+            {/* Steps SVG — Figma 714:36018, three isometric tiers
+             * exported as one combined image. Same asset as desktop
+             * (~388×389), scaled to half for mobile (194×195). */}
+            <img
+              src={v2('steps.svg')}
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute top-[100px] left-1/2 h-[195px] w-[194px] max-w-none -translate-x-1/2"
+            />
+            {/* Animated mascot — same embed as desktop, character's
+             * feet at iframe-y ≈ 180 land on the top step (y = 100). */}
+            <iframe
+              src={asset('/mascot-animated.html')}
+              title=""
+              aria-hidden
+              tabIndex={-1}
+              scrolling="no"
+              className="pointer-events-none absolute top-0 left-1/2 z-10 h-[200px] w-[183px] max-w-none -translate-x-1/2 border-0 bg-transparent"
+            />
+          </div>
         </div>
       </div>
     </section>

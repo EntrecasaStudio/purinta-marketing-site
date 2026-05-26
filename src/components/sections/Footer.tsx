@@ -232,20 +232,23 @@ export default function Footer() {
         </div>
 
         {/* Top fade — softens the meadow into Community (the section
-         * above). Same gradient + soft mask as desktop, just shorter
-         * to fit the mobile section. Without this the meadow's top
-         * edge cuts hard against the previous section's background. */}
+         * above). Solid Neutral-50 (#fefefe) — the same tone as the
+         * page background showing through Community's transparent
+         * section, so the fade's opaque top reads as a continuation
+         * of Community rather than introducing a new tint. Taller
+         * mask (320 px) + a longer fully-opaque region (0–22 %) so
+         * the meadow's hard top edge stays covered until the gradient
+         * has space to dissolve into the grass. */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 z-[5]"
           style={{
-            height: '220px',
-            background:
-              'linear-gradient(106.89deg, #f9f9f7 0%, #f4f7f5 100%)',
+            height: '320px',
+            background: '#fefefe',
             maskImage:
-              'linear-gradient(to bottom, #000 0%, #000 14%, rgba(0,0,0,0.55) 46%, transparent 100%)',
+              'linear-gradient(to bottom, #000 0%, #000 22%, rgba(0,0,0,0.65) 50%, rgba(0,0,0,0.25) 78%, transparent 100%)',
             WebkitMaskImage:
-              'linear-gradient(to bottom, #000 0%, #000 14%, rgba(0,0,0,0.55) 46%, transparent 100%)',
+              'linear-gradient(to bottom, #000 0%, #000 22%, rgba(0,0,0,0.65) 50%, rgba(0,0,0,0.25) 78%, transparent 100%)',
           }}
         />
 
@@ -279,42 +282,60 @@ export default function Footer() {
 }
 
 /* Shared band content — logotype + copyright + two link groups.
- * Responsive classes inside switch between stacked (mobile) and
- * side-by-side (desktop) layouts so this single tree serves both. */
+ * Responsive utilities switch the type scale & layout per breakpoint:
+ *
+ *   Mobile  (Figma 773:40690): logo 20 px, text Rubik Medium 13/21
+ *                              tracking 0.26, gap-8 logo↔copyright,
+ *                              gap-24 logo-block↔links-block, links
+ *                              flex-wrap with separator pipes.
+ *   Desktop (Figma 551:41115):  logo 34 px, text 16/26 tracking 0.16,
+ *                              gap-18 logo↔copyright, flex-row, gap-64
+ *                              between link groups.
+ */
 function BandInner() {
   return (
-    <div className="relative mx-auto flex h-full max-w-[1440px] flex-col items-center justify-center gap-4 px-6 py-8 md:flex-row md:items-center md:justify-between md:gap-10 md:px-[156px] md:pt-[88px] md:pb-[56px]">
-      <div className="flex flex-col items-center gap-2.5 md:flex-row md:items-center md:gap-[18px]">
+    <div className="relative mx-auto flex h-full max-w-[1440px] flex-col items-center justify-center gap-[24px] px-[16px] py-[24px] md:flex-row md:items-center md:justify-between md:gap-10 md:px-[156px] md:pt-[88px] md:pb-[56px]">
+      <div className="flex flex-col items-center gap-[8px] md:flex-row md:items-center md:gap-[18px]">
+        {/* Logo — Figma sizes the mobile lockup at 20 × 84 (symbol
+         * 17.66 × 20 + wordmark 62.46 × 12.37). Rendering the 135×34
+         * SVG at h=20 keeps the same composition at the natural 3.97:1
+         * aspect → 79.4 px wide (≈ Figma's 84). Desktop stays 34×135. */}
         <img
           src={asset('/assets/figma/footer/logotype-footer.svg')}
           alt="Purinta"
-          className="h-[34px] w-[135px] shrink-0"
+          className="h-[20px] w-[79.4px] shrink-0 md:h-[34px] md:w-[135px]"
         />
-        <p className="font-body text-[16px] leading-[26px] font-medium tracking-[0.16px] text-[#333] whitespace-nowrap">
+        <p className="font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] text-[#333] whitespace-nowrap md:text-[16px] md:leading-[26px] md:tracking-[0.16px]">
           © {new Date().getFullYear()} Purinta Inc. All rights reserved.
         </p>
       </div>
       <nav
         aria-label="Footer"
-        className="flex flex-wrap items-center justify-center gap-x-10 gap-y-2 md:flex-nowrap md:gap-[64px]"
+        className="flex flex-wrap items-start justify-center gap-y-2 gap-x-[32px] px-[56px] md:flex-nowrap md:items-center md:gap-[64px] md:px-0"
       >
         {linkGroups.map((group, gi) => (
-          <div key={gi} className="flex items-center gap-[16px]">
+          <div
+            key={gi}
+            className="flex items-center gap-[12px] md:gap-[16px]"
+          >
             {group.map((l, li) => (
-              <span key={l.label} className="flex items-center gap-[16px]">
+              <span
+                key={l.label}
+                className="flex items-center gap-[12px] md:gap-[16px]"
+              >
                 <a
                   href={l.href}
                   {...(l.external
                     ? { target: '_blank', rel: 'noopener noreferrer' }
                     : {})}
-                  className="font-body text-[16px] leading-[26px] font-medium tracking-[0.16px] whitespace-nowrap text-[#333] transition-opacity hover:opacity-70"
+                  className="font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] whitespace-nowrap text-[#333] transition-opacity hover:opacity-70 md:text-[16px] md:leading-[26px] md:tracking-[0.16px]"
                 >
                   {l.label}
                 </a>
                 {li === 0 && (
                   <span
                     aria-hidden
-                    className="font-body text-[16px] leading-[26px] font-medium text-[#808080]"
+                    className="font-body text-[13px] leading-[21px] font-medium text-[#808080] md:text-[16px] md:leading-[26px]"
                   >
                     |
                   </span>

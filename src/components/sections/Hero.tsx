@@ -249,7 +249,9 @@ export default function Hero() {
                 your bags, borrow USDC, and keep the upside.
               </p>
             </div>
-            <Button variant="primary" size="sm" asChild>
+            {/* Mobile CTA — Figma matches the Community mobile button:
+             * 44 px tall, 16 px Medium text (same as <Button size="md">). */}
+            <Button variant="primary" size="md" asChild>
               <a href="https://app.purinta.xyz">Launch App</a>
             </Button>
           </div>

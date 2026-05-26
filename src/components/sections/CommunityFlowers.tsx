@@ -33,7 +33,18 @@ import { asset } from '@/lib/utils'
  * Each instance crops the shared sprite (`flowers-sprite.png`, 2840×539)
  * exactly as Figma does: an `overflow-hidden` box with an inner <img>
  * scaled by a width % and shifted by a left % so a single flower shows.
- * Hidden below `md` so it never crowds the mobile copy (existing pattern).
+ *
+ * Two layers
+ * ----------
+ *   Desktop (≥ md): the 12-flower scatter from 726:40370, positioned in
+ *   a 1440-wide reference frame, anchored to Community's bottom at
+ *   y = REF_H (638).
+ *
+ *   Mobile  (< md): the 12-flower scatter from 773:40689's flowers group
+ *   (726:40369), positioned in the 960-wide Bottom-Illustration scene
+ *   and centered horizontally inside the 360-wide section so the same
+ *   x-coords resolve 1:1. Anchored to Community's bottom edge via
+ *   `bottom: 0` so the section's actual height doesn't matter.
  */
 
 const sprite = asset('/assets/figma/community/flowers-sprite.png')
@@ -74,8 +85,17 @@ type Flower = {
 }
 
 /**
- * The 12 instances of Figma group 726:40370, transcribed 1:1 from the
- * get_design_context output (left/top/size/rotation/opacity/sprite crop).
+ * Mobile reference: the Bottom-Illustration scene is 960 wide and sits
+ * centered inside the 360-wide section, so x-coords from Figma resolve
+ * 1:1 once the layer wrapper is centered too. The layer uses
+ * `bottom: 0` (anchored to Community's bottom edge) so the section's
+ * actual height isn't needed.
+ */
+const REF_W_MOBILE = 960
+
+/**
+ * The 12 instances of Figma group 726:40370 (desktop, Bottom-Illustration
+ * 1440-wide scene), transcribed 1:1 from get_design_context.
  */
 const flowers: Flower[] = [
   { id: 'f1', left: 1332.6, top: 23.93, w: 140.52, h: 181.5, imgW: '680.56%', imgL: '-580.56%' },
@@ -107,6 +127,42 @@ const flowers: Flower[] = [
   },
 ]
 
+/**
+ * The 12 instances of Figma group 726:40369 (mobile, Bottom-Illustration
+ * 960-wide scene), transcribed 1:1 from 773:40689 get_design_context.
+ * Several have NEGATIVE top so they overflow up into Community; the
+ * rest sit in the Footer meadow. Same sprite as desktop.
+ */
+const flowersMobile: Flower[] = [
+  { id: 'mf1', left: 666.3, top: 12.47, w: 70.26, h: 90.75, imgW: '680.56%', imgL: '-580.56%' },
+  { id: 'mf3', left: 258.4, top: 12.47, w: 160.975, h: 90.75, imgW: '297.04%', imgL: '0%' },
+  {
+    id: 'mf4', left: 650.09, top: 9, w: 129.602, h: 89.681,
+    rot: 168.13, innerW: 118.403, innerH: 66.75, imgW: '297.04%', imgL: '0%',
+  },
+  { id: 'mf5', left: 475.69, top: 16.47, w: 44.601, h: 66.75, imgW: '788.57%', imgL: '0%', opacity: 0.4 },
+  { id: 'mf6', left: 527.69, top: -31.53, w: 44.601, h: 66.75, imgW: '788.57%', imgL: '0%' },
+  { id: 'mf7', left: 399.99, top: -24.06, w: 28.6, h: 42.803, imgW: '788.57%', imgL: '0%', opacity: 0.5 },
+  { id: 'mf9', left: 211.99, top: 8.44, w: 28.6, h: 42.803, imgW: '788.57%', imgL: '0%', opacity: 0.5 },
+  { id: 'mf8', left: 471.99, top: 8.44, w: 28.6, h: 42.803, imgW: '788.57%', imgL: '0%', opacity: 0.5 },
+  {
+    id: 'mf2', left: 281.69, top: 6.68, w: 44.181, h: 65.355,
+    rot: -176.05, flipY: true, innerW: 39.95, innerH: 62.75, imgW: '827.61%', imgL: '-727.61%',
+  },
+  {
+    id: 'mf10', left: 256.73, top: -2.91, w: 30.099, h: 44.525,
+    rot: -3.95, innerW: 27.217, innerH: 42.75, imgW: '827.61%', imgL: '-727.61%', opacity: 0.5,
+  },
+  {
+    id: 'mf11', left: 416.73, top: 9.09, w: 30.099, h: 44.525,
+    rot: -3.95, innerW: 27.217, innerH: 42.75, imgW: '827.61%', imgL: '-727.61%', opacity: 0.5,
+  },
+  {
+    id: 'mf12', left: 628.73, top: 53.09, w: 30.099, h: 44.525,
+    rot: -3.95, innerW: 27.217, innerH: 42.75, imgW: '827.61%', imgL: '-727.61%', opacity: 0.5,
+  },
+]
+
 /** A single sprite-cropped flower. */
 function FlowerCrop({
   w,
@@ -130,71 +186,97 @@ function FlowerCrop({
   )
 }
 
+/** Render a list of flowers inside a fixed-width coord space. */
+function FlowerLayer({ items, width }: { items: Flower[]; width: number }) {
+  return (
+    <div className="relative" style={{ width: `${width}px` }}>
+      {items.map((fl) => {
+        const inner = (
+          <FlowerCrop
+            w={fl.innerW ?? fl.w}
+            h={fl.innerH ?? fl.h}
+            imgW={fl.imgW}
+            imgL={fl.imgL}
+            opacity={fl.opacity}
+          />
+        )
+        // Rotated/flipped instances: Figma centers the inner box in the
+        // bounding box, then applies flip + rotation.
+        const content =
+          fl.rot !== undefined ? (
+            <div className="flex h-full w-full items-center justify-center">
+              <div
+                className="flex-none"
+                style={{
+                  transform: `${fl.flipY ? 'scaleY(-1) ' : ''}rotate(${fl.rot}deg)`,
+                }}
+              >
+                {inner}
+              </div>
+            </div>
+          ) : (
+            inner
+          )
+
+        return (
+          <div
+            key={fl.id}
+            className="absolute"
+            style={{
+              left: `${fl.left}px`,
+              top: `${fl.top}px`,
+              width: `${fl.w}px`,
+              height: `${fl.h}px`,
+            }}
+          >
+            {content}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function CommunityFlowers() {
   return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none absolute hidden select-none md:block"
-      style={{
-        // Anchor the layer's origin (y = 0) to the Community↔Footer
-        // boundary, i.e. Community's bottom edge. Instance `top` values
-        // offset from here (negative → up into Community).
-        top: `${REF_H}px`,
-        // Center the 1440-wide coordinate space (same pattern as the
-        // Footer scene-wrap); flowers overflow below into the Footer
-        // meadow, hence z-20 so the cluster paints over it.
-        left: '50%',
-        width: `${REF_W}px`,
-        height: 0,
-        transform: 'translateX(-50%)',
-        zIndex: 20,
-      }}
-    >
-      <div className="relative" style={{ width: `${REF_W}px` }}>
-        {flowers.map((fl) => {
-          const inner = (
-            <FlowerCrop
-              w={fl.innerW ?? fl.w}
-              h={fl.innerH ?? fl.h}
-              imgW={fl.imgW}
-              imgL={fl.imgL}
-              opacity={fl.opacity}
-            />
-          )
-          // Rotated/flipped instances: Figma centers the inner box in the
-          // bounding box, then applies flip + rotation.
-          const content =
-            fl.rot !== undefined ? (
-              <div className="flex h-full w-full items-center justify-center">
-                <div
-                  className="flex-none"
-                  style={{
-                    transform: `${fl.flipY ? 'scaleY(-1) ' : ''}rotate(${fl.rot}deg)`,
-                  }}
-                >
-                  {inner}
-                </div>
-              </div>
-            ) : (
-              inner
-            )
-
-          return (
-            <div
-              key={fl.id}
-              className="absolute"
-              style={{
-                left: `${fl.left}px`,
-                top: `${fl.top}px`,
-                width: `${fl.w}px`,
-                height: `${fl.h}px`,
-              }}
-            >
-              {content}
-            </div>
-          )
-        })}
+    <>
+      {/* Desktop layer — 1440-wide scene, anchored to top: REF_H so it
+       *  sits at Community's bottom edge (section has md:min-h-[638]). */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute hidden select-none md:block"
+        style={{
+          top: `${REF_H}px`,
+          left: '50%',
+          width: `${REF_W}px`,
+          height: 0,
+          transform: 'translateX(-50%)',
+          zIndex: 20,
+        }}
+      >
+        <FlowerLayer items={flowers} width={REF_W} />
       </div>
-    </div>
+
+      {/* Mobile layer — 960-wide Bottom-Illustration scene, anchored
+       *  via bottom: 0 so the section's natural height is honoured.
+       *  The 960-wide layer overflows the 360 viewport symmetrically
+       *  (the section is overflow-visible at the page level, but the
+       *  Footer below is overflow-clip so anything that lands inside
+       *  the Footer is clipped to it). */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute select-none md:hidden"
+        style={{
+          bottom: 0,
+          left: '50%',
+          width: `${REF_W_MOBILE}px`,
+          height: 0,
+          transform: 'translateX(-50%)',
+          zIndex: 20,
+        }}
+      >
+        <FlowerLayer items={flowersMobile} width={REF_W_MOBILE} />
+      </div>
+    </>
   )
 }
