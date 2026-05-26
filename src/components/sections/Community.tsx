@@ -35,7 +35,12 @@ export default function Community() {
   return (
     <section
       id="community"
-      className="relative w-full overflow-visible px-6 pt-1 pb-4 md:min-h-[638px] md:px-[var(--ds-space-24,24px)] md:pt-[80px] md:pb-[83px]"
+      /* z-10 promotes Community to its own stacking context so the
+       * CommunityFlowers scatter (with z-20 inside) paints OVER the
+       * Footer section that follows in document order. Without this
+       * the later <Footer /> sibling covers the flowers that overflow
+       * Community's bottom edge into the Footer meadow. */
+      className="relative z-10 w-full overflow-visible px-6 pt-1 pb-12 md:min-h-[638px] md:px-[var(--ds-space-24,24px)] md:pt-[80px] md:pb-[83px]"
     >
       <div className="relative z-10 mx-auto flex w-full max-w-[1080px] flex-col items-center gap-[28px] md:gap-[72px]">
         {/* Heading + body — 540 px column on mobile, 700 px column at md+ */}

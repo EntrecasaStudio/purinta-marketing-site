@@ -186,12 +186,13 @@ export default function Footer() {
           style={{ width: '960px', height: '730.692px' }}
         >
           {/* Background meadow — Figma 726:40364 "Purinta footer V4".
-           * Native 4096×2651 (RGBA) downsampled to 1200×776 webp.
-           * Sits at Figma offset (-40, 0), rendered into a 1040×581
-           * box with object-fit:cover so the lush meadow + flowers
-           * fill the box edge-to-edge. The 581-tall image covers the
-           * full 548-tall section so the meadow is visible behind
-           * everything — including the band logo + links. */}
+           * Native 4096×2651 (RGBA) downsampled to 1200×776 webp. The
+           * webp carries its OWN baked alpha fade at the top edge.
+           * A long, gentle CSS mask supplements that fade — the top
+           * ~18 % of the image ramps slowly from transparent to opaque
+           * so the meadow dissolves into the diagonal page gradient
+           * (Community) over ~105 px without a visible band. The grass
+           * body below the mascot stays fully visible. */}
           <img
             src={sceneBgMobile}
             alt=""
@@ -206,6 +207,10 @@ export default function Footer() {
               height: '581px',
               objectFit: 'cover',
               objectPosition: '50% 50%',
+              maskImage:
+                'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 5%, rgba(0,0,0,0.4) 9%, rgba(0,0,0,0.7) 13%, rgba(0,0,0,0.92) 16%, #000 18%)',
+              WebkitMaskImage:
+                'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 5%, rgba(0,0,0,0.4) 9%, rgba(0,0,0,0.7) 13%, rgba(0,0,0,0.92) 16%, #000 18%)',
             }}
           />
 
@@ -230,27 +235,6 @@ export default function Footer() {
             <FooterMascot />
           </div>
         </div>
-
-        {/* Top fade — softens the meadow into Community (the section
-         * above). Solid Neutral-50 (#fefefe) — the same tone as the
-         * page background showing through Community's transparent
-         * section, so the fade's opaque top reads as a continuation
-         * of Community rather than introducing a new tint. Taller
-         * mask (320 px) + a longer fully-opaque region (0–22 %) so
-         * the meadow's hard top edge stays covered until the gradient
-         * has space to dissolve into the grass. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 z-[5]"
-          style={{
-            height: '320px',
-            background: '#fefefe',
-            maskImage:
-              'linear-gradient(to bottom, #000 0%, #000 22%, rgba(0,0,0,0.65) 50%, rgba(0,0,0,0.25) 78%, transparent 100%)',
-            WebkitMaskImage:
-              'linear-gradient(to bottom, #000 0%, #000 22%, rgba(0,0,0,0.65) 50%, rgba(0,0,0,0.25) 78%, transparent 100%)',
-          }}
-        />
 
         {/* Band — Figma 773:40690, absolute bottom 171. The radial
          * tint is the SAME pattern as desktop (transparent at the top
