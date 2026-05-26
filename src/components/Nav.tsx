@@ -10,21 +10,71 @@ import { XIcon, DiscordIcon } from '@/components/icons/Social'
 import { Button } from '@/components/ui/button'
 import { asset } from '@/lib/utils'
 
+/* The nav is not sticky — it scrolls away with the hero — so a fixed
+ * "active" highlight on Home would always be on (uninformative) and on
+ * mobile it'd be actively wrong: the menu is an overlay opened from any
+ * scroll position, so flagging Home as the current section while the
+ * user is mid-page is misleading. No item carries `active` until/unless
+ * a scroll-spy is added (would need the nav to be sticky to be useful). */
 const links = [
-  { href: '#', label: 'Home', active: true },
-  { href: '#features', label: 'Features' },
+  { href: '#features', label: 'Why Purinta' },
   { href: '#how-it-works', label: 'How It Works' },
-  { href: '#ecosystem', label: 'Ecosystem' },
-  // { href: '#community', label: 'Community' }, // section hidden for now
+  { href: '#ecosystem', label: 'The Stack' },
 ]
 
-/* Mobile menu links — matches Figma node 773:40693 (Menu-Mobile-Content). */
-const mobileLinks = [
-  { href: '#', label: 'Home', active: true },
-  { href: '#features', label: 'Features' },
-  { href: '#how-it-works', label: 'How It Works' },
-  { href: '#community', label: 'Community' },
-]
+/* Mobile menu links — same three sections as desktop. */
+const mobileLinks = links
+
+/* Smooth scroll with a configurable duration. The native CSS
+ * `scroll-behavior: smooth` on <html> finishes in ~300–500 ms, which
+ * reads as a jump; this rAF loop runs ~1.1 s with an ease-in-out so
+ * the user actually sees the page travel between sections. Honours
+ * prefers-reduced-motion (snaps to target in one frame). */
+const SCROLL_DURATION_MS = 1100
+
+function easeInOutCubic(t: number) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+}
+
+function smoothScrollTo(targetY: number) {
+  const reduceMotion =
+    typeof window !== 'undefined' &&
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  if (reduceMotion) {
+    window.scrollTo({ top: targetY, behavior: 'auto' })
+    return
+  }
+  /* Disable CSS scroll-behavior so per-frame scrollTo calls don't
+   * compound with the browser's own smooth scrolling. Restored when
+   * the animation finishes. */
+  const html = document.documentElement
+  const prevBehavior = html.style.scrollBehavior
+  html.style.scrollBehavior = 'auto'
+
+  const startY = window.scrollY
+  const distance = targetY - startY
+  const startTime = performance.now()
+
+  function step(now: number) {
+    const elapsed = now - startTime
+    const t = Math.min(elapsed / SCROLL_DURATION_MS, 1)
+    window.scrollTo(0, startY + distance * easeInOutCubic(t))
+    if (t < 1) requestAnimationFrame(step)
+    else html.style.scrollBehavior = prevBehavior
+  }
+  requestAnimationFrame(step)
+}
+
+function scrollToHref(href: string) {
+  if (href === '#' || href === '') {
+    smoothScrollTo(0)
+    return
+  }
+  const el = document.querySelector(href) as HTMLElement | null
+  if (!el) return
+  const targetY = el.getBoundingClientRect().top + window.scrollY
+  smoothScrollTo(targetY)
+}
 
 /**
  * Top navigation pill — Figma node 384:2293.
@@ -49,11 +99,15 @@ export default function Nav() {
                 <li key={l.label}>
                   <a
                     href={l.href}
-                    className={`block px-[8px] py-[1.5px] font-body text-[16px] leading-[26px] tracking-[0.16px] whitespace-nowrap text-[#333] transition-colors hover:text-[var(--color-green-600)] ${
-                      l.active
-                        ? 'border-b border-solid border-[#B2B2B2]'
-                        : ''
-                    }`}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      scrollToHref(l.href)
+                      /* Update the URL hash without triggering the
+                       * native instant jump (history.pushState skips
+                       * the browser's scroll-to-anchor behaviour). */
+                      history.pushState(null, '', l.href)
+                    }}
+                    className="block px-[8px] py-[1.5px] font-body text-[16px] leading-[26px] tracking-[0.16px] whitespace-nowrap text-[#333] transition-colors hover:text-[var(--color-green-600)]"
                   >
                     {l.label}
                   </a>
@@ -117,7 +171,6 @@ export default function Nav() {
  *  - prefers-reduced-motion: all of it collapses to a 0.15 s fade.
  * ============================================================ */
 
-const starGreen = asset('/assets/figma/menu/star.svg')
 const starWhite = asset('/assets/figma/menu/star2.svg')
 
 /** Hamburger ⇄ X — three bars; top/bottom rotate to the X, mid fades. */
@@ -171,18 +224,17 @@ export function NavMobile() {
       setOpen(false)
     }
 
-  /* Runs once the panel's exit animation has fully completed. */
+  /* Runs once the panel's exit animation has fully completed. Uses the
+   * same custom-duration smooth scroll as the desktop nav so the
+   * travel between sections feels consistent across breakpoints. */
   const runPendingScroll = () => {
     if (pendingScroll == null) return
     const target = pendingScroll
     setPendingScroll(null)
-    if (target === '#' || target === '') {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-      return
+    scrollToHref(target)
+    if (target !== '#' && target !== '') {
+      history.pushState(null, '', target)
     }
-    document
-      .querySelector(target)
-      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   /* Lock body scroll + wire Escape-to-close while the menu is open. */
@@ -310,17 +362,13 @@ export function NavMobile() {
                 >
                   <span className="flex items-center pb-[10px]">
                     <motion.img
-                      src={l.active ? starGreen : starWhite}
+                      src={starWhite}
                       alt=""
                       aria-hidden
                       variants={starVariants}
                       className="size-4 shrink-0"
                     />
                   </span>
-                  {/* Text block sizes to the word (not flex-1), so the
-                   * "Home" underline rule spans only the label width —
-                   * per Figma, where the divider is w-full of a
-                   * shrink-to-content text block. */}
                   <a
                     href={l.href}
                     onClick={handleNavClick(l.href)}
@@ -329,9 +377,6 @@ export function NavMobile() {
                     <span className="font-body text-[20px] leading-[32px] font-normal tracking-[0.2px] text-[#333]">
                       {l.label}
                     </span>
-                    {l.active && (
-                      <span className="block h-[1.5px] w-full bg-[#57A053]" />
-                    )}
                   </a>
                 </motion.div>
               ))}
