@@ -41,10 +41,10 @@ const cards: Card[] = [
     bg: '#FFFAFA',
     border: '#FEC4C0',
     star: asset('/assets/figma/features/star-borrow.svg'),
-    illu: asset('/assets/figma/features/borrow.png'),
-    /* natural 127×156 → scaled to fit ~90 px tall */
-    illuW: 73,
-    illuH: 90,
+    illu: asset('/assets/figma/features/borrow.svg'),
+    /* natural 130×110 → 0.75× for mobile */
+    illuW: 98,
+    illuH: 83,
   },
   {
     key: 'apy',
@@ -53,10 +53,10 @@ const cards: Card[] = [
     bg: '#F2F8F7',
     border: '#6ECFC6',
     star: asset('/assets/figma/features/star-apy.svg'),
-    illu: asset('/assets/figma/features/apy.png'),
-    /* natural 113×103 → scaled to fit ~90 px tall */
-    illuW: 99,
-    illuH: 90,
+    illu: asset('/assets/figma/features/apy.svg'),
+    /* natural 153×155 → 0.75× for mobile */
+    illuW: 115,
+    illuH: 116,
   },
   {
     key: 'morpho',
@@ -65,10 +65,10 @@ const cards: Card[] = [
     bg: '#FFF5ED',
     border: '#FFA466',
     star: asset('/assets/figma/features/star-morpho.svg'),
-    illu: asset('/assets/figma/features/morpho.png'),
-    /* natural 161×140 → scaled to fit ~90 px tall */
-    illuW: 103,
-    illuH: 90,
+    illu: asset('/assets/figma/features/morpho.svg'),
+    /* natural 131×161 → 0.75× for mobile */
+    illuW: 98,
+    illuH: 121,
   },
   {
     key: 'mainnet',
@@ -77,10 +77,10 @@ const cards: Card[] = [
     bg: '#EDF4FF',
     border: '#669FFF',
     star: asset('/assets/figma/features/star-mainnet.svg'),
-    illu: asset('/assets/figma/features/mainnet.png'),
-    /* natural 126×160 → scaled to fit ~90 px tall */
-    illuW: 71,
-    illuH: 90,
+    illu: asset('/assets/figma/features/mainnet.svg'),
+    /* natural 130×160 → 0.75× for mobile */
+    illuW: 98,
+    illuH: 120,
   },
   {
     key: 'api3',
@@ -89,10 +89,10 @@ const cards: Card[] = [
     bg: '#F1F3E7',
     border: '#57A053',
     star: asset('/assets/figma/features/star-api3.svg'),
-    illu: asset('/assets/figma/features/api3.png'),
-    /* natural 123×134 → scaled to fit ~90 px tall */
-    illuW: 83,
-    illuH: 90,
+    illu: asset('/assets/figma/features/api3.svg'),
+    /* natural 172×135 → 0.75× for mobile */
+    illuW: 129,
+    illuH: 101,
   },
 ]
 

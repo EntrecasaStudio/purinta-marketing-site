@@ -4,6 +4,25 @@ import { ChevronRight } from 'lucide-react'
 import { asset } from '@/lib/utils'
 import FeaturesMobile from '@/components/sections/FeaturesMobile'
 
+/* Card mascot SVGs imported as raw strings (Vite ?raw) so they can be
+ * inlined into the DOM as actual <svg> markup — not <img src=*.svg>.
+ * Inlined SVG stays vector through every CSS transform (including the
+ * 1.5× active-state upscale), so no pixelation regardless of scale.
+ * Keyed by card.id so MascotImage can look the right one up. */
+import borrowSvg from '@/assets/figma/features/borrow.svg?raw'
+import apySvg from '@/assets/figma/features/apy.svg?raw'
+import morphoSvg from '@/assets/figma/features/morpho.svg?raw'
+import mainnetSvg from '@/assets/figma/features/mainnet.svg?raw'
+import api3Svg from '@/assets/figma/features/api3.svg?raw'
+
+const MASCOT_SVG: Record<string, string> = {
+  borrow: borrowSvg,
+  apy: apySvg,
+  morpho: morphoSvg,
+  mainnet: mainnetSvg,
+  api3: api3Svg,
+}
+
 /**
  * Features — Figma node 383:4066 ("Why Degens Love Purinta").
  *
@@ -79,9 +98,9 @@ const CARDS: CardData[] = [
     title: 'Borrow Against Memes',
     titleCollapsed: 'Borrow\nAgainst Memes',
     body: 'Lock your PEPE, SHIB, or any supported memecoin as collateral and borrow USDC without selling your bags. Your memes stay yours — you just unlock their liquidity.',
-    mascot: asset('/assets/figma/features/borrow.png'),
-    /* Source PNG is exported @2x — divide by 2 for design size. */
-    mascotSize: { w: 127, h: 156 },
+    mascot: asset('/assets/figma/features/borrow.svg'),
+    /* Natural SVG viewBox size (Type=1 export). */
+    mascotSize: { w: 130, h: 110 },
     accent: {
       bg: 'var(--color-blush-50)',
       border: 'var(--color-blush-400)',
@@ -98,7 +117,19 @@ const CARDS: CardData[] = [
      * pulls 16 px leftward to land balanced against the title column. */
     expandedOverride: {
       blob: { right: 16, bottom: 33 },
-      image: { right: 8 },
+      /* Lift the mascot 46 px from the default (-34 → 12). Net of
+       * +72 then -26 (last nudge down) to land the body above the
+       * divider without bleeding past the card's bottom edge. */
+      image: { right: 8, bottom: 12 },
+    },
+    /* Collapsed: shift the blob 12 px to the right (default right: 9 →
+     * -3, letting it overhang past the card's right edge by 3 px) so
+     * the blob sits behind the mascot's lower body. Image: drop 16 px
+     * (bottom 60 → 44) and shift 12 px right (default 11 → -1) so the
+     * mascot lands centred on the lowered blob. */
+    collapsedOverride: {
+      blob: { right: -3 },
+      image: { right: -1, bottom: 44 },
     },
   },
   {
@@ -106,8 +137,8 @@ const CARDS: CardData[] = [
     title: 'Best APY on the Market',
     titleCollapsed: 'Best APY\non the Market',
     body: 'Competitive rates powered by efficient market design. Lenders earn real yield from memecoin borrowers, while borrowers get the best rates available anywhere.',
-    mascot: asset('/assets/figma/features/apy.png'),
-    mascotSize: { w: 113, h: 103 },
+    mascot: asset('/assets/figma/features/apy.svg'),
+    mascotSize: { w: 153, h: 155 },
     accent: {
       bg: 'var(--color-success-50)',
       border: 'var(--color-success-400)',
@@ -118,17 +149,17 @@ const CARDS: CardData[] = [
      * the blob sits too high relative to the polaroid. Pull the image
      * up 30 and left 32 (16 + another 16); drop the blob 16 so they
      * recompose. (The blob stays put — only the mascot shifts further
-     * left to balance against the title column.) */
+     * left to balance against the title column.) Dropped 32 px more
+     * (-4 → -36) so the tofu-on-rocket lands lower on the blob. */
     expandedOverride: {
       blob: { bottom: 32 },
-      image: { right: 24, bottom: -4 },
+      image: { right: 24, bottom: -36 },
     },
-    /* Collapsed: bump the mascot up 32 px from the default (60 → 92)
-     * so the shorter 103 px-tall polaroid sits at a similar visual
-     * height to the taller mascots on the neighbouring cards. The
-     * blob keeps its default 75 px bottom — only the image moves. */
+    /* Collapsed: drop the mascot 72 px from its previous 92 → 20 so
+     * the new (taller) tofu-on-rocket SVG sits low on the lowered
+     * blob instead of floating above it. Expanded is untouched. */
     collapsedOverride: {
-      image: { bottom: 92 },
+      image: { bottom: 20 },
     },
   },
   {
@@ -138,18 +169,25 @@ const CARDS: CardData[] = [
     title: 'Built on Morpho',
     titleCollapsed: 'Built on\nMorpho',
     body: "Purinta is built on Morpho's battle-tested lending infrastructure — the same protocol securing billions in DeFi. No shortcuts on security.",
-    mascot: asset('/assets/figma/features/morpho.png'),
-    mascotSize: { w: 161, h: 140 },
+    mascot: asset('/assets/figma/features/morpho.svg'),
+    mascotSize: { w: 131, h: 161 },
     accent: {
       bg: 'var(--color-warning-50)',
       border: 'var(--color-warning-400)',
       blob: 'var(--color-warning-200)',
     },
     blobRotate: { collapsed: 156.39, expanded: 49.81 },
-    /* Lift the polaroid 32 px in expanded (default bottom -34 → -2)
-     * so the butterfly composition isn't half-cut by the card edge. */
+    /* Expanded: drop the mascot 42 px (-2 → -44) and pull it 60 px
+     * LEFT (right -8 → 52) so the butterfly composition sits low
+     * and centred against the title column instead of hugging the
+     * card's bottom-right corner. */
     expandedOverride: {
-      image: { bottom: -2 },
+      image: { right: 52, bottom: -44 },
+    },
+    /* Collapsed: drop the mascot 60 px (default 60 → 0) so it sits at
+     * the card's bottom edge, riding on the lowered blob. */
+    collapsedOverride: {
+      image: { bottom: 0 },
     },
   },
   {
@@ -158,8 +196,8 @@ const CARDS: CardData[] = [
     title: 'Mainnet Native',
     titleCollapsed: 'Mainnet\nNative',
     body: 'Live on Ethereum mainnet from day one. Deep liquidity, real security, no testnet games. Your memes deserve the real thing.',
-    mascot: asset('/assets/figma/features/mainnet.png'),
-    mascotSize: { w: 126, h: 160 },
+    mascot: asset('/assets/figma/features/mainnet.svg'),
+    mascotSize: { w: 130, h: 160 },
     accent: {
       bg: 'var(--color-info-50)',
       border: 'var(--color-info-400)',
@@ -172,6 +210,11 @@ const CARDS: CardData[] = [
     expandedOverride: {
       image: { right: 24 },
     },
+    /* Collapsed: drop the mascot 50 px (default 60 → 10) so the
+     * tofu-on-crystal sits low on the lowered blob. */
+    collapsedOverride: {
+      image: { bottom: 10 },
+    },
   },
   {
     /* Per Figma node 383:5010: Api3 card uses Green (the brand color),
@@ -180,8 +223,8 @@ const CARDS: CardData[] = [
     title: 'Powered by Api3',
     titleCollapsed: 'Powered\nby Api3',
     body: 'First-party oracle feeds with OEV capture. Accurate pricing for your memecoins, with value flowing back to the protocol.',
-    mascot: asset('/assets/figma/features/api3.png'),
-    mascotSize: { w: 123, h: 134 },
+    mascot: asset('/assets/figma/features/api3.svg'),
+    mascotSize: { w: 172, h: 135 },
     accent: {
       bg: 'var(--color-green-50)',
       border: 'var(--color-green-400)',
@@ -190,9 +233,16 @@ const CARDS: CardData[] = [
     blobRotate: { collapsed: -9.47, expanded: 49.81 },
     /* Api3 expanded: shift the polaroid 32 px LEFT and 32 px UP from
      * the default expanded anchor so the flexing-arms pose sits
-     * centered against the title column, not hugging the corner. */
+     * centered against the title column, not hugging the corner.
+     * Drop the blob 16 px (48 → 32) so it tracks below the mascot. */
     expandedOverride: {
+      blob: { bottom: 32 },
       image: { right: 24, bottom: -2 },
+    },
+    /* Collapsed: drop the mascot 24 px (default 60 → 36) so it lands
+     * lower on the lowered blob without overhanging the card. */
+    collapsedOverride: {
+      image: { bottom: 36 },
     },
   },
 ]
@@ -773,7 +823,10 @@ function MascotBlob({
   const baseRight = card.expandedOverride?.blob?.right ?? 28
   const baseBottom = card.expandedOverride?.blob?.bottom ?? 48
   const collapsedRight = card.collapsedOverride?.blob?.right ?? 9
-  const collapsedBottom = card.collapsedOverride?.blob?.bottom ?? 75
+  /* Collapsed blob anchor pulled 32 px down (75 → 43) so it sits
+   * behind the mascot body rather than above it in the narrow pill.
+   * Same default for every card; per-card overrides still apply. */
+  const collapsedBottom = card.collapsedOverride?.blob?.bottom ?? 43
   /* Center-of-expanded minus center-of-collapsed, accounting for the
    * 35×30 size shrink (the centre moves by half that when the blob
    * scales down around centre). */
@@ -859,21 +912,29 @@ function MascotImage({
   const collapsedY = -(collapsedBottom - baseBottom)
 
   return (
-    /* Polaroid scales 1.4× when expanded (Figma 454:8816 — polaroid
-     * 177×221 vs collapsed 127×156 = 1.39× linear). Origin bottom-right
-     * so scale grows up-and-left from a fixed anchor; in expanded the
-     * anchor is OUTSIDE the card so the polaroid floats past the
-     * boundary, in collapsed the translate tucks it back inside. */
-    <motion.img
-      src={card.mascot}
-      alt=""
+    /* Mascot scales 1.5× when expanded (Type=N SVG exports — natural
+     * size in collapsed, 1.5× upscale in active per design spec).
+     *
+     * Rendered as INLINE <svg> markup (via dangerouslySetInnerHTML on
+     * a motion.div wrapper) instead of <img src=*.svg>. The wrapper
+     * is sized to the EXPANDED footprint (1.5× natural) always, and
+     * the inner <svg> is forced to fill the wrapper via the
+     * [&>svg]:size-full Tailwind variant. The collapsed state then
+     * scales DOWN to 1 / 1.5; downscaling stays crisp where upscaling
+     * (which would composite a smaller layer texture) pixelates.
+     *
+     * Origin bottom-right so scale grows up-and-left from a fixed
+     * anchor; in expanded the anchor is OUTSIDE the card so the
+     * mascot floats past the boundary, in collapsed the translate
+     * tucks it back inside. */
+    <motion.div
       aria-hidden
-      width={card.mascotSize.w}
-      height={card.mascotSize.h}
-      className="pointer-events-none absolute max-w-none drop-shadow-[0_8px_8px_rgba(0,0,0,0.15)]"
+      className="pointer-events-none absolute [&>svg]:size-full"
       style={{
         right: baseRight,
         bottom: baseBottom,
+        width: card.mascotSize.w * 1.5,
+        height: card.mascotSize.h * 1.5,
         transformOrigin: 'bottom right',
         willChange: 'transform',
       }}
@@ -881,9 +942,10 @@ function MascotImage({
         x: isActive ? 0 : collapsedX,
         y: isActive ? 0 : collapsedY,
         rotate: isActive ? 6 : 0,
-        scale: isActive ? 1.4 : 1,
+        scale: isActive ? 1 : 1 / 1.5,
       }}
       transition={transition}
+      dangerouslySetInnerHTML={{ __html: MASCOT_SVG[card.id] ?? '' }}
     />
   )
 }
