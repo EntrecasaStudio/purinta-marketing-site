@@ -127,7 +127,7 @@ export default function HowItWorksMobile() {
     <section className="w-full pt-[48px] pb-[24px] md:hidden">
       {/* Title — Figma 714:35917: Ohno Softie Bold 25 / 33 */}
       <div className="reveal reveal-up flex w-full items-center justify-center px-6 pb-2">
-        <h2 className="text-center font-display text-[25px] leading-[33px] font-bold tracking-[0.5px] text-[#333]">
+        <h2 className="text-center font-display text-[25px] leading-[33px] font-semibold tracking-[0.5px] text-[#333]">
           How It Works
         </h2>
       </div>

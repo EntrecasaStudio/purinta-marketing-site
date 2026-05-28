@@ -31,6 +31,14 @@ type Card = {
    * mascot's natural aspect ratio. */
   illuW: number
   illuH: number
+  /** Optional vertical nudge (px). Positive = down. Per-card tweak
+   * so mascots 2-5 sit slightly lower in their slot than mascot 1,
+   * matching the Figma 773:40685 mobile layout. */
+  illuOffsetY?: number
+  /** Optional horizontal nudge (px). Positive = right (past the
+   * card's right edge). Used for mascot 5 (api3) which sits a bit
+   * outside the column per Figma. */
+  illuOffsetX?: number
   /** Background blob behind the mascot — matches the desktop
    * expanded-state blob (shape via mask SVG, fill via accent color).
    * Sized 0.75× of the desktop expanded blob (170×150 → 128×113)
@@ -47,7 +55,7 @@ const cards: Card[] = [
     body: 'Lock any of the supported memecoins as collateral and borrow USDC without selling. Your memes stay yours. You just unlock their liquidity.',
     bg: '#FFFAFA',
     border: '#FEC4C0',
-    star: asset('/assets/figma/features/star-borrow.svg'),
+    star: asset('/assets/figma/features/star-mobile-borrow.svg'),
     illu: asset('/assets/figma/features/borrow.svg'),
     /* natural 130×110 → 0.75× for mobile */
     illuW: 98,
@@ -61,11 +69,12 @@ const cards: Card[] = [
     body: 'Competitive rates powered by efficient market design. Lenders earn real yield from memecoin borrowers, while borrowers get the best rates available anywhere.',
     bg: '#F2F8F7',
     border: '#6ECFC6',
-    star: asset('/assets/figma/features/star-apy.svg'),
+    star: asset('/assets/figma/features/star-mobile-apy.svg'),
     illu: asset('/assets/figma/features/apy.svg'),
     /* natural 153×155 → 0.75× for mobile */
     illuW: 115,
     illuH: 116,
+    illuOffsetY: 20,
     blob: 'var(--color-success-200)',
     blobRotate: 49.81,
   },
@@ -75,11 +84,12 @@ const cards: Card[] = [
     body: "Purinta is built on Morpho's battle-tested lending infrastructure, the same protocol securing billions in DeFi. No shortcuts on security.",
     bg: '#FFF5ED',
     border: '#FFA466',
-    star: asset('/assets/figma/features/star-morpho.svg'),
+    star: asset('/assets/figma/features/star-mobile-morpho.svg'),
     illu: asset('/assets/figma/features/morpho.svg'),
     /* natural 131×161 → 0.75× for mobile */
     illuW: 98,
     illuH: 121,
+    illuOffsetY: 20,
     blob: 'var(--color-warning-200)',
     blobRotate: 49.81,
   },
@@ -89,11 +99,12 @@ const cards: Card[] = [
     body: 'Live on Ethereum mainnet from day one. Deep liquidity, real security, great volumes. Your memes deserve the real thing.',
     bg: '#EDF4FF',
     border: '#669FFF',
-    star: asset('/assets/figma/features/star-mainnet.svg'),
+    star: asset('/assets/figma/features/star-mobile-mainnet.svg'),
     illu: asset('/assets/figma/features/mainnet.svg'),
     /* natural 130×160 → 0.75× for mobile */
     illuW: 98,
     illuH: 120,
+    illuOffsetY: 20,
     blob: 'var(--color-info-200)',
     blobRotate: 49.81,
   },
@@ -103,11 +114,13 @@ const cards: Card[] = [
     body: 'A curator you can trust. An oracle that never misreported. Api3 picks which memecoins make the cut and powers the price feeds, while OEV capture sends value back to the protocol.',
     bg: '#F1F3E7',
     border: '#57A053',
-    star: asset('/assets/figma/features/star-api3.svg'),
+    star: asset('/assets/figma/features/star-mobile-api3.svg'),
     illu: asset('/assets/figma/features/api3.svg'),
     /* natural 172×135 → 0.75× for mobile */
     illuW: 129,
     illuH: 101,
+    illuOffsetY: 12,
+    illuOffsetX: 16,
     blob: 'var(--color-green-100)',
     blobRotate: 49.81,
   },
@@ -149,20 +162,31 @@ export default function FeaturesMobile() {
           {cards.map((c) => (
             <article
               key={c.key}
-              className="reveal reveal-up w-full max-w-[480px] rounded-[24px] border border-solid p-4"
+              className="reveal reveal-up w-full max-w-[480px] rounded-[24px] border border-solid p-4 pb-6"
               style={{ backgroundColor: c.bg, borderColor: c.border }}
             >
               {/* Title row — star + heading on the left, illustration
                * on the right (the mascot overhangs the card top). */}
               <div className="flex items-start justify-between gap-2 pt-1">
-                <div className="flex flex-col gap-2 pt-1 pl-2">
+                {/* Title column — collapses to a single line at
+                 * viewports wide enough to fit the longest title
+                 * ("Best APY on the Market", ~290 px at 20 px bold)
+                 * without touching the 120 px mascot column. Below
+                 * that threshold the explicit \n breaks in `title`
+                 * are honoured via whitespace-pre-line (Borrow /
+                 * Against Memes, Built / on Morpho, Powered / by
+                 * Api3 — matching Figma 773:40685). At ≥ 500 px
+                 * viewport the column adds 24 px extra padding-top
+                 * so the now-single-line title's baseline lands at
+                 * the same gap to the paragraph below (16 px). */}
+                <div className="flex flex-1 flex-col gap-2 pt-1 pl-2 min-[500px]:pt-7">
                   <img
                     src={c.star}
                     alt=""
                     aria-hidden
-                    className="size-4"
+                    className="size-9"
                   />
-                  <h3 className="w-[160px] font-display text-[20px] leading-[24px] font-bold tracking-[0.4px] whitespace-pre-line text-[#333]">
+                  <h3 className="font-display text-[20px] leading-[24px] font-semibold tracking-[0.4px] whitespace-pre-line text-[#333] min-[500px]:whitespace-normal">
                     {c.title}
                   </h3>
                 </div>
@@ -180,7 +204,7 @@ export default function FeaturesMobile() {
                     className="pointer-events-none absolute"
                     style={{
                       right: '-4px',
-                      bottom: '-4px',
+                      bottom: '20px',
                       width: '76px',
                       height: '52px',
                       backgroundColor: c.blob,
@@ -204,14 +228,35 @@ export default function FeaturesMobile() {
                     decoding="async"
                     width={c.illuW}
                     height={c.illuH}
-                    className="absolute right-0 bottom-0 max-w-none"
-                    style={{ width: `${c.illuW}px`, height: `${c.illuH}px` }}
+                    className="absolute max-w-none"
+                    style={{
+                      width: `${c.illuW}px`,
+                      height: `${c.illuH}px`,
+                      /* Anchored to the slot's bottom-right; per-card
+                       * `illuOffsetY` (mascots 2-5 = 12 px) pushes the
+                       * mascot down past the slot edge, and
+                       * `illuOffsetX` (api3 only = 16 px) pushes it
+                       * further right past the slot edge — both per
+                       * Figma 773:40685. */
+                      bottom: `${-(c.illuOffsetY ?? 0)}px`,
+                      right: `${-(c.illuOffsetX ?? 0)}px`,
+                      /* Per Figma 773:40685 mobile cards: each mascot
+                       * is tilted +8° (clockwise) so the character
+                       * reads as if leaning into the blob behind it. */
+                      transform: 'rotate(8deg)',
+                      transformOrigin: 'bottom right',
+                    }}
                   />
                 </div>
               </div>
 
-              {/* Body + Learn more */}
-              <div className="flex flex-col items-start gap-2 px-2 pt-2">
+              {/* Body + Learn more — `relative` (no z-index) promotes
+               * this section to a positioned element so it paints AFTER
+               * the header row in DOM order. Without it, the mascot's
+               * transform-created stacking context makes the overflowing
+               * mascot paint over the paragraph (positioned slot beats
+               * static body in CSS paint order). */}
+              <div className="relative flex flex-col items-start gap-2 px-2 pt-2">
                 <p className="font-body text-[13px] leading-[21px] font-normal tracking-[0.26px] text-[#808080]">
                   {c.body}
                 </p>

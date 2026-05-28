@@ -233,6 +233,51 @@ export default function Hero() {
           decoding="async"
           className="block w-full"
         />
+
+        {/* Vector mascot overlays — replace the raster mascots baked
+         * into the mobile scene webp so they render crisp at any
+         * DPR (especially Safari/Retina). Positions per Figma
+         * 752:52201-203 inside the 360×655 mobile scene:
+         *   Pepe  ─ x=15.2  y=403.2 w=78   h=104.32
+         *   Tofu  ─ x=107   y=376   w=148  h=129.09
+         *   Shibu ─ x=261.4 y=392.4 w=91.5 h=121.28
+         * Expressed as percentages so they scale with the full-bleed
+         * webp on any viewport. Vector SVGs cover the baked raster
+         * pixel-for-pixel at the same anchor. */}
+        <img
+          src={asset('/assets/figma/pepe.svg')}
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute max-w-none"
+          style={{
+            left: `${(15.2 / 360) * 100}%`,
+            top: `${(403.2 / 655) * 100}%`,
+            width: `${(78 / 360) * 100}%`,
+          }}
+        />
+        <img
+          src={asset('/assets/figma/hero-mascot.svg')}
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute max-w-none"
+          style={{
+            left: `${(107 / 360) * 100}%`,
+            top: `${(376 / 655) * 100}%`,
+            width: `${(148 / 360) * 100}%`,
+          }}
+        />
+        <img
+          src={asset('/assets/figma/shibu.svg')}
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute max-w-none"
+          style={{
+            left: `${(261.4 / 360) * 100}%`,
+            top: `${(392.4 / 655) * 100}%`,
+            width: `${(91.5 / 360) * 100}%`,
+          }}
+        />
+
         <div className="absolute inset-x-0 top-0 pt-[39%]">
           <div className="mx-auto flex w-full max-w-[480px] flex-col items-center gap-4 px-6">
             <div className="flex flex-col items-center gap-2">
