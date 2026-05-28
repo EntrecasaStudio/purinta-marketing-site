@@ -104,8 +104,8 @@ const STEPS: Step[] = [
     numTop: -32,
     /* Combined-SVG placement — "1" digit sits at x=175 of the 256
      * viewBox (narrow numeral pulled right), so anchor the SVG
-     * slightly LEFT-shifted to land the stem near the column centre. */
-    svgLeft: -10,
+     * LEFT-shifted (-34) to land the stem near the column centre. */
+    svgLeft: -34,
     svgTop: -8,
     svgWidth: 140,
   },
