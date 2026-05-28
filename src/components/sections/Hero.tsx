@@ -216,34 +216,37 @@ export default function Hero() {
         <Nav />
       </motion.div>
 
-      {/* ---------- Mobile Hero — Figma 665:59178 ("00_Hero", 360 wide).
-       * Scene (lake + 3 mascots) flattened from Figma node 665:56488.
-       *
-       * Responsive rule: the background scene is FULL-BLEED — it always
-       * spans the viewport width and never crops. Only the copy column
-       * (headline / paragraph / CTA) is capped at 480 px and centred.
-       * The copy overlay uses `pt-[39%]` (% of the full-bleed scene
-       * width) so it tracks the scene's sky as the scene scales. */}
-      <div className="relative w-full md:hidden">
+      {/* ---------- Mobile Hero — uses the DESKTOP scene background
+       * (`background.webp`, 1920×1462) cropped to the mobile
+       * portrait frame (360×655 aspect, ~0.55) via object-fit:cover.
+       * The desktop bg has no mascots / no hill / no shadows — just
+       * the clean lake-mountain-pagoda scene — so the SVG mascot
+       * overlays are the only mascot rendering and there's no
+       * raster halo around them in Safari/Retina. */}
+      <div
+        className="relative w-full overflow-hidden md:hidden"
+        style={{ aspectRatio: '360 / 655' }}
+      >
         <img
-          src={asset('/assets/figma/hero-mobile-scene.webp')}
+          src={asset('/assets/figma/background.webp')}
           alt=""
           aria-hidden
           fetchPriority="high"
           decoding="async"
-          className="block w-full"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: '50% 70%' }}
         />
 
-        {/* Vector mascot overlays — replace the raster mascots baked
-         * into the mobile scene webp so they render crisp at any
-         * DPR (especially Safari/Retina). Positions per Figma
-         * 752:52201-203 inside the 360×655 mobile scene:
-         *   Pepe  ─ x=15.2  y=403.2 w=78   h=104.32
-         *   Tofu  ─ x=107   y=376   w=148  h=129.09
-         *   Shibu ─ x=261.4 y=392.4 w=91.5 h=121.28
-         * Expressed as percentages so they scale with the full-bleed
-         * webp on any viewport. Vector SVGs cover the baked raster
-         * pixel-for-pixel at the same anchor. */}
+        {/* Vector mascot overlays — same SVG files as desktop, just
+         * scaled and re-positioned for the 360-wide mobile layout
+         * (Figma 752:52201-203). Sizes / positions per the original
+         * mobile design inside the 360×655 frame, expressed as
+         * percentages of the parent so they track the scene as it
+         * scales between phone widths. The natural aspect of the
+         * desktop bg (1920×1462 → ~1.31) means the mobile bg is
+         * shorter than the 360×655 frame, so the mascot positions
+         * are anchored to the bg's actual aspect via `% of width`
+         * for left/width AND `% of width × (1462/1920)` for top. */}
         <img
           src={asset('/assets/figma/pepe.svg')}
           alt=""
@@ -278,7 +281,11 @@ export default function Hero() {
           }}
         />
 
-        <div className="absolute inset-x-0 top-0 pt-[39%]">
+        {/* Content overlay — title + paragraph + CTA. Pulled up
+         * 24 px from the previous pt-[39%] anchor (Figma marketing
+         * spec adjustment) so the headline sits higher in the
+         * sky portion of the scene. */}
+        <div className="absolute inset-x-0 top-0 pt-[calc(39%-24px)]">
           <div className="mx-auto flex w-full max-w-[480px] flex-col items-center gap-4 px-6">
             <div className="flex flex-col items-center gap-2">
               <h1
