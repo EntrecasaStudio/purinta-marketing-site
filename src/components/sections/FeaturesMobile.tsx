@@ -179,12 +179,19 @@ export default function FeaturesMobile() {
                  * viewport the column adds 24 px extra padding-top
                  * so the now-single-line title's baseline lands at
                  * the same gap to the paragraph below (16 px). */}
-                <div className="flex flex-1 flex-col gap-2 pt-1 pl-2 min-[500px]:pt-7">
+                <div className="flex flex-1 flex-col gap-0 pt-1 pl-2 min-[500px]:pt-7">
+                  {/* Star — 36×36 SVG with built-in shadow / padding
+                   * around the ~16 px glyph. Negative left margin
+                   * (-10 px) cancels the SVG's left padding so the
+                   * visible glyph aligns with the title's left edge,
+                   * and negative bottom margin (-4 px) tightens the
+                   * gap between the glyph's bottom and the title to
+                   * a clean ~8 px visual. */}
                   <img
                     src={c.star}
                     alt=""
                     aria-hidden
-                    className="size-9"
+                    className="size-9 -mb-1 -ml-[10px]"
                   />
                   <h3 className="font-display text-[20px] leading-[24px] font-semibold tracking-[0.4px] whitespace-pre-line text-[#333] min-[500px]:whitespace-normal">
                     {c.title}

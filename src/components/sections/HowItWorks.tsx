@@ -7,8 +7,20 @@ import {
   useTransform,
 } from 'motion/react'
 import { ChevronRight } from 'lucide-react'
-import { asset } from '@/lib/utils'
 import HowItWorksMobile from '@/components/sections/HowItWorksMobile'
+
+/* SVGs split out of Figma Type=N, Size=lg combined exports (one path
+ * = digit, the rest = mascot). Imported as raw strings (?raw) so we
+ * can inline them via dangerouslySetInnerHTML and render true inline
+ * <svg> markup — <img src=*.svg> rasterises at the intrinsic size
+ * first and then CSS transforms scale the bitmap, which pixelates in
+ * Safari/Retina at any non-1× scale. */
+import step1NumberSvg from '@/assets/figma/how-it-works/step-1-number.svg?raw'
+import step1MascotSvg from '@/assets/figma/how-it-works/step-1-mascot.svg?raw'
+import step2NumberSvg from '@/assets/figma/how-it-works/step-2-number.svg?raw'
+import step2MascotSvg from '@/assets/figma/how-it-works/step-2-mascot.svg?raw'
+import step3NumberSvg from '@/assets/figma/how-it-works/step-3-number.svg?raw'
+import step3MascotSvg from '@/assets/figma/how-it-works/step-3-mascot.svg?raw'
 
 /**
  * HowItWorks — Figma node 454:7091.
@@ -43,24 +55,13 @@ type Step = {
   num: string
   title: string
   body: string
-  /** Per-panel screenshot from Figma (includes any wrapper rotation
-   * baked in — no further CSS rotation required). */
-  mascot: string
-  /** Absolute offsets within the numeral column (px). Width is the
-   * screenshot's natural canvas width — the screenshot already
-   * captures the rotated frame's bounding box, so just render at this
-   * exact pixel size and position. */
-  mascotPosition: { top: number; left: number; width: number }
-  /** Vertical nudge of the numeral within the column (px). The digit
-   * itself is a fixed 256.11 px text-centered box pinned to the
-   * column's left edge — in Figma every step's "Front" text node sits
-   * at x=0 within the number column (454:7100 / 7181 / 7195) — so only
-   * the vertical offset varies per step. */
-  numberTop: number
-  /** Per-step accent colors from Figma — the giant numeral and the
-   * panel title. Each step keys to its own palette family (green /
-   * cream / blush). */
-  numberColor: string
+  /** Inline SVG markup (?raw) split out of the Figma Type=N, Size=lg
+   * combined export: digit and mascot share the SAME 256×~334
+   * viewBox, so stacked at (0,0) of the number column the mascot
+   * lands at its Figma-designed position relative to the digit. */
+  numberSvg: string
+  mascotSvg: string
+  /** Per-step accent colors from Figma — the panel title. */
   titleColor: string
 }
 
@@ -69,52 +70,24 @@ const steps: Step[] = [
     num: '1',
     title: 'Deposit\nyour memes',
     body: 'Connect your wallet, pick a market (PEPE, SHIB, etc.), and deposit your memecoins as collateral.',
-    /* Figma node 454:7100. The "1" sits at x=0 in the number column;
-     * mascot wrapper at ml-0 mt-40.17 with rotation -12.65° (rotation
-     * already baked into the PNG export). */
-    mascot: asset('/assets/figma/how-it-works/step-1.png'),
-    /* Manual nudge: top +80 to drop the mascot into the bottom curve of
-     * the "1". `left` tracks the digit — it's shifted the same -45 px
-     * the centered "1" moved, so the number + mascot stay a unit. */
-    mascotPosition: { top: 120, left: -129, width: 296 },
-    numberTop: 0,
-    numberColor: '#498746', // Green/500
+    numberSvg: step1NumberSvg,
+    mascotSvg: step1MascotSvg,
     titleColor: '#57A053', // Green/400
   },
   {
     num: '2',
     title: 'Borrow USDC',
     body: 'Choose how much USDC to borrow — up to 62.5% of your collateral value with built-in safety buffers.',
-    /* Figma node 454:7181. The "2" sits at x=0 in the number column,
-     * nudged ~16 px down; mascot wrapper at ml-0 mt-0 with rotation
-     * +19.62° (baked into PNG). The screenshot canvas (353×284) is
-     * 42 px wider than the Figma wrapper (311×284) because the
-     * character's arms overflow LEFT of the wrapper bounds, so we
-     * shift left by -42 to keep the wrapper origin aligned with the
-     * column origin. */
-    mascot: asset('/assets/figma/how-it-works/step-2.png'),
-    /* Manual nudge: top +94 to align the mascot with the bottom hump of
-     * the "2". `left` tracks the digit — it's shifted the same -87 px
-     * the centered "2" moved, so the number + mascot stay a unit. */
-    mascotPosition: { top: 94, left: -129, width: 353 },
-    numberTop: 16,
-    numberColor: '#8B8765', // Cream/900
+    numberSvg: step2NumberSvg,
+    mascotSvg: step2MascotSvg,
     titleColor: '#8B8765', // Cream/900
   },
   {
     num: '3',
     title: 'Chill',
     body: 'Use your USDC anywhere. When ready, repay your loan and get your memecoins back. Moon mission intact.',
-    /* Figma node 454:7195. The "3" sits at x=0 in the number column;
-     * mascot frame at ml-0 mt-34.54 (no outer rotation). */
-    mascot: asset('/assets/figma/how-it-works/step-3.png'),
-    /* Manual nudge: top +70 to drop the peaceful mascot into the bottom
-     * curve of the "3". `left` tracks the digit — it's shifted the same
-     * -54 px the centered "3" moved, so the number + mascot stay a
-     * unit. */
-    mascotPosition: { top: 105, left: -70, width: 256 },
-    numberTop: 0,
-    numberColor: '#498A70', // Mint/700
+    numberSvg: step3NumberSvg,
+    mascotSvg: step3MascotSvg,
     titleColor: '#498A70', // Mint/700
   },
 ]
@@ -392,45 +365,33 @@ function PanelContent({ step, isActive }: { step: Step; isActive: boolean }) {
         className="relative shrink-0 -translate-y-[70px]"
         style={{ width: NUMBER_COL_FLOW_WIDTH, height: 332 }}
       >
-        {/* The digit is a fixed 256.11 px text-centered box pinned to
-         * the column's left edge — exactly the Figma "Front" text node,
-         * which sits at x=0 within the number column in every step. */}
-        <span
-          className="absolute font-display text-center"
-          style={{
-            top: step.numberTop,
-            left: 0,
-            width: 256.11,
-            fontSize: 437,
-            lineHeight: 1,
-            fontWeight: 500,
-            letterSpacing: '-21.87px',
-            color: step.numberColor,
-          }}
-        >
-          {step.num}
-        </span>
-        {/* Mascot — jelly bounce in together with the title when the
-         * panel becomes active. Until then it's hidden (scale 0.5,
-         * opacity 0), so only the giant numeral slides in with the
-         * panel from the right; the mascot character pops in only
-         * once the panel lands at its design position. */}
-        <motion.img
-          src={step.mascot}
-          alt=""
+        {/* Number — INLINE <svg> (via dangerouslySetInnerHTML) so
+         * the digit stays true vector through every CSS transform.
+         * Same 256-wide viewBox as the mascot, pinned to the
+         * column's left edge. No per-active animation — only the
+         * panel fade. The inner [&>svg]:size-full variant forces
+         * the raw <svg> to fill the wrapper at 256×~334. */}
+        <div
           aria-hidden
-          /* No CSS rotation: the screenshot already captures the
-           * frame's rotated bounding box, so just place it at the
-           * Figma `ml`/`mt` of the mascot wrapper. */
-          className="pointer-events-none absolute max-w-none"
+          className="absolute top-0 left-0 [&>svg]:size-full"
+          style={{ width: 256, height: 332 }}
+          dangerouslySetInnerHTML={{ __html: step.numberSvg }}
+        />
+        {/* Mascot — INLINE <svg>, same viewBox as the number so
+         * positioning at (0,0) lands the character at its Figma-
+         * designed spot relative to the digit. Wrapper sized to the
+         * EXPANDED footprint and animation scales between 0.5 and 1
+         * — always a downscale of the layout-sized SVG, which stays
+         * crisp in Safari/Retina (unlike <img src=*.svg> which
+         * rasterises the bitmap before transforms). */}
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute top-0 left-0 [&>svg]:size-full"
           style={{
-            top: step.mascotPosition.top,
-            left: step.mascotPosition.left,
-            width: step.mascotPosition.width,
-            /* Bounce from the center-bottom so it reads like the
-             * mascot is "landing" into its spot, not zooming out
-             * from a corner. */
+            width: 256,
+            height: 332,
             transformOrigin: 'center bottom',
+            willChange: 'transform',
           }}
           initial={false}
           animate={{
@@ -448,6 +409,7 @@ function PanelContent({ step, isActive }: { step: Step; isActive: boolean }) {
                 }
               : { duration: 0.18, ease: 'easeOut' }
           }
+          dangerouslySetInnerHTML={{ __html: step.mascotSvg }}
         />
       </div>
 

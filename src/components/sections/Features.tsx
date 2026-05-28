@@ -379,19 +379,30 @@ function Card({ card, isActive, onSelect, index }: CardProps) {
            * the row totals exactly 1024 px — fitting the safe content
            * area perfectly without the overflow the 198 variant had. */
           width: isActive ? 384 : 152,
+          /* Hover lift — only collapsed cards rise on hover. The
+           * active card is already showcased so it stays put. */
+          y: !isActive && isHovered ? -6 : 0,
+          /* Subtle cream shadow on hover (collapsed only) — colour
+           * lifted from Cream/500 at 35 % alpha so the shadow reads
+           * as a soft beige glow that matches the resting cream tint,
+           * not a harsh grey drop-shadow. */
+          boxShadow:
+            !isActive && isHovered
+              ? '0 12px 24px -8px rgba(214, 210, 178, 0.45)'
+              : '0 0 0 0 rgba(214, 210, 178, 0)',
         }}
-        /* Tween (not a spring) so the card GROWS smoothly into place
-         * without the snap-and-settle that a spring produces at the
-         * beginning of the motion. Both directions share the same
-         * 130 ms delay so the opening and the closing cards start
-         * widening / shrinking at the EXACT same moment, keeping the
-         * row at 1024 px wide throughout the transition. Identical
-         * timing + ease to useMascotTransition so the polaroid's
-         * scale + translate ride the card's width perfectly in step. */
+        /* Per-prop transitions: width keeps the 0.55 s / 130 ms-delay
+         * tween that drives the row reflow; the hover lift + shadow
+         * use a faster 0.22 s easeOut so the hover feels snappy and
+         * doesn't drag behind the cursor. */
         transition={{
-          duration: 0.55,
-          delay: 0.13,
-          ease: [0.4, 0, 0.2, 1],
+          width: {
+            duration: 0.55,
+            delay: 0.13,
+            ease: [0.4, 0, 0.2, 1],
+          },
+          y: { duration: 0.22, ease: 'easeOut' },
+          boxShadow: { duration: 0.22, ease: 'easeOut' },
         }}
         className="relative h-[416px] cursor-pointer rounded-[24px] border border-solid bg-white text-left transition-colors duration-500 outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
