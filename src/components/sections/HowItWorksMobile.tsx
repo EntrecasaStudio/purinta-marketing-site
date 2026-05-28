@@ -68,7 +68,10 @@ const STEPS: Step[] = [
     /* Reset to 0 then rotate −45° (mascot leans clearly onto the
      * digit's stem from its top). */
     mascotRotate: -45,
-    bg: '#FCFBF5', // Cream/50
+    /* Step 1 panel is transparent — the surrounding page bg shows
+     * through so the Deposit panel reads as part of the canvas
+     * rather than its own coloured band. */
+    bg: 'transparent',
     numColor: '#498746', // Green/500
     titleColor: '#57A053', // Green/400
     /* Digit shifted +24 px right (32 − 8) + 32 px up to clear the

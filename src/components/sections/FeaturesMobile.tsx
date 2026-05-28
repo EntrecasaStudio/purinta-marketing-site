@@ -31,12 +31,19 @@ type Card = {
    * mascot's natural aspect ratio. */
   illuW: number
   illuH: number
+  /** Background blob behind the mascot — matches the desktop
+   * expanded-state blob (shape via mask SVG, fill via accent color).
+   * Sized 0.75× of the desktop expanded blob (170×150 → 128×113)
+   * and tilted per `blobRotate` so the organic ellipse feels
+   * hand-placed under each character. */
+  blob: string
+  blobRotate: number
 }
 
 const cards: Card[] = [
   {
     key: 'borrow',
-    title: 'Borrow Against Memes',
+    title: 'Borrow\nAgainst Memes',
     body: 'Lock any of the supported memecoins as collateral and borrow USDC without selling. Your memes stay yours. You just unlock their liquidity.',
     bg: '#FFFAFA',
     border: '#FEC4C0',
@@ -45,6 +52,8 @@ const cards: Card[] = [
     /* natural 130×110 → 0.75× for mobile */
     illuW: 98,
     illuH: 83,
+    blob: 'var(--color-blush-300)',
+    blobRotate: 68.88,
   },
   {
     key: 'apy',
@@ -57,10 +66,12 @@ const cards: Card[] = [
     /* natural 153×155 → 0.75× for mobile */
     illuW: 115,
     illuH: 116,
+    blob: 'var(--color-success-200)',
+    blobRotate: 49.81,
   },
   {
     key: 'morpho',
-    title: 'Built on Morpho',
+    title: 'Built\non Morpho',
     body: "Purinta is built on Morpho's battle-tested lending infrastructure, the same protocol securing billions in DeFi. No shortcuts on security.",
     bg: '#FFF5ED',
     border: '#FFA466',
@@ -69,6 +80,8 @@ const cards: Card[] = [
     /* natural 131×161 → 0.75× for mobile */
     illuW: 98,
     illuH: 121,
+    blob: 'var(--color-warning-200)',
+    blobRotate: 49.81,
   },
   {
     key: 'mainnet',
@@ -81,10 +94,12 @@ const cards: Card[] = [
     /* natural 130×160 → 0.75× for mobile */
     illuW: 98,
     illuH: 120,
+    blob: 'var(--color-info-200)',
+    blobRotate: 49.81,
   },
   {
     key: 'api3',
-    title: 'Powered by Api3',
+    title: 'Powered\nby Api3',
     body: 'A curator you can trust. An oracle that never misreported. Api3 picks which memecoins make the cut and powers the price feeds, while OEV capture sends value back to the protocol.',
     bg: '#F1F3E7',
     border: '#57A053',
@@ -93,6 +108,8 @@ const cards: Card[] = [
     /* natural 172×135 → 0.75× for mobile */
     illuW: 129,
     illuH: 101,
+    blob: 'var(--color-green-100)',
+    blobRotate: 49.81,
   },
 ]
 
@@ -145,11 +162,40 @@ export default function FeaturesMobile() {
                     aria-hidden
                     className="size-4"
                   />
-                  <h3 className="w-[132px] font-display text-[20px] leading-[24px] font-bold tracking-[0.4px] text-[#333]">
+                  <h3 className="w-[160px] font-display text-[20px] leading-[24px] font-bold tracking-[0.4px] whitespace-pre-line text-[#333]">
                     {c.title}
                   </h3>
                 </div>
                 <div className="relative h-[76px] w-[120px] shrink-0">
+                  {/* Blob behind the mascot — same per-card mask SVG
+                   * + accent fill as the desktop expanded state.
+                   * Per Figma 773:40685 the mobile blob is much
+                   * smaller than desktop's (170×150 → 76×52), and
+                   * sits low-and-right behind the mascot's body so
+                   * the character reads against the cream card with
+                   * a tinted shape under its lower half rather than
+                   * a full halo. */}
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute"
+                    style={{
+                      right: '-4px',
+                      bottom: '-4px',
+                      width: '76px',
+                      height: '52px',
+                      backgroundColor: c.blob,
+                      transform: `rotate(${c.blobRotate}deg)`,
+                      transformOrigin: 'center',
+                      WebkitMaskImage: `url(${asset(`/assets/figma/features/blob-${c.key}.svg`)})`,
+                      WebkitMaskSize: 'contain',
+                      WebkitMaskRepeat: 'no-repeat',
+                      WebkitMaskPosition: 'center',
+                      maskImage: `url(${asset(`/assets/figma/features/blob-${c.key}.svg`)})`,
+                      maskSize: 'contain',
+                      maskRepeat: 'no-repeat',
+                      maskPosition: 'center',
+                    }}
+                  />
                   <img
                     src={c.illu}
                     alt=""
