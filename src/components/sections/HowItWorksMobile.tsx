@@ -1,6 +1,21 @@
 import { ChevronRight } from 'lucide-react'
 import { asset } from '@/lib/utils'
 
+/* Combined number + mascot SVGs (Figma Type=N, Size=lg exports).
+ * Inlined via ?raw + dangerouslySetInnerHTML so the artwork stays
+ * vector through every CSS transform — <img src=*.svg> rasterises
+ * at the intrinsic size first, which pixelates in Safari/Retina
+ * when the column scales the SVG via width/height. */
+import step1Svg from '@/assets/figma/how-it-works/step-1.svg?raw'
+import step2Svg from '@/assets/figma/how-it-works/step-2.svg?raw'
+import step3Svg from '@/assets/figma/how-it-works/step-3.svg?raw'
+
+const STEP_SVG: Record<string, string> = {
+  '1': step1Svg,
+  '2': step2Svg,
+  '3': step3Svg,
+}
+
 /**
  * HowItWorks — mobile layout, Figma node 773:40686 ("02_How It Works",
  * 360 wide). Three stacked full-bleed panels with their own bg colour;
@@ -39,6 +54,15 @@ type Step = {
   numColor: string
   /** Title colour per Figma. */
   titleColor: string
+  /** Per-step adjustments to the combined-SVG (digit + mascot)
+   * placement inside the 98-wide number column. The digit's
+   * horizontal position varies per character ("1" sits at the
+   * SVG's right, "2" / "3" sit more centred), so each step gets
+   * its own left/width tweak so the digit's visual centre lands
+   * at the column centre. */
+  svgLeft: number
+  svgTop: number
+  svgWidth: number
   /** Horizontal offset (px) the numeral sits inside the inline-grid
    * cell — Figma's `ml-[63px]` for "1" (it's a narrow digit so it
    * shifts right) and `ml-[31px]` for "2" and "3". */
@@ -78,6 +102,12 @@ const STEPS: Step[] = [
      * rotated mascot bbox without moving the mascot itself. */
     numLeft: 34,
     numTop: -32,
+    /* Combined-SVG placement — "1" digit sits at x=175 of the 256
+     * viewBox (narrow numeral pulled right), so anchor the SVG
+     * slightly LEFT-shifted to land the stem near the column centre. */
+    svgLeft: -10,
+    svgTop: -8,
+    svgWidth: 140,
   },
   {
     num: '2',
@@ -99,6 +129,12 @@ const STEPS: Step[] = [
     titleColor: '#8B8765',
     numLeft: -6,
     numTop: -32,
+    /* Combined-SVG placement — "2" digit centred around x=190 of
+     * the 256 viewBox; SVG anchored further LEFT to bring the
+     * digit centre to the column centre. */
+    svgLeft: -38,
+    svgTop: -8,
+    svgWidth: 140,
   },
   {
     num: '3',
@@ -119,6 +155,12 @@ const STEPS: Step[] = [
     titleColor: '#498A70',
     numLeft: 2,
     numTop: -32,
+    /* Combined-SVG placement — "3" digit centred around x=185 of
+     * the 256 viewBox; same left-shift as "2" so the column
+     * centre line stays aligned across all three steps. */
+    svgLeft: -38,
+    svgTop: -8,
+    svgWidth: 140,
   },
 ]
 
@@ -148,48 +190,30 @@ export default function HowItWorksMobile() {
               style={{ overflow: 'visible' }}
             >
               {/* Number column — Figma 714:36627/-65/-78 mobile.
-               * Match the Figma 98-wide column exactly; the digit +
-               * mascot are positioned absolutely with the rotated
-               * mascot bbox overflowing symmetrically (negative left)
-               * into the panel padding, like the Figma inline-grid
-               * cell centered in pr-32. Font is Ohno Softie Medium
-               * 218/line-none tracking -10.9 per Figma 714:36629. */}
+               * Renders the COMBINED step-N.svg (digit + mascot at
+               * their Figma-designed relative positions) as a
+               * single inline <svg> so the whole composition stays
+               * vector at any DPR. Scaled to ~0.55× of the natural
+               * 256×~334 viewBox (140×~184) — roughly the visual
+               * footprint of the previous 218 px text digit + its
+               * companion mascot in the 98-wide mobile column. */}
               <div
                 className="relative h-[178px] w-[98px] shrink-0"
                 style={{ overflow: 'visible' }}
               >
-                <span
+                <div
                   aria-hidden
-                  className="pointer-events-none absolute font-display text-[218px] leading-none font-medium tracking-[-10.9px] select-none"
+                  className="pointer-events-none absolute select-none [&>svg]:size-full"
                   style={{
-                    top: step.numTop ?? 0,
-                    left: step.numLeft,
-                    color: step.numColor,
+                    top: step.svgTop,
+                    left: step.svgLeft,
+                    width: step.svgWidth,
+                    /* Height auto-scales from the SVG's viewBox so
+                     * each digit keeps its natural aspect ratio
+                     * (step-3 is slightly taller than step-1). */
+                    height: 'auto',
                   }}
-                >
-                  {step.num}
-                </span>
-                {/* Mascot — Figma 714:36630/-68/-81. Each SVG renders
-                 * at its OWN natural viewBox size (mascot-1 134×102,
-                 * mascot-2 116×100, mascot-3 130×98) so the artwork
-                 * isn't stretched or letterboxed. The Figma wrapper
-                 * rotation -12.65° is preserved. */}
-                <img
-                  src={step.mascot}
-                  alt=""
-                  aria-hidden
-                  loading="lazy"
-                  decoding="async"
-                  className="pointer-events-none absolute max-w-none"
-                  style={{
-                    top: step.mascotTop,
-                    left: step.mascotLeft,
-                    width: step.mascotW,
-                    height: step.mascotH,
-                    transform: `rotate(${step.mascotRotate}deg)`,
-                    transformOrigin: 'center',
-                    overflow: 'visible',
-                  }}
+                  dangerouslySetInnerHTML={{ __html: STEP_SVG[step.num] ?? '' }}
                 />
               </div>
 
