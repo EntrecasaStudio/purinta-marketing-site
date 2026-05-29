@@ -84,23 +84,40 @@ export default function Hero() {
   return (
     <section
       ref={ref}
-      className="relative flex w-full flex-col items-center md:min-h-[1300px]"
+      className="relative flex w-full flex-col items-center min-[768px]:min-h-[962px] min-[1154px]:min-h-[1300px]"
       data-node-id="384:2207"
     >
-      {/* Hill ellipse — pulled out of the bg container so the section
-          can have overflow-visible. Positioned absolutely with z-30 so
-          it paints OVER Features' bg plane (z-auto). The Features
-          title / cards have z-40+ so they stay above the hill. */}
+      {/* Hill ellipse — DESKTOP. Pulled out of the bg container so the
+          section can have overflow-visible. Positioned absolutely
+          with z-30 so it paints OVER Features' bg plane (z-auto).
+          The Features title / cards have z-40+ so they stay above
+          the hill. */}
       <motion.img
         src={asset('/assets/figma/hill-ellipse.svg')}
         alt=""
         aria-hidden
-        className="pointer-events-none absolute left-1/2 z-30 hidden h-[1312.311px] w-[2485.428px] max-w-none -translate-x-1/2 md:block"
+        className="pointer-events-none absolute left-1/2 z-30 hidden h-[1312.311px] w-[2485.428px] max-w-none -translate-x-1/2 min-[1154px]:block"
         style={{ top: 839.17 }}
         initial={bgInitial}
         animate={{ opacity: bgLoaded || reduceMotion ? 1 : 0 }}
         transition={bgTransition}
         data-node-id="384:2217"
+      />
+      {/* Hill ellipse — TABLET (Figma 1006:113054). Same SVG as
+          desktop, scaled to the smaller 2112×1115 footprint and
+          anchored at top:713 relative to the section so the lower
+          curve bleeds into the Why Purinta section below, providing
+          the visual hand-off between hero meadow and the cards
+          canvas without a hard horizontal cut. */}
+      <motion.img
+        src={asset('/assets/figma/hill-ellipse.svg')}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 z-30 hidden h-[1115.464px] w-[2112.614px] max-w-none -translate-x-1/2 min-[768px]:block min-[1154px]:hidden"
+        style={{ top: 713.29 }}
+        initial={bgInitial}
+        animate={{ opacity: bgLoaded || reduceMotion ? 1 : 0 }}
+        transition={bgTransition}
       />
       {/* ---------- BG layer (1920×1462, overflow-clip) ----------
           Container matches the image's exact natural size so the
@@ -112,7 +129,7 @@ export default function Hero() {
         initial={bgInitial}
         animate={{ opacity: bgLoaded || reduceMotion ? 1 : 0 }}
         transition={bgTransition}
-        className="pointer-events-none absolute top-0 left-1/2 z-[1] hidden -translate-x-1/2 md:block"
+        className="pointer-events-none absolute top-0 left-1/2 z-[1] hidden -translate-x-1/2 min-[1154px]:block"
       >
         <div className="relative h-[1462px] w-[1920px] overflow-hidden">
           {/* Scene — Figma node 430:4341 ("Purinta Hero back - 20260512").
@@ -204,11 +221,11 @@ export default function Hero() {
       </motion.div>
 
       {/* ---------- Top spacer (Bg flex item, 48px) ---------- */}
-      <div className="hidden h-[48px] w-full md:block" />
+      <div className="hidden h-[48px] w-full min-[1154px]:block" />
 
       {/* ---------- Nav ---------- */}
       <motion.div
-        className="relative z-50 hidden w-full px-4 md:block"
+        className="relative z-50 hidden w-full px-4 md:block min-[768px]:pt-6 min-[1154px]:pt-0"
         initial={navInitial}
         animate={{ opacity: 1, y: 0 }}
         transition={navTransition}
@@ -310,8 +327,155 @@ export default function Hero() {
         </div>
       </div>
 
+      {/* ============================================================
+       *  TABLET Hero (768 ≤ vw < 1154) — Figma 1047:144278.
+       *
+       *  Same `background.webp` + Pepe / Tofu / Shibu SVGs as the
+       *  desktop scene, but sized down for the 1320-wide bg
+       *  container the tablet design uses (vs desktop's 1920). The
+       *  768 content column stays centred at any viewport in this
+       *  range; the bg container is 1320 wide, so on viewports
+       *  narrower than that the sides clip into the section's
+       *  overflow-hidden, matching the "content fixed, image
+       *  continuing" pattern used on desktop.
+       * ============================================================ */}
+      <div
+        className="absolute inset-x-0 top-0 z-[1] hidden w-full overflow-hidden min-[768px]:block min-[1154px]:hidden"
+        style={{ height: 962 }}
+      >
+        {/* Bg container — 1320 × 1054 centered at top, overflow-clip
+         * (so the bg image's negative offsets don't bleed past it). */}
+        <div
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 overflow-hidden"
+          style={{ width: 1320, height: 1054 }}
+        >
+          {/* Scene image — Figma 1006:113049 nests the bg at
+           * 123.67% × 117.9% sized with negative left / top so the
+           * mountain sits left-of-centre, lake fills the middle and
+           * the pagoda is just inside the right edge. Same source
+           * webp as desktop. */}
+          <img
+            src={asset('/assets/figma/background.webp')}
+            alt=""
+            aria-hidden
+            fetchPriority="high"
+            decoding="async"
+            className="absolute block max-w-none"
+            style={{
+              width: '123.67%',
+              height: '117.9%',
+              left: '-11.84%',
+              top: '-17.86%',
+            }}
+          />
+
+          {/* Drop shadows under mascots — Figma 1006:113050. */}
+          <img
+            src={asset('/assets/figma/shadows.svg')}
+            alt=""
+            aria-hidden
+            className="absolute block max-w-none mix-blend-multiply"
+            style={{
+              width: 635.276,
+              height: 63.076,
+              left: 'calc(50% + 12.17px)',
+              top: 666.4,
+              transform: 'translateX(-50%)',
+            }}
+          />
+
+          {/* Pepe (frog) — md size 148.75 × 198.95, Figma offset
+           * left=(50%-238.62px), top=515 (centre-anchored). */}
+          <img
+            src={asset('/assets/figma/pepe.svg')}
+            alt="Pepe the frog"
+            className="absolute block max-w-none"
+            style={{
+              width: 148.75,
+              height: 198.95,
+              left: 'calc(50% - 238.62px)',
+              top: 515,
+              transform: 'translateX(-50%)',
+            }}
+          />
+
+          {/* Tofu / Purinta-chan — md size 281.35 × 245.4, Figma
+           * offset left=(50%+1.68px), top=464. */}
+          <img
+            src={asset('/assets/figma/hero-mascot.svg')}
+            alt="Purinta mascot"
+            className="absolute block max-w-none"
+            style={{
+              width: 281.35,
+              height: 245.4,
+              left: 'calc(50% + 1.68px)',
+              top: 464,
+              transform: 'translateX(-50%)',
+            }}
+          />
+
+          {/* Shibu (dog) — md size 174.25 × 230.96, Figma offset
+           * left=(50%+241.13px), top=494. */}
+          <img
+            src={asset('/assets/figma/shibu.svg')}
+            alt="Shiba the dog"
+            className="absolute block max-w-none"
+            style={{
+              width: 174.25,
+              height: 230.96,
+              left: 'calc(50% + 241.13px)',
+              top: 494,
+              transform: 'translateX(-50%)',
+            }}
+          />
+        </div>
+
+        {/* Content overlay — title + paragraph + CTA, 600 px column
+         * centred in the 768 frame. Figma 1006:113058 sets the
+         * content vertical anchor with pt:170 / pb:524 — that puts
+         * the title baseline ~170 px below the section top, well
+         * above the mascots that sit further down in the bg. */}
+        <div className="relative z-10 mx-auto flex w-full max-w-[768px] flex-col items-center gap-4 pt-[170px]">
+          <div className="flex w-[600px] max-w-full flex-col items-center gap-[10px]">
+            <h1
+              className="w-full text-center font-display text-[61px] leading-[61px] font-bold tracking-[1.22px] text-[#333]"
+              style={{ textShadow: '2px 2px 8px rgba(254,254,254,0.52)' }}
+            >
+              Deposit Memes,
+              <br />
+              Print USDC.
+            </h1>
+            <p className="w-full px-10 text-center font-body text-[16px] leading-[26px] font-medium tracking-[0.16px] text-[#333]">
+              The first lending protocol for memecoin believers.
+              <br />
+              Lock your bags, borrow USDC, and keep the upside.
+            </p>
+          </div>
+          <Button variant="primary" size="md" asChild>
+            <a href="https://app.purinta.xyz">Launch App</a>
+          </Button>
+        </div>
+
+        {/* Gradient fade — long, very gentle dissolve of the scene
+         * into the PAGE background (blush-50 → mint-50 diagonal
+         * --gradient-bg). Painted in transparent → mint-50 so the
+         * bottom edge matches the page gradient at the section
+         * boundary instead of ramping to opaque white, which used to
+         * create a faint color band against the Why Purinta canvas
+         * below. The mascot crew at y≈770 already lives in the more
+         * opaque area; the dissolve happens BEHIND them. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[340px]"
+          style={{
+            background:
+              'linear-gradient(to bottom, transparent 0%, rgba(242,247,244,0.12) 35%, rgba(242,247,244,0.45) 65%, rgba(242,247,244,0.78) 85%, var(--color-mint-50) 100%)',
+          }}
+        />
+      </div>
+
       {/* ---------- Hero content (1280 × 668, pt-58 pb-148) ---------- */}
-      <div className="relative z-10 hidden w-full flex-col items-center md:flex">
+      <div className="relative z-10 hidden w-full flex-col items-center min-[1154px]:flex">
         <motion.div
           style={{ y: contentY, opacity: contentOpacity }}
           className="flex h-[668px] w-full max-w-[1280px] flex-col items-start px-6 pt-[58px] pb-[148px]"

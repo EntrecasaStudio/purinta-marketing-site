@@ -166,7 +166,7 @@ const STEPS: Step[] = [
 
 export default function HowItWorksMobile() {
   return (
-    <section className="w-full pt-[48px] pb-[24px] md:hidden">
+    <section className="w-full pt-[48px] pb-[24px] min-[1154px]:hidden">
       {/* Title — Figma 714:35917: Ohno Softie Bold 25 / 33 */}
       <div className="reveal reveal-up flex w-full items-center justify-center px-6 pb-2">
         <h2 className="text-center font-display text-[25px] leading-[33px] font-semibold tracking-[0.5px] text-[#333]">

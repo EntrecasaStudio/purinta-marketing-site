@@ -202,7 +202,7 @@ function HowItWorksDesktop() {
    * with their flat Figma backgrounds, no scroll pin, no slide. */
   if (reduceMotion) {
     return (
-      <section className="relative hidden w-full md:block">
+      <section className="relative hidden w-full min-[1154px]:block">
         <div className="py-12 text-center">
           <h2 className="font-display text-[39px] leading-[1] font-semibold tracking-[0.88px] text-[var(--color-neutral-900)]">
             How It Works?
@@ -228,7 +228,7 @@ function HowItWorksDesktop() {
        * (z-30) which extends ~300 px PAST Features' bottom into the
        * top of HowItWorks. Without this, the ellipse would render on
        * top of the title + first panel during the entry phase. */
-      className="relative z-40 hidden w-full md:block"
+      className="relative z-40 hidden w-full min-[1154px]:block"
       /* 3.92× viewport. The sticky pin eats 100vh, leaving a 292vh
        * scroll range: 130vh + 130vh to slide between the three panels,
        * plus two 16vh DWELL stretches where panels 2 and 3 hold
@@ -357,12 +357,14 @@ function PanelContent({ step, isActive }: { step: Step; isActive: boolean }) {
   return (
     <div className="flex w-full max-w-[1232px] items-center justify-center gap-[40px] pl-[208px]">
       {/* ---------- Number column (absolute positioning per Figma) ----------
-       *  Shifted up 70 px so the number + mascot sit higher than the
-       *  text column, matching the Figma composition. The translate is
-       *  visual-only — it doesn't affect the column's flow width (which
-       *  still drives where the text column starts). */}
+       *  Sits at the flex row's vertical center (items-center on the
+       *  parent) so the digit + mascot align with the title baseline
+       *  on its right — the earlier -translate-y-[70px] lifted it
+       *  above the text and read as misaligned with the new vector
+       *  digit + mascot SVG that's shorter than the original 437 px
+       *  text numeral. */}
       <div
-        className="relative shrink-0 -translate-y-[70px]"
+        className="relative shrink-0"
         style={{ width: NUMBER_COL_FLOW_WIDTH, height: 332 }}
       >
         {/* Number — INLINE <svg> (via dangerouslySetInnerHTML) so

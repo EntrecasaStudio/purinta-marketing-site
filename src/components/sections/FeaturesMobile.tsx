@@ -149,7 +149,7 @@ function Caret() {
 
 export default function FeaturesMobile() {
   return (
-    <section className="relative w-full pt-10 pb-4 md:hidden">
+    <section className="relative z-40 w-full pt-10 pb-4 min-[1154px]:hidden min-[768px]:pt-[24px] min-[768px]:pb-[124px]">
       <div className="flex w-full flex-col items-center gap-8">
         {/* Title — Figma 665:61546: Rubik Medium 25 / 38 */}
         <h2 className="reveal reveal-up px-[5px] text-center font-display text-[25px] leading-[38px] font-semibold tracking-[0.25px] text-[#333]">
@@ -162,7 +162,7 @@ export default function FeaturesMobile() {
           {cards.map((c) => (
             <article
               key={c.key}
-              className="reveal reveal-up w-full max-w-[480px] rounded-[24px] border border-solid p-4 pb-6"
+              className="reveal reveal-up w-full max-w-[480px] rounded-[24px] border border-solid p-4 pb-6 min-[768px]:max-w-[680px] min-[768px]:px-[16px] min-[768px]:pt-[24px] min-[768px]:pb-[24px]"
               style={{ backgroundColor: c.bg, borderColor: c.border }}
             >
               {/* Title row — star + heading on the left, illustration
@@ -196,24 +196,52 @@ export default function FeaturesMobile() {
                   <h3 className="font-display text-[20px] leading-[24px] font-semibold tracking-[0.4px] whitespace-pre-line text-[#333] min-[500px]:whitespace-normal">
                     {c.title}
                   </h3>
+
+                  {/* Body + Learn more — TABLET ONLY. At tablet+
+                   * (Figma 1047:144282) the card flattens to a single
+                   * row with all text content on the LEFT of the
+                   * mascot+blob, so the body + CTA live inside the
+                   * title column here. The mobile layout keeps the
+                   * full-width body section below the title row
+                   * (rendered after this title-col wrapper). */}
+                  <div className="hidden min-[768px]:mt-4 min-[768px]:flex min-[768px]:flex-col min-[768px]:gap-2">
+                    <p className="font-body text-[13px] leading-[21px] font-normal tracking-[0.26px] text-[#808080]">
+                      {c.body}
+                    </p>
+                    <a
+                      href="https://docs.purinta.xyz/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-0.5 font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] text-[#39763D] transition-opacity hover:opacity-70"
+                    >
+                      Learn more
+                      <Caret />
+                    </a>
+                  </div>
                 </div>
-                <div className="relative h-[76px] w-[120px] shrink-0">
-                  {/* Blob behind the mascot — same per-card mask SVG
-                   * + accent fill as the desktop expanded state.
-                   * Per Figma 773:40685 the mobile blob is much
-                   * smaller than desktop's (170×150 → 76×52), and
-                   * sits low-and-right behind the mascot's body so
-                   * the character reads against the cream card with
-                   * a tinted shape under its lower half rather than
-                   * a full halo. */}
+                <div
+                  className="relative h-[76px] w-[120px] shrink-0 min-[768px]:h-[200px] min-[768px]:w-[260px]"
+                  style={{
+                    /* Per-card mascot dims: mobile uses the 0.75×
+                     * mobile-design sizes (illuW/H); tablet+ jumps to
+                     * the desktop-expanded sizes (natural × 1.5 = 2×
+                     * mobile) and pins blob + mascot INSIDE the slot
+                     * with no overflow, matching Figma 1047:144282. */
+                    ['--m-w' as string]: `${c.illuW}px`,
+                    ['--m-h' as string]: `${c.illuH}px`,
+                    ['--m-w-t' as string]: `${c.illuW * 2}px`,
+                    ['--m-h-t' as string]: `${c.illuH * 2}px`,
+                  }}
+                >
+                  {/* Blob — mobile 76×52 sits low behind the mascot's
+                   * body; tablet+ jumps to the desktop-default 170×150
+                   * shape and is anchored inside the slot so the whole
+                   * mascot+blob group reads as a contained "expanded
+                   * state" snapshot to the right of the text. */}
                   <div
                     aria-hidden
-                    className="pointer-events-none absolute"
+                    className="pointer-events-none absolute right-[-4px] bottom-[20px] h-[52px] w-[76px] min-[768px]:right-[8px] min-[768px]:bottom-[24px] min-[768px]:h-[150px] min-[768px]:w-[170px]"
                     style={{
-                      right: '-4px',
-                      bottom: '20px',
-                      width: '76px',
-                      height: '52px',
                       backgroundColor: c.blob,
                       transform: `rotate(${c.blobRotate}deg)`,
                       transformOrigin: 'center',
@@ -235,21 +263,16 @@ export default function FeaturesMobile() {
                     decoding="async"
                     width={c.illuW}
                     height={c.illuH}
-                    className="absolute max-w-none"
+                    className="absolute max-w-none [width:var(--m-w)] [height:var(--m-h)] min-[768px]:[width:var(--m-w-t)] min-[768px]:[height:var(--m-h-t)] min-[768px]:right-[24px] min-[768px]:bottom-0"
                     style={{
-                      width: `${c.illuW}px`,
-                      height: `${c.illuH}px`,
-                      /* Anchored to the slot's bottom-right; per-card
-                       * `illuOffsetY` (mascots 2-5 = 12 px) pushes the
-                       * mascot down past the slot edge, and
-                       * `illuOffsetX` (api3 only = 16 px) pushes it
-                       * further right past the slot edge — both per
-                       * Figma 773:40685. */
+                      /* Mobile anchor — bottom-right of the slot with
+                       * per-card offsets (illuOffsetY for cards 2-5,
+                       * illuOffsetX for api3) so each character lands
+                       * over its blob. Tablet+ overrides via Tailwind
+                       * classes to pin the mascot inside the wider
+                       * slot. */
                       bottom: `${-(c.illuOffsetY ?? 0)}px`,
                       right: `${-(c.illuOffsetX ?? 0)}px`,
-                      /* Per Figma 773:40685 mobile cards: each mascot
-                       * is tilted +8° (clockwise) so the character
-                       * reads as if leaning into the blob behind it. */
                       transform: 'rotate(8deg)',
                       transformOrigin: 'bottom right',
                     }}
@@ -257,13 +280,16 @@ export default function FeaturesMobile() {
                 </div>
               </div>
 
-              {/* Body + Learn more — `relative` (no z-index) promotes
-               * this section to a positioned element so it paints AFTER
-               * the header row in DOM order. Without it, the mascot's
-               * transform-created stacking context makes the overflowing
-               * mascot paint over the paragraph (positioned slot beats
-               * static body in CSS paint order). */}
-              <div className="relative flex flex-col items-start gap-2 px-2 pt-2">
+              {/* Body + Learn more — MOBILE ONLY. Hidden at tablet+
+               * because the body is rendered inside the title column
+               * for the side-by-side layout (Figma 1047:144282).
+               * `relative` (no z-index) promotes this section to a
+               * positioned element so it paints AFTER the header row
+               * in DOM order. Without it, the mascot's transform-
+               * created stacking context makes the overflowing
+               * mascot paint over the paragraph (positioned slot
+               * beats static body in CSS paint order). */}
+              <div className="relative flex flex-col items-start gap-2 px-2 pt-2 min-[768px]:hidden">
                 <p className="font-body text-[13px] leading-[21px] font-normal tracking-[0.26px] text-[#808080]">
                   {c.body}
                 </p>

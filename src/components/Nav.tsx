@@ -5,7 +5,6 @@ import {
   useReducedMotion,
   type Variants,
 } from 'motion/react'
-import Logo from '@/components/Logo'
 import { XIcon, DiscordIcon } from '@/components/icons/Social'
 import { Button } from '@/components/ui/button'
 import { asset } from '@/lib/utils'
@@ -84,17 +83,44 @@ function scrollToHref(href: string) {
 export default function Nav() {
   return (
     <nav
-      className="relative z-50 mx-auto hidden h-[84px] w-full max-w-[1280px] items-center justify-center rounded-[64px] bg-[#FEFEFE] px-[40px] py-[24px] shadow-[0_4px_24px_rgba(24,82,41,0.06)] md:flex"
+      /* Nav pill — Figma desktop 384:2293 (1280×84, px-24 py-24) and
+       * Figma tablet 1041:29233 (720×72, px-20 py-16). All inner
+       * spacings + element sizes interpolate between the two
+       * breakpoints via min-[768px]: (tablet) and min-[1154px]:
+       * (desktop) overrides so the same nav renders pixel-perfect
+       * at both ranges. */
+      className="relative z-50 mx-auto hidden w-full items-center justify-center rounded-[64px] bg-[#FEFEFE] shadow-[0_4px_24px_rgba(24,82,41,0.06)] md:flex min-[768px]:h-[72px] min-[768px]:max-w-[720px] min-[768px]:px-[20px] min-[768px]:py-[16px] min-[1154px]:h-[84px] min-[1154px]:max-w-[1280px] min-[1154px]:px-[24px] min-[1154px]:py-[24px]"
       data-node-id="384:2293"
     >
-      <div className="flex w-full items-center justify-between pl-4">
-        <a href="#" aria-label="Purinta" className="flex shrink-0">
-          <Logo />
+      <div className="flex w-full items-center justify-between">
+        {/* Logo — Figma tablet 1041:29180 sizes the lockup at
+         * 126.356 × 30 (symbol 26.5×30 + wordmark 93.69×18.56 at
+         * left:32.6 top:6.61). Desktop keeps the 168.475×40
+         * default lockup shipped by <Logo />. */}
+        <a
+          href="#"
+          aria-label="Purinta"
+          className="relative flex shrink-0 min-[768px]:h-[30px] min-[768px]:w-[126.36px] min-[1154px]:h-[40px] min-[1154px]:w-[168.475px]"
+        >
+          <img
+            src={asset('/assets/figma/logo-symbol.svg')}
+            alt=""
+            className="absolute top-0 left-0 min-[768px]:h-[30px] min-[768px]:w-[26.5px] min-[1154px]:h-[40px] min-[1154px]:w-[35.33px]"
+          />
+          <img
+            src={asset('/assets/figma/wordmark.svg')}
+            alt="Purinta"
+            className="absolute min-[768px]:top-[6.61px] min-[768px]:left-[32.6px] min-[768px]:h-[18.56px] min-[768px]:w-[93.69px] min-[1154px]:top-[8.814px] min-[1154px]:left-[43.47px] min-[1154px]:h-[24.746px] min-[1154px]:w-[124.915px]"
+          />
         </a>
 
-        <div className="flex items-center gap-[32px]">
-          <div className="flex items-center gap-[64px]">
-            <ul className="flex items-center justify-end gap-[20px]">
+        {/* Outer right group — tablet collapses to a single 3-child
+         * flex (links / socials / button) with gap-24; desktop
+         * keeps the nested 32/64-gap structure from the original
+         * 1280-wide design. */}
+        <div className="flex items-center min-[768px]:gap-[24px] min-[1154px]:gap-[32px]">
+          <div className="flex items-center min-[768px]:gap-[24px] min-[1154px]:gap-[64px]">
+            <ul className="flex items-center justify-end min-[768px]:gap-[8px] min-[1154px]:gap-[20px]">
               {links.map((l) => (
                 <li key={l.label}>
                   <a
@@ -102,12 +128,11 @@ export default function Nav() {
                     onClick={(e) => {
                       e.preventDefault()
                       scrollToHref(l.href)
-                      /* Update the URL hash without triggering the
-                       * native instant jump (history.pushState skips
-                       * the browser's scroll-to-anchor behaviour). */
                       history.pushState(null, '', l.href)
                     }}
-                    className="block px-[8px] py-[1.5px] font-body text-[16px] leading-[26px] tracking-[0.16px] whitespace-nowrap text-[#333] transition-colors hover:text-[var(--color-green-600)]"
+                    /* Tablet: 13 px Rubik Regular tracking 0.26.
+                     * Desktop: 16 px Rubik tracking 0.16. */
+                    className="block whitespace-nowrap text-[#333] transition-colors hover:text-[var(--color-green-600)] min-[768px]:px-[8px] min-[768px]:py-[1.5px] min-[768px]:font-body min-[768px]:text-[13px] min-[768px]:leading-[21px] min-[768px]:font-normal min-[768px]:tracking-[0.26px] min-[1154px]:text-[16px] min-[1154px]:leading-[26px] min-[1154px]:font-medium min-[1154px]:tracking-[0.16px]"
                   >
                     {l.label}
                   </a>
@@ -115,13 +140,15 @@ export default function Nav() {
               ))}
             </ul>
 
-            <div className="flex h-[32px] items-center justify-end gap-[24px]">
+            {/* Socials — tablet 28×28 wrapper, gap-8. Desktop
+             * 32×32, gap-24. */}
+            <div className="flex items-center justify-end min-[768px]:h-[28px] min-[768px]:gap-[8px] min-[1154px]:h-[32px] min-[1154px]:gap-[24px]">
               <a
                 href="https://x.com/purintaxyz"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Purinta on X"
-                className="flex size-[32px] items-center justify-center text-[#666666] transition-colors hover:text-[var(--color-green-600)]"
+                className="flex items-center justify-center text-[#666666] transition-colors hover:text-[var(--color-green-600)] min-[768px]:size-[28px] min-[1154px]:size-[32px]"
               >
                 <XIcon width={20} height={18} />
               </a>
@@ -130,20 +157,20 @@ export default function Nav() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Purinta on Discord"
-                className="flex size-[32px] items-center justify-center text-[#666666] transition-colors hover:text-[var(--color-green-600)]"
+                className="flex items-center justify-center text-[#666666] transition-colors hover:text-[var(--color-green-600)] min-[768px]:size-[28px] min-[1154px]:size-[32px]"
               >
                 <DiscordIcon width={24} height={18.5} />
               </a>
             </div>
           </div>
 
-          {/* Nav primary button uses Figma-specific dimensions
-              (font 16, px-[21] py-[13], rounded-[22]) — bigger font
-              than .btn-sm (13 px), smaller padding than .btn (12/24). */}
+          {/* Launch App — Figma tablet 541:25138 ("Extra Small"):
+           * px-16 py-6 text-13 tracking-0.39, Green/700 (#185229).
+           * Desktop 384:2293: px-21 py-13 text-16 tracking-0.48. */}
           <Button
             variant="primary"
             asChild
-            className="rounded-[22px] !px-[21px] !py-[13px] !text-[16px] tracking-[0.48px]"
+            className="shrink-0 rounded-[22px] whitespace-nowrap min-[768px]:!px-[16px] min-[768px]:!py-[6px] min-[768px]:!text-[13px] min-[768px]:!tracking-[0.39px] min-[1154px]:!px-[21px] min-[1154px]:!py-[13px] min-[1154px]:!text-[16px] min-[1154px]:!tracking-[0.48px]"
           >
             <a href="https://app.purinta.xyz">Launch App</a>
           </Button>
