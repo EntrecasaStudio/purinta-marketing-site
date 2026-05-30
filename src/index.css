@@ -361,6 +361,16 @@
       height: 916px;
     }
   }
+  /* Tablet (768-1153) — the mascot is anchored at x=1048 inside the
+   * 1920-wide scene wrap = +88 px from wrap centre. At tablet the
+   * narrower viewport makes that 88 px offset read as noticeably
+   * right of centre, so shift the wrap an extra 88 px LEFT to
+   * recentre the mascot. */
+  @media (min-width: 768px) and (max-width: 1153px) {
+    .footer-scene-wrap {
+      transform: translateX(-50%) translateX(-88px);
+    }
+  }
 }
 
 /* ---------- Keyframes ---------- */

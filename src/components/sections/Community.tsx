@@ -40,16 +40,20 @@ export default function Community() {
        * Footer section that follows in document order. Without this
        * the later <Footer /> sibling covers the flowers that overflow
        * Community's bottom edge into the Footer meadow. */
-      className="relative z-10 w-full overflow-visible px-6 pt-1 pb-12 md:min-h-[638px] md:px-[var(--ds-space-24,24px)] md:pt-[80px] md:pb-[83px]"
+      className="relative z-10 w-full overflow-visible px-6 pt-1 pb-12 min-[768px]:px-[24px] min-[768px]:py-[40px] min-[1154px]:min-h-[638px] min-[1154px]:px-[var(--ds-space-24,24px)] min-[1154px]:pt-[80px] min-[1154px]:pb-[83px]"
     >
-      <div className="relative z-10 mx-auto flex w-full max-w-[1080px] flex-col items-center gap-[28px] md:gap-[72px]">
-        {/* Heading + body — 540 px column on mobile, 700 px column at md+ */}
-        <div className="reveal reveal-up flex w-full max-w-[540px] flex-col items-center gap-[12px] text-center md:max-w-[700px] md:gap-6">
-          <h2 className="w-full font-display text-[25px] leading-[33px] font-semibold tracking-[0.5px] text-[var(--color-neutral-900)] md:text-[39px] md:leading-[43px] md:tracking-[-0.195px]">
-            <span className="block">The Meme Lending</span>
-            <span className="block">Community</span>
+      <div className="relative z-10 mx-auto flex w-full max-w-[1080px] flex-col items-center gap-[28px] min-[768px]:gap-[24px] min-[1154px]:gap-[72px]">
+        {/* Heading + body — 540 px on mobile, 700 px on tablet+,
+         * 1080 px on desktop. */}
+        <div className="reveal reveal-up flex w-full max-w-[480px] flex-col items-center gap-[12px] text-center min-[768px]:max-w-[700px] min-[768px]:gap-[24px] min-[1154px]:gap-6">
+          {/* Title: mobile breaks "The Meme Lending\nCommunity" into
+           * two stacked lines via `block` spans. Tablet+ collapses
+           * them to a single inline line (Figma 1047:144285). */}
+          <h2 className="w-full font-display text-[25px] leading-[33px] font-semibold tracking-[0.5px] text-[var(--color-neutral-900)] min-[768px]:text-[31px] min-[768px]:leading-[37px] min-[768px]:font-bold min-[768px]:tracking-[0.62px] min-[1154px]:text-[39px] min-[1154px]:leading-[43px] min-[1154px]:tracking-[-0.195px]">
+            <span className="block min-[768px]:inline">The Meme Lending</span>{' '}
+            <span className="block min-[768px]:inline">Community</span>
           </h2>
-          <p className="w-[312px] max-w-full font-body text-[13px] leading-[21px] font-normal tracking-[0.26px] text-[var(--color-neutral-800)] md:w-full md:text-[25px] md:leading-[38px] md:tracking-[0.25px]">
+          <p className="w-[312px] max-w-full font-body text-[13px] leading-[21px] font-normal tracking-[0.26px] text-[var(--color-neutral-800)] min-[768px]:w-full min-[768px]:text-[20px] min-[768px]:leading-[32px] min-[768px]:tracking-[0.2px] min-[1154px]:text-[25px] min-[1154px]:leading-[38px] min-[1154px]:tracking-[0.25px]">
             Purinta combines the best DeFi primitives into one seamless
             memecoin lending experience. No shortcuts, no compromises
           </p>
@@ -58,9 +62,9 @@ export default function Community() {
         {/* CTAs — two layouts share the same three actions:
          *   - Mobile: stacked column, every button w-[260px] and ~44 px
          *     tall (Button size="md"), 8 px gap.
-         *   - Desktop: flex row, Button size="lg", 16 px gap (wraps on
+         *   - Tablet+: flex row, Button size="lg", 16 px gap (wraps on
          *     narrow viewports between sm and md). */}
-        <div className="reveal reveal-up flex w-full flex-col items-center justify-center gap-2 md:hidden">
+        <div className="reveal reveal-up flex w-full flex-col items-center justify-center gap-2 min-[768px]:hidden">
           <Button
             variant="primary"
             size="md"
@@ -100,7 +104,7 @@ export default function Community() {
             </a>
           </Button>
         </div>
-        <div className="reveal reveal-up hidden w-full flex-col items-center justify-center gap-4 sm:flex-row sm:flex-wrap md:flex">
+        <div className="reveal reveal-up hidden w-full flex-col items-center justify-center gap-4 sm:flex-row sm:flex-wrap min-[768px]:flex">
           <Button variant="primary" size="lg" asChild>
             <a href="https://app.purinta.xyz">Launch App</a>
           </Button>

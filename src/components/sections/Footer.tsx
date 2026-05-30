@@ -278,8 +278,8 @@ export default function Footer() {
  */
 function BandInner() {
   return (
-    <div className="relative mx-auto flex h-full max-w-[1440px] flex-col items-center justify-center gap-[24px] px-[16px] py-[24px] md:flex-row md:items-center md:justify-between md:gap-10 md:px-[156px] md:pt-[88px] md:pb-[56px]">
-      <div className="flex flex-col items-center gap-[8px] md:flex-row md:items-center md:gap-[18px]">
+    <div className="relative mx-auto flex h-full max-w-[1440px] flex-col items-center justify-center gap-[24px] px-[16px] py-[24px] md:gap-[16px] md:px-[24px] md:pt-[56px] md:pb-[40px] min-[1154px]:flex-row min-[1154px]:items-center min-[1154px]:justify-between min-[1154px]:gap-10 min-[1154px]:px-[156px] min-[1154px]:pt-[88px] min-[1154px]:pb-[56px]">
+      <div className="flex flex-col items-center gap-[8px] min-[1154px]:flex-row min-[1154px]:gap-[18px]">
         {/* Logo — Figma sizes the mobile lockup at 20 × 84 (symbol
          * 17.66 × 20 + wordmark 62.46 × 12.37). Rendering the 135×34
          * SVG at h=20 keeps the same composition at the natural 3.97:1
@@ -295,7 +295,7 @@ function BandInner() {
       </div>
       <nav
         aria-label="Footer"
-        className="flex flex-wrap items-start justify-center gap-y-2 gap-x-[32px] px-[56px] md:flex-nowrap md:items-center md:gap-[64px] md:px-0"
+        className="flex flex-wrap items-start justify-center gap-y-2 gap-x-[32px] px-[56px] md:flex-nowrap md:items-center md:gap-[32px] md:px-0 min-[1154px]:gap-[64px]"
       >
         {linkGroups.map((group, gi) => (
           <div

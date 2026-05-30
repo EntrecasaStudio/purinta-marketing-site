@@ -301,7 +301,7 @@ export default function Ecosystem() {
        *  Fixed 1920×1604 reference frame, centered horizontally. Every
        *  child uses absolute pixel offsets copied straight from the
        *  Figma artboard. Hidden below `md`. */}
-      <div className="pointer-events-none absolute top-0 left-1/2 z-0 hidden h-[1604px] w-[1920px] -translate-x-1/2 md:block">
+      <div className="pointer-events-none absolute top-0 left-1/2 z-0 hidden h-[1604px] w-[1920px] -translate-x-1/2 min-[1154px]:block">
         {/* Top isometric squares pattern (rotated 180° per Figma) */}
         <img
           src={v2('squares-top.svg')}
@@ -370,7 +370,7 @@ export default function Ecosystem() {
        *  mobile scene); items outside the viewport are clipped by the
        *  section's overflow-hidden. */}
       <div
-        className="pointer-events-none absolute top-0 left-1/2 z-0 h-[1300px] w-[960px] -translate-x-1/2 md:hidden"
+        className="pointer-events-none absolute top-0 left-1/2 z-0 h-[1300px] w-[960px] -translate-x-1/2 min-[1154px]:hidden"
       >
         {/* Top isometric squares pattern (rotated 180° per Figma) */}
         <img
@@ -400,22 +400,22 @@ export default function Ecosystem() {
       </div>
 
       {/* ---------- Foreground content ---------- */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col items-center gap-6 px-6 py-16 md:h-[1604px] md:justify-start md:gap-[72px] md:py-0 md:pt-[136px]">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col items-center gap-6 px-6 py-16 min-[1154px]:h-[1604px] min-[1154px]:justify-start min-[1154px]:gap-[72px] min-[1154px]:py-0 min-[1154px]:pt-[136px]">
         {/* Copy block — title + subtitle. Mobile sizing (Figma
          * 773:40687): h2 31/37 Bold, p 13/21 Regular. Desktop keeps
          * the original 76/76 + 25/38. */}
-        <div className="flex w-full flex-col items-center gap-2 md:gap-4">
-          <h2 className="reveal reveal-up text-center font-display text-[31px] leading-[37px] font-bold tracking-[0.62px] text-[#185229] md:text-[76px] md:leading-[76px] md:tracking-[0.76px]">
+        <div className="mx-auto flex w-full max-w-[320px] flex-col items-center gap-2 min-[768px]:max-w-none min-[1154px]:gap-4">
+          <h2 className="reveal reveal-up text-center font-display text-[31px] leading-[37px] font-bold tracking-[0.62px] text-[#185229] min-[1154px]:text-[76px] min-[1154px]:leading-[76px] min-[1154px]:tracking-[0.76px]">
             The Stack
           </h2>
-          <p className="reveal reveal-up text-center font-body text-[13px] leading-[21px] tracking-[0.26px] text-[#333] md:text-[25px] md:leading-[38px] md:tracking-[0.25px] md:text-[#4C4C4C]">
-            <span className="md:hidden">
+          <p className="reveal reveal-up text-center font-body text-[13px] leading-[21px] tracking-[0.26px] text-[#333] min-[1154px]:text-[25px] min-[1154px]:leading-[38px] min-[1154px]:tracking-[0.25px] min-[1154px]:text-[#4C4C4C]">
+            <span className="min-[1154px]:hidden">
               Purinta combines the best DeFi primitives into one
               seamless memecoin lending experience.
               <br />
               No shortcuts, no compromises.
             </span>
-            <span className="hidden md:inline">
+            <span className="hidden min-[1154px]:inline">
               Purinta combines the best DeFi primitives into one
               <br />
               seamless memecoin lending experience.
@@ -426,13 +426,13 @@ export default function Ecosystem() {
         </div>
 
         {/* Pillar cards — desktop: 4 across, big vertical cards.
-         * `md:-mx-6 md:w-[calc(100%+3rem)]` cancels the foreground's
+         * `min-[1154px]:-mx-6 min-[1154px]:w-[calc(100%+3rem)]` cancels the foreground's
          * `px-6` mobile gutter on desktop so the row spans the full
          * 1024 px Figma width — without it the cards are 12 px
          * narrower each and "Battle-tested lending" wraps to a 2nd
          * line. Hidden on mobile (the mobile layout below renders
          * a more compact horizontal-card variant). */}
-        <div className="hidden md:-mx-6 md:flex md:w-[calc(100%+3rem)] md:flex-row md:items-stretch md:gap-6">
+        <div className="hidden min-[1154px]:-mx-6 min-[1154px]:flex min-[1154px]:w-[calc(100%+3rem)] min-[1154px]:flex-row min-[1154px]:items-stretch min-[1154px]:gap-6">
           {pillars.map((p, i) => (
             <div
               key={p.title}
@@ -478,7 +478,7 @@ export default function Ecosystem() {
          * stack uses gap-4 (16 px) — visually tighter than the
          * desktop card row and matches the compact stack seen in the
          * Figma mobile screenshot. */}
-        <div className="flex w-full max-w-[480px] flex-col gap-4 md:hidden">
+        <div className="flex w-full max-w-[360px] flex-col gap-4 min-[1154px]:hidden">
           {pillars.map((p) => (
             <div
               key={p.title}
@@ -526,7 +526,7 @@ export default function Ecosystem() {
          * mascot so the character's feet rest on the top step (~50%
          * of mascot height overlap, matching the desktop scene
          * composition where the steps span the mascot's bottom half). */}
-        <div className="flex w-full justify-center -mt-2 md:hidden md:mt-0">
+        <div className="flex w-full justify-center -mt-2 min-[1154px]:hidden min-[1154px]:mt-0">
           <div className="relative h-[295px] w-[260px]">
             {/* Steps SVG — Figma 714:36018, three isometric tiers
              * exported as one combined image. Same asset as desktop

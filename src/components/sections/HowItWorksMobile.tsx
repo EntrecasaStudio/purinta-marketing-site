@@ -167,9 +167,10 @@ const STEPS: Step[] = [
 export default function HowItWorksMobile() {
   return (
     <section className="w-full pt-[48px] pb-[24px] min-[1154px]:hidden">
-      {/* Title — Figma 714:35917: Ohno Softie Bold 25 / 33 */}
-      <div className="reveal reveal-up flex w-full items-center justify-center px-6 pb-2">
-        <h2 className="text-center font-display text-[25px] leading-[33px] font-semibold tracking-[0.5px] text-[#333]">
+      {/* Title — mobile (714:35917): 25/33 semibold. Tablet
+       *  (1006:114833): 31/37 bold tracking 0.62. */}
+      <div className="reveal reveal-up flex w-full items-center justify-center px-6 pb-2 min-[768px]:py-[24px]">
+        <h2 className="text-center font-display text-[25px] leading-[33px] font-semibold tracking-[0.5px] text-[#333] min-[768px]:text-[31px] min-[768px]:leading-[37px] min-[768px]:font-bold min-[768px]:tracking-[0.62px]">
           How It Works
         </h2>
       </div>
@@ -182,11 +183,21 @@ export default function HowItWorksMobile() {
         {STEPS.map((step, i) => (
           <div
             key={step.num}
-            className="reveal reveal-up relative w-full px-4 pt-[52px] pb-10"
+            /* Mobile: block layout, full-bleed panel with auto height
+             * + 52/40 py — content row sits on top, Learn more (step 3
+             * only) stacks below it. Tablet (Figma 1041:95801-803):
+             * each card is 464 tall with 30/40 px-x and the content
+             * row centred via flex items-center justify-center; the
+             * Learn more is absolutely positioned at the bottom (40
+             * px above the panel edge) so it doesn't compete with the
+             * centred row. */
+            className="reveal reveal-up relative w-full px-4 pt-[52px] pb-10 min-[768px]:flex min-[768px]:h-[464px] min-[768px]:min-h-[464px] min-[768px]:items-center min-[768px]:justify-center min-[768px]:px-[40px] min-[768px]:py-0"
             style={{ backgroundColor: step.bg, overflow: 'visible' }}
           >
             <div
-              className="mx-auto flex w-full max-w-[480px] items-center justify-center gap-2"
+              /* Mobile: 480 max content. Tablet: 688 wide / 249 tall
+               * row with 48 gap between number col and text col. */
+              className="mx-auto flex w-full max-w-[328px] items-center justify-center gap-2 min-[768px]:h-[249px] min-[768px]:max-w-[688px] min-[768px]:gap-[48px]"
               style={{ overflow: 'visible' }}
             >
               {/* Number column — Figma 714:36627/-65/-78 mobile.
@@ -198,12 +209,18 @@ export default function HowItWorksMobile() {
                * footprint of the previous 218 px text digit + its
                * companion mascot in the 98-wide mobile column. */}
               <div
-                className="relative h-[178px] w-[98px] shrink-0"
+                /* Mobile: 98×178 column with the combined SVG at
+                 * 140×~184 inside. Tablet (Figma 1041:95496/-512/
+                 * -613): the number+mascot lockup grows to 192×249. */
+                className="relative h-[178px] w-[98px] shrink-0 min-[768px]:h-[249px] min-[768px]:w-[192px]"
                 style={{ overflow: 'visible' }}
               >
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute select-none [&>svg]:size-full"
+                  /* Tablet: SVG scales to 192 wide (~0.75× of natural
+                   * 256) and re-anchors so the digit lands flush left
+                   * inside the wider 192-px column. */
+                  className="pointer-events-none absolute select-none [&>svg]:size-full min-[768px]:!top-0 min-[768px]:!left-0 min-[768px]:!w-[192px]"
                   style={{
                     top: step.svgTop,
                     left: step.svgLeft,
@@ -217,36 +234,36 @@ export default function HowItWorksMobile() {
                 />
               </div>
 
-              {/* Text column — title + body. Title font is 31 px on
-               * mobile (vs 39 in Figma's 360 frame) so "your memes"
-               * stays on one line on a 360 viewport with the wider
-               * number column. Height matches the number column so
-               * `items-center` doesn't shift one against the other. */}
-              <div className="flex h-[178px] min-w-0 flex-1 flex-col items-start justify-center gap-2 pr-2">
+              {/* Text column — mobile: 178 tall, title 31/34 +
+               * body 13/21. Tablet (Figma 1041:95506-09): 249 tall
+               * items-end with pb-24, title 61/61 bold tracking
+               * 1.22, body 20/32 tracking 0.2. */}
+              <div className="flex h-[178px] min-w-0 flex-1 flex-col items-start justify-center gap-2 pr-2 min-[768px]:h-[249px] min-[768px]:w-[448px] min-[768px]:items-start min-[768px]:justify-end min-[768px]:gap-[18px] min-[768px]:pr-0 min-[768px]:pb-[24px]">
                 <h3
-                  className="w-full font-display text-[31px] leading-[34px] font-semibold tracking-[0.62px] whitespace-pre-line"
+                  className="w-full font-display text-[31px] leading-[34px] font-semibold tracking-[0.62px] whitespace-pre-line min-[768px]:text-[61px] min-[768px]:leading-[61px] min-[768px]:font-bold min-[768px]:tracking-[1.22px]"
                   style={{ color: step.titleColor }}
                 >
                   {step.title}
                 </h3>
-                <p className="w-full font-body text-[13px] leading-[21px] font-normal tracking-[0.26px] text-[#4C4C4C]">
+                <p className="w-full font-body text-[13px] leading-[21px] font-normal tracking-[0.26px] text-[#4C4C4C] min-[768px]:text-[20px] min-[768px]:leading-[32px] min-[768px]:tracking-[0.2px]">
                   {step.body}
                 </p>
               </div>
             </div>
 
             {/* Docs link — Figma renders this once on the Chill panel,
-             * centered under the content row (node 714:36689). */}
+             * centered under the content row (mobile 714:36689,
+             * tablet 1041:95624 pt-54 with 16 px Rubik Medium). */}
             {i === STEPS.length - 1 && (
-              <div className="mt-2 flex w-full items-center justify-center">
+              <div className="mt-2 flex w-full items-center justify-center min-[768px]:absolute min-[768px]:bottom-[40px] min-[768px]:mt-0">
                 <a
                   href="https://docs.purinta.xyz/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-0.5 font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] text-[#39763D] transition-opacity hover:opacity-70"
+                  className="flex items-center gap-0.5 font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] text-[#39763D] transition-opacity hover:opacity-70 min-[768px]:text-[16px] min-[768px]:leading-[26px] min-[768px]:tracking-[0.16px]"
                 >
                   Learn more in the docs
-                  <ChevronRight className="size-4" strokeWidth={2} />
+                  <ChevronRight className="size-4 min-[768px]:size-5" strokeWidth={2} />
                 </a>
               </div>
             )}

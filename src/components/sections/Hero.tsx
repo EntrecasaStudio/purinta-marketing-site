@@ -325,6 +325,20 @@ export default function Hero() {
             </Button>
           </div>
         </div>
+
+        {/* Gradient fade — same approach as tablet: a long, gentle
+         * dissolve from the bottom of the cropped scene into the
+         * page bg (mint-50) so the hero blends into Why Purinta
+         * below instead of cutting on a hard line. ~30% of the
+         * section height. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[28%]"
+          style={{
+            background:
+              'linear-gradient(to bottom, transparent 0%, rgba(242,247,244,0.12) 35%, rgba(242,247,244,0.45) 65%, rgba(242,247,244,0.78) 85%, var(--color-mint-50) 100%)',
+          }}
+        />
       </div>
 
       {/* ============================================================
