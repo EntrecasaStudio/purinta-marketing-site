@@ -240,9 +240,17 @@ export default function Hero() {
        * the clean lake-mountain-pagoda scene — so the SVG mascot
        * overlays are the only mascot rendering and there's no
        * raster halo around them in Safari/Retina. */}
+      {/* Mobile hero — section has a FIXED 655 px height (matching
+       * the Figma 360×655 mobile frame). The bg fills the section
+       * via object-cover so it extends horizontally as the viewport
+       * widens; the mascot crew + content live inside a 360-wide
+       * inner container centred on the section, so they stay
+       * pinned to their original Figma pixel positions while the
+       * viewport grows around them (instead of scaling up with
+       * aspect-ratio). */}
       <div
         className="relative w-full overflow-hidden md:hidden"
-        style={{ aspectRatio: '360 / 655' }}
+        style={{ height: 655 }}
       >
         <img
           src={asset('/assets/figma/background.webp')}
@@ -254,55 +262,43 @@ export default function Hero() {
           style={{ objectPosition: '50% 70%' }}
         />
 
-        {/* Vector mascot overlays — same SVG files as desktop, just
-         * scaled and re-positioned for the 360-wide mobile layout
-         * (Figma 752:52201-203). Sizes / positions per the original
-         * mobile design inside the 360×655 frame, expressed as
-         * percentages of the parent so they track the scene as it
-         * scales between phone widths. The natural aspect of the
-         * desktop bg (1920×1462 → ~1.31) means the mobile bg is
-         * shorter than the 360×655 frame, so the mascot positions
-         * are anchored to the bg's actual aspect via `% of width`
-         * for left/width AND `% of width × (1462/1920)` for top. */}
-        <img
-          src={asset('/assets/figma/pepe.svg')}
-          alt=""
-          aria-hidden
-          className="pointer-events-none absolute max-w-none"
-          style={{
-            left: `${(15.2 / 360) * 100}%`,
-            top: `${(403.2 / 655) * 100}%`,
-            width: `${(78 / 360) * 100}%`,
-          }}
-        />
-        <img
-          src={asset('/assets/figma/hero-mascot.svg')}
-          alt=""
-          aria-hidden
-          className="pointer-events-none absolute max-w-none"
-          style={{
-            left: `${(107 / 360) * 100}%`,
-            top: `${(376 / 655) * 100}%`,
-            width: `${(148 / 360) * 100}%`,
-          }}
-        />
-        <img
-          src={asset('/assets/figma/shibu.svg')}
-          alt=""
-          aria-hidden
-          className="pointer-events-none absolute max-w-none"
-          style={{
-            left: `${(261.4 / 360) * 100}%`,
-            top: `${(392.4 / 655) * 100}%`,
-            width: `${(91.5 / 360) * 100}%`,
-          }}
-        />
+        {/* Vector mascot overlays — same SVG files as desktop, sized
+         * 1:1 with the Figma mobile design (752:52201-203) inside the
+         * 360-wide inner. Centred on the section so the mascots stay
+         * anchored to the bg scene's visual centre at any viewport
+         * width ≤ 768. */}
+        <div
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2"
+          style={{ width: 360, height: 655 }}
+        >
+          <img
+            src={asset('/assets/figma/pepe.svg')}
+            alt=""
+            aria-hidden
+            className="absolute max-w-none"
+            style={{ left: 15.2, top: 403.2, width: 78 }}
+          />
+          <img
+            src={asset('/assets/figma/hero-mascot.svg')}
+            alt=""
+            aria-hidden
+            className="absolute max-w-none"
+            style={{ left: 107, top: 376, width: 148 }}
+          />
+          <img
+            src={asset('/assets/figma/shibu.svg')}
+            alt=""
+            aria-hidden
+            className="absolute max-w-none"
+            style={{ left: 261.4, top: 392.4, width: 91.5 }}
+          />
+        </div>
 
-        {/* Content overlay — title + paragraph + CTA. Pulled up
-         * 24 px from the previous pt-[39%] anchor (Figma marketing
-         * spec adjustment) so the headline sits higher in the
-         * sky portion of the scene. */}
-        <div className="absolute inset-x-0 top-0 pt-[calc(39%-24px)]">
+        {/* Content overlay — title + paragraph + CTA pinned at a
+         * fixed top (140 px = 24 px nav offset + 52 px nav height +
+         * 64 px Figma spec) so the headline stays at the same
+         * vertical position regardless of viewport width. */}
+        <div className="absolute inset-x-0 top-[140px]">
           <div className="mx-auto flex w-full max-w-[480px] flex-col items-center gap-4 px-6">
             <div className="flex flex-col items-center gap-2">
               <h1
@@ -329,11 +325,11 @@ export default function Hero() {
         {/* Gradient fade — same approach as tablet: a long, gentle
          * dissolve from the bottom of the cropped scene into the
          * page bg (mint-50) so the hero blends into Why Purinta
-         * below instead of cutting on a hard line. ~30% of the
+         * below instead of cutting on a hard line. ~28 % of the
          * section height. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[28%]"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[180px]"
           style={{
             background:
               'linear-gradient(to bottom, transparent 0%, rgba(242,247,244,0.12) 35%, rgba(242,247,244,0.45) 65%, rgba(242,247,244,0.78) 85%, var(--color-mint-50) 100%)',

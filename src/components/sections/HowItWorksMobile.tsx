@@ -197,7 +197,7 @@ export default function HowItWorksMobile() {
             <div
               /* Mobile: 480 max content. Tablet: 688 wide / 249 tall
                * row with 48 gap between number col and text col. */
-              className="mx-auto flex w-full max-w-[328px] items-center justify-center gap-2 min-[768px]:h-[249px] min-[768px]:max-w-[688px] min-[768px]:gap-[48px]"
+              className="mx-auto flex w-full max-w-[426px] items-center justify-center gap-2 min-[768px]:h-[249px] min-[768px]:max-w-[688px] min-[768px]:gap-[48px]"
               style={{ overflow: 'visible' }}
             >
               {/* Number column — Figma 714:36627/-65/-78 mobile.
@@ -235,10 +235,12 @@ export default function HowItWorksMobile() {
               </div>
 
               {/* Text column — mobile: 178 tall, title 31/34 +
-               * body 13/21. Tablet (Figma 1041:95506-09): 249 tall
-               * items-end with pb-24, title 61/61 bold tracking
-               * 1.22, body 20/32 tracking 0.2. */}
-              <div className="flex h-[178px] min-w-0 flex-1 flex-col items-start justify-center gap-2 pr-2 min-[768px]:h-[249px] min-[768px]:w-[448px] min-[768px]:items-start min-[768px]:justify-end min-[768px]:gap-[18px] min-[768px]:pr-0 min-[768px]:pb-[24px]">
+               * body 13/21, capped at 320 px so the body wraps to a
+               * predictable 3 lines across the three steps. Tablet
+               * (Figma 1041:95506-09): 249 tall items-end with
+               * pb-24, title 61/61 bold tracking 1.22, body 20/32
+               * tracking 0.2. */}
+              <div className="flex h-[178px] min-w-0 max-w-[240px] flex-1 flex-col items-start justify-center gap-2 pr-2 min-[768px]:h-[249px] min-[768px]:w-[448px] min-[768px]:max-w-none min-[768px]:items-start min-[768px]:justify-end min-[768px]:gap-[18px] min-[768px]:pr-0 min-[768px]:pb-[24px]">
                 <h3
                   className="w-full font-display text-[31px] leading-[34px] font-semibold tracking-[0.62px] whitespace-pre-line min-[768px]:text-[61px] min-[768px]:leading-[61px] min-[768px]:font-bold min-[768px]:tracking-[1.22px]"
                   style={{ color: step.titleColor }}
