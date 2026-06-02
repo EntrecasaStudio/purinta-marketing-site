@@ -42,6 +42,19 @@ export default function Community() {
        * Community's bottom edge into the Footer meadow. */
       className="relative z-10 w-full overflow-visible px-6 pt-1 pb-12 min-[768px]:px-[24px] min-[768px]:py-[40px] min-[1154px]:min-h-[638px] min-[1154px]:px-[var(--ds-space-24,24px)] min-[1154px]:pt-[80px] min-[1154px]:pb-[83px]"
     >
+      {/* Mobile/tablet warm-white surface — Figma 831:43460 places the
+       * Community block on the same warm Blush-white as The Stack
+       * (#FFF5F4), NOT the page's cool diagonal gradient. Painted as a
+       * full-bleed solid layer behind the content (z-0). It stays solid
+       * all the way to the bottom edge: Ecosystem above and the Footer
+       * meadow below each carry their own blush backdrop at the shared
+       * boundary, so the whole region reads as one continuous warm
+       * surface. Desktop keeps its own treatment (CommunityFlowers over
+       * the page bg). */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0 bg-[#FFF5F4] min-[1154px]:hidden"
+      />
       <div className="relative z-10 mx-auto flex w-full max-w-[1080px] flex-col items-center gap-[28px] min-[768px]:gap-[24px] min-[1154px]:gap-[72px]">
         {/* Heading + body — 540 px on mobile, 700 px on tablet+,
          * 1080 px on desktop. */}
@@ -68,15 +81,20 @@ export default function Community() {
           <Button
             variant="primary"
             size="md"
-            className="w-[260px]"
+            className="h-[44px] w-[260px]"
             asChild
           >
-            <a href="https://app.purinta.xyz">Launch App</a>
+            <a
+              href="https://app.purinta.xyz"
+              style={{ border: '1px solid #78ba68' }}
+            >
+              Launch App
+            </a>
           </Button>
           <Button
             variant="secondary"
             size="md"
-            className="w-[260px]"
+            className="h-[44px] w-[260px]"
             asChild
           >
             <a
@@ -91,7 +109,7 @@ export default function Community() {
           <Button
             variant="secondary"
             size="md"
-            className="w-[260px]"
+            className="h-[44px] w-[260px]"
             asChild
           >
             <a

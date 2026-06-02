@@ -166,7 +166,7 @@ const STEPS: Step[] = [
 
 export default function HowItWorksMobile() {
   return (
-    <section className="w-full pt-[48px] pb-[24px] min-[1154px]:hidden">
+    <section className="w-full pt-[48px] pb-0 min-[768px]:pb-[24px] min-[1154px]:hidden">
       {/* Title — mobile (714:35917): 25/33 semibold. Tablet
        *  (1006:114833): 31/37 bold tracking 0.62. */}
       <div className="reveal reveal-up flex w-full items-center justify-center px-6 pb-2 min-[768px]:py-[24px]">
@@ -272,6 +272,12 @@ export default function HowItWorksMobile() {
           </div>
         ))}
       </div>
+      {/* 24 px spacer in The Stack's #FEFEFE so the green step-3 panel
+       * is separated from Ecosystem by a white band (not the page's
+       * cool diagonal gradient). Lives here — outside Ecosystem — so
+       * the whole Stack section (bg + graphics + content) still shifts
+       * down as one unit instead of only its inner content. */}
+      <div className="h-6 bg-[#FEFEFE]" />
     </section>
   )
 }

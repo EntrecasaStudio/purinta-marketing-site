@@ -399,6 +399,21 @@ export default function Ecosystem() {
         <Bill spec={billsMobile.bill6} progress={scrollYProgress} />
       </div>
 
+      {/* Mobile/tablet bottom blush — the section background fades to
+       * transparent over its last ~14 % (revealing the page's cool
+       * diagonal gradient behind the grid graphic). Community below is
+       * solid Blush-white (#FFF5F4), so paint the bottom band blush too
+       * and the Stack→Community boundary reads as one warm surface.
+       * Sits above the z-0 grid layer but below the z-10 content. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[220px] min-[1154px]:hidden"
+        style={{
+          background:
+            'linear-gradient(to bottom, rgba(255,245,244,0) 0%, #FFF5F4 100%)',
+        }}
+      />
+
       {/* ---------- Foreground content ---------- */}
       <div className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col items-center gap-6 px-6 py-16 min-[1154px]:h-[1604px] min-[1154px]:justify-start min-[1154px]:gap-[72px] min-[1154px]:py-0 min-[1154px]:pt-[136px]">
         {/* Copy block — title + subtitle. Mobile sizing (Figma
@@ -505,7 +520,7 @@ export default function Ecosystem() {
                   className="max-w-none object-contain"
                 />
               </div>
-              <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
                 <h3 className="font-body text-[16px] leading-[26px] font-medium tracking-[0.16px] text-[#185229]">
                   {p.title}
                 </h3>

@@ -176,6 +176,21 @@ export default function Footer() {
         className="md:hidden relative w-full overflow-clip"
         style={{ height: '548px' }}
       >
+        {/* Blush backdrop — the meadow's top ~18 % fades to transparent
+         * to dissolve into the section above. That section (Community)
+         * is now solid Blush-white (#FFF5F4), so back the fade with the
+         * same blush instead of the page's cool diagonal gradient. A
+         * short top band, blush → transparent, sits behind the scene so
+         * the grass melts into one continuous warm surface. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 z-0"
+          style={{
+            height: '160px',
+            background:
+              'linear-gradient(to bottom, #FFF5F4 0%, #FFF5F4 35%, rgba(255,245,244,0) 100%)',
+          }}
+        />
         {/* Scene — Figma 726:40007 sized 960 × 730.692. Centered
          * horizontally so x-positions copied from Figma still resolve
          * 1:1; vertical anchor stays at top so the mascot lands at its

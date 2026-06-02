@@ -252,14 +252,54 @@ export default function Hero() {
         className="relative w-full overflow-hidden md:hidden"
         style={{ height: 655 }}
       >
+        {/* Bg scene — Figma 665:56488 sizes the 1920×1462 webp at a
+         * fixed 908 px width (116.44% of the 780-wide design frame),
+         * centred on the 360 section and top-aligned, so the bottom
+         * ~36 px clip into the section. Fixed width (not object-cover)
+         * keeps the scene at the Figma scale and locks it to the
+         * 360-wide mascot overlay at any mobile viewport. */}
+        {/* Scene is masked to fade to transparent toward its bottom so
+         * the crew sits on the grass but the lower edge dissolves into
+         * the CONTINUOUS page gradient (--gradient-bg) instead of into
+         * a solid band. The page gradient is near-horizontal (106.89°,
+         * blush-50 left → mint-50 right) so it has no vertical seam —
+         * letting it show through removes the hard cut entirely. */}
         <img
           src={asset('/assets/figma/background.webp')}
           alt=""
           aria-hidden
           fetchPriority="high"
           decoding="async"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: '50% 70%' }}
+          className="absolute top-0 left-1/2 max-w-none -translate-x-1/2"
+          style={{
+            width: 908,
+            WebkitMaskImage:
+              'linear-gradient(to bottom, black 66%, transparent 92%)',
+            maskImage:
+              'linear-gradient(to bottom, black 66%, transparent 92%)',
+          }}
+        />
+
+        {/* Soft transition — Figma 665:56494 (Ellipse 1052): a 50px
+         * blurred white→pale-lime ellipse rising from the bottom of
+         * the scene. It sits ABOVE the scene but BELOW the mascots so
+         * the crew stays crisp. Masked to fade out before the 655 px
+         * section edge so its semi-opaque tail isn't hard-clipped into
+         * a faint line by the section's overflow-hidden. */}
+        <img
+          src={asset('/assets/figma/hill-ellipse.svg')}
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 max-w-none -translate-x-1/2"
+          style={{
+            top: 475.71,
+            width: 1113.265,
+            height: 587.806,
+            WebkitMaskImage:
+              'linear-gradient(to bottom, black 22%, transparent 31%)',
+            maskImage:
+              'linear-gradient(to bottom, black 22%, transparent 31%)',
+          }}
         />
 
         {/* Vector mascot overlays — same SVG files as desktop, sized
@@ -309,32 +349,24 @@ export default function Hero() {
                 <br />
                 Print USDC.
               </h1>
-              <p className="text-center font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] text-[#333]">
+              <p className="max-w-[320px] text-center font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] text-[#333]">
                 The first lending protocol for memecoin believers. Lock
                 your bags, borrow USDC, and keep the upside.
               </p>
             </div>
             {/* Mobile CTA — Figma matches the Community mobile button:
              * 44 px tall, 16 px Medium text (same as <Button size="md">). */}
-            <Button variant="primary" size="md" asChild>
-              <a href="https://app.purinta.xyz">Launch App</a>
+            <Button variant="primary" size="md" className="h-[44px]" asChild>
+              <a
+                href="https://app.purinta.xyz"
+                style={{ border: '1px solid #78ba68', padding: '0 25px' }}
+              >
+                Launch App
+              </a>
             </Button>
           </div>
         </div>
 
-        {/* Gradient fade — same approach as tablet: a long, gentle
-         * dissolve from the bottom of the cropped scene into the
-         * page bg (mint-50) so the hero blends into Why Purinta
-         * below instead of cutting on a hard line. ~28 % of the
-         * section height. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[180px]"
-          style={{
-            background:
-              'linear-gradient(to bottom, transparent 0%, rgba(242,247,244,0.12) 35%, rgba(242,247,244,0.45) 65%, rgba(242,247,244,0.78) 85%, var(--color-mint-50) 100%)',
-          }}
-        />
       </div>
 
       {/* ============================================================
