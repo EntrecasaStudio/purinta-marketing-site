@@ -1,13 +1,15 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import {
   motion,
   useReducedMotion,
   useScroll,
   useTransform,
+  type MotionValue,
 } from 'motion/react'
 import Nav from '@/components/Nav'
 import { Button } from '@/components/ui/button'
 import { asset } from '@/lib/utils'
+import { useParallaxPointer } from '@/hooks/useParallaxPointer'
 
 /* ============================================================
  * Entrance cascade timeline (seconds from mount):
@@ -32,6 +34,100 @@ const CONTENT_BASE_DELAY = 0.95
 const CONTENT_STAGGER = 0.13
 const CONTENT_RISE_DURATION = 0.55
 
+/* ============================================================
+ * Layered parallax — the flat scene was split into 5 transparent
+ * 1920×1462 layers (same registration as background.webp), which
+ * sits behind them as a STATIC base so any edge revealed by a
+ * moving layer shows identical pixels (no seams). Each layer
+ * shifts by `depth × POINTER_PX` with the cursor and `depth ×
+ * SCROLL_PX` with scroll. SCROLL_PX is NEGATIVE so on scroll-down
+ * every layer rises, and since the offset scales with depth the
+ * foreground (grass + mascots, depth 1) rises faster than the
+ * background (sky, depth 0.15) — classic depth parallax. The
+ * grass layer carries the three mascots (nested in its group),
+ * so the characters stay locked to the floor.
+ * ============================================================ */
+const POINTER_PX = 28
+const SCROLL_PX = -280
+const DEPTH = { sky: 0.04, lake: 0.12, tree: 0.55, grass: 1 } as const
+const layerSrc = (n: string) => asset(`/assets/figma/hero-layers/${n}.webp`)
+
+function useLayerTransform(
+  px: MotionValue<number>,
+  py: MotionValue<number>,
+  scroll: MotionValue<number>,
+  depth: number,
+) {
+  const x = useTransform(px, (v) => v * depth * POINTER_PX)
+  const y = useTransform(
+    [scroll, py] as [MotionValue<number>, MotionValue<number>],
+    ([s, p]: number[]) => s * depth * SCROLL_PX + p * depth * POINTER_PX,
+  )
+  return { x, y }
+}
+
+/** A single transparent scene layer that parallaxes with cursor + scroll. */
+function ParallaxLayer({
+  px,
+  py,
+  scroll,
+  depth,
+  src,
+  className,
+  scale,
+  style,
+}: {
+  px: MotionValue<number>
+  py: MotionValue<number>
+  scroll: MotionValue<number>
+  depth: number
+  src: string
+  className?: string
+  scale?: MotionValue<number>
+  style?: React.CSSProperties
+}) {
+  const { x, y } = useLayerTransform(px, py, scroll, depth)
+  return (
+    <motion.img
+      src={src}
+      alt=""
+      aria-hidden
+      decoding="async"
+      style={{ ...style, x, y, scale, willChange: 'transform' }}
+      className={className}
+    />
+  )
+}
+
+/** A parallax group (grass + shadows + mascots) that moves as one unit. */
+function ParallaxGroup({
+  px,
+  py,
+  scroll,
+  depth,
+  className,
+  style,
+  children,
+}: {
+  px: MotionValue<number>
+  py: MotionValue<number>
+  scroll: MotionValue<number>
+  depth: number
+  className?: string
+  style?: React.CSSProperties
+  children: ReactNode
+}) {
+  const { x, y } = useLayerTransform(px, py, scroll, depth)
+  return (
+    <motion.div
+      style={{ x, y, willChange: 'transform', ...style }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
 /**
  * Hero — Figma node 384:2207 ("Purinta - Desktop 1440px").
  *
@@ -53,6 +149,7 @@ export default function Hero() {
    * the browser prioritise it — for a returning visitor the cache
    * hit fires onLoad almost immediately. */
   const [bgLoaded, setBgLoaded] = useState(false)
+  const { px, py } = useParallaxPointer()
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start start', 'end start'],
@@ -61,7 +158,7 @@ export default function Hero() {
   // Scroll-driven parallax (mascot parallax removed — would break their
   // percent-based positioning by creating a new containing block).
   const sceneY = useTransform(scrollYProgress, [0, 1], ['0%', '20%'])
-  const sceneScale = useTransform(scrollYProgress, [0, 1], [1, 1.08])
+  const sceneScale = useTransform(scrollYProgress, [0, 1], [1, 1.22])
   const contentY = useTransform(scrollYProgress, [0, 1], ['0%', '-30%'])
   const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0])
 
@@ -132,23 +229,16 @@ export default function Hero() {
         className="pointer-events-none absolute top-0 left-1/2 z-[1] hidden -translate-x-1/2 min-[1154px]:block"
       >
         <div className="relative h-[1462px] w-[1920px] overflow-hidden">
-          {/* Scene — Figma node 430:4341 ("Purinta Hero back - 20260512").
-              Natural 1920×1462. Width pinned at the natural size, height
-              auto, so aspect is preserved without any object-fit crop.
-              Vertical offset -80px so the sky band sits tighter at the
-              top while the mascots / hill / shadows stay anchored at
-              their original positions. */}
+          {/* STATIC base — the original flat scene. Sits behind every
+              parallax layer so any edge revealed by a moving layer
+              shows identical pixels (no seams / holes). Keeps the
+              load gate (`bgLoaded`) + priority hints that drive the
+              entrance fade. Does NOT parallax (depth 0). */}
           <motion.img
             src={asset('/assets/figma/background.webp')}
             alt=""
             width={1920}
             height={1462}
-            /* fetchpriority + decoding hints so the bg lands in
-             * memory before the entrance fade starts and the mascot
-             * doesn't render alone during the initial paint. The
-             * <link rel="preload"> in index.html schedules the
-             * download; these attrs make sure the browser actually
-             * decodes the bytes ASAP. */
             fetchPriority="high"
             decoding="async"
             loading="eager"
@@ -158,65 +248,94 @@ export default function Hero() {
             data-node-id="430:4341"
           />
 
-          {/* Hill ellipse is now hoisted OUT of the bg container so
-              it can overflow into Features — see <img> at section
-              root above. */}
+          {/* Depth layers (back → front). Same registration / sizing as
+              the base so they overlay 1:1; each scales with scroll like
+              the base and shifts by its own depth on cursor + scroll. */}
+          {(['01-sky:sky', '02-lake:lake', '03-tree-L:tree', '03-tree-R:tree'] as const).map(
+            (entry) => {
+              const [file, key] = entry.split(':') as [string, keyof typeof DEPTH]
+              return (
+                <ParallaxLayer
+                  key={file}
+                  px={px}
+                  py={py}
+                  scroll={scrollYProgress}
+                  depth={DEPTH[key]}
+                  scale={sceneScale}
+                  src={layerSrc(file)}
+                  className="absolute top-[-220px] left-0 block h-auto w-[1920px] max-w-none"
+                />
+              )
+            },
+          )}
 
-          {/* Drop shadows under mascots */}
-          <img
-            src={asset('/assets/figma/shadows.svg')}
-            alt=""
-            className="absolute top-[784px] left-[600.63px] h-[74.208px] w-[747.384px] mix-blend-multiply"
-            data-node-id="384:2213"
-          />
-
-          {/* Mascots — direct children of the BG container so their
-              percent insets resolve correctly (no `transform` parent).
-
-              Pepe / Shibu are standalone SVG vector exports. Their box
-              matches the visible footprint of the previous sprite-clipped
-              mascots exactly: same bottom-centre anchor + height, width
-              derived from each SVG's own aspect ratio so the vector is
-              never distorted. */}
-
-          {/* Frog (Pepe) */}
-          <img
-            src={asset('/assets/figma/pepe.svg')}
-            alt="Pepe the frog"
-            className="absolute h-[231.81px] w-[175.07px] max-w-none"
-            style={{ top: '601.91px', left: '592.83px' }}
-            data-node-id="384:2222"
-          />
-
-          {/* Dog (Shibu) */}
-          <img
-            src={asset('/assets/figma/shibu.svg')}
-            alt="Shiba the dog"
-            className="absolute h-[269.75px] w-[205.77px] max-w-none"
-            style={{ top: '585.16px', left: '1130.44px' }}
-            data-node-id="384:2220"
-          />
-
-          {/* Tofu / Hero mascot — single flattened SVG export from Figma.
-              Bounding box mirrors the original Figma frame inset:
-              top 37.29% / right 41.17% / bottom 42.94% / left 41.58%
-              of the 1920×1461 BG container. */}
-          <div
-            className="absolute"
-            style={{
-              top: '37.29%',
-              left: '41.58%',
-              right: '41.17%',
-              bottom: '42.94%',
-            }}
-            data-node-id="384:2224"
+          {/* GRASS GROUP — grass + shadows + the three mascots move as
+              ONE unit so the characters stay locked to the floor. The
+              wrapper is `inset-0` (full BG-container size) so the
+              hero-mascot's percent insets still resolve unchanged. */}
+          <ParallaxGroup
+            px={px}
+            py={py}
+            scroll={scrollYProgress}
+            depth={DEPTH.grass}
+            className="absolute inset-0"
           >
-            <img
-              src={asset('/assets/figma/hero-mascot.svg')}
-              alt="Purinta mascot"
-              className="block h-full w-full"
+            {/* Grass plate — scales with scroll like the other scene
+                layers (mascots below intentionally do NOT scale). */}
+            <motion.img
+              src={layerSrc('04-grass')}
+              alt=""
+              aria-hidden
+              decoding="async"
+              style={{ scale: sceneScale }}
+              className="absolute top-[-220px] left-0 block h-auto w-[1920px] max-w-none"
             />
-          </div>
+
+            {/* Drop shadows under mascots */}
+            <img
+              src={asset('/assets/figma/shadows.svg')}
+              alt=""
+              className="absolute top-[784px] left-[600.63px] h-[74.208px] w-[747.384px] mix-blend-multiply"
+              data-node-id="384:2213"
+            />
+
+            {/* Frog (Pepe) */}
+            <img
+              src={asset('/assets/figma/pepe.svg')}
+              alt="Pepe the frog"
+              className="absolute h-[231.81px] w-[175.07px] max-w-none"
+              style={{ top: '601.91px', left: '592.83px' }}
+              data-node-id="384:2222"
+            />
+
+            {/* Dog (Shibu) */}
+            <img
+              src={asset('/assets/figma/shibu.svg')}
+              alt="Shiba the dog"
+              className="absolute h-[269.75px] w-[205.77px] max-w-none"
+              style={{ top: '585.16px', left: '1130.44px' }}
+              data-node-id="384:2220"
+            />
+
+            {/* Tofu / Hero mascot — percent insets resolve against the
+                inset-0 wrapper (same size as the BG container). */}
+            <div
+              className="absolute"
+              style={{
+                top: '37.29%',
+                left: '41.58%',
+                right: '41.17%',
+                bottom: '42.94%',
+              }}
+              data-node-id="384:2224"
+            >
+              <img
+                src={asset('/assets/figma/hero-mascot.svg')}
+                alt="Purinta mascot"
+                className="block h-full w-full"
+              />
+            </div>
+          </ParallaxGroup>
         </div>
       </motion.div>
 
@@ -257,7 +376,10 @@ export default function Hero() {
          * centred on the 360 section and top-aligned, so the bottom
          * ~36 px clip into the section. Fixed width (not object-cover)
          * keeps the scene at the Figma scale and locks it to the
-         * 360-wide mascot overlay at any mobile viewport. */}
+         * 360-wide mascot overlay at any mobile viewport.
+         *
+         * Doubles as the STATIC seam-filler base behind the parallax
+         * layers (depth 0 — never moves). */}
         {/* Scene is masked to fade to transparent toward its bottom so
          * the crew sits on the grass but the lower edge dissolves into
          * the CONTINUOUS page gradient (--gradient-bg) instead of into
@@ -279,6 +401,33 @@ export default function Hero() {
               'linear-gradient(to bottom, black 66%, transparent 92%)',
           }}
         />
+
+        {/* Depth layers (back → front) — same 908 px width + bottom mask
+         * as the base so they overlay it 1:1. Touch has no fine pointer
+         * → these parallax with scroll only. */}
+        {(['01-sky:sky', '02-lake:lake', '03-tree-L:tree', '03-tree-R:tree', '04-grass:grass'] as const).map(
+          (entry) => {
+            const [file, key] = entry.split(':') as [string, keyof typeof DEPTH]
+            return (
+              <ParallaxLayer
+                key={file}
+                px={px}
+                py={py}
+                scroll={scrollYProgress}
+                depth={DEPTH[key]}
+                src={layerSrc(file)}
+                className="absolute top-0 left-1/2 max-w-none -translate-x-1/2"
+                style={{
+                  width: 908,
+                  WebkitMaskImage:
+                    'linear-gradient(to bottom, black 66%, transparent 92%)',
+                  maskImage:
+                    'linear-gradient(to bottom, black 66%, transparent 92%)',
+                }}
+              />
+            )
+          },
+        )}
 
         {/* Soft transition — Figma 665:56494 (Ellipse 1052): a 50px
          * blurred white→pale-lime ellipse rising from the bottom of
@@ -302,36 +451,43 @@ export default function Hero() {
           }}
         />
 
-        {/* Vector mascot overlays — same SVG files as desktop, sized
-         * 1:1 with the Figma mobile design (752:52201-203) inside the
-         * 360-wide inner. Centred on the section so the mascots stay
-         * anchored to the bg scene's visual centre at any viewport
-         * width ≤ 768. */}
+        {/* Mascot crew — centred on the 360-wide inner (static), with an
+         * inner ParallaxGroup at the grass depth so the characters ride
+         * the floor on scroll. Painted above the soft transition so the
+         * crew stays crisp. */}
         <div
           className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2"
           style={{ width: 360, height: 655 }}
         >
-          <img
-            src={asset('/assets/figma/pepe.svg')}
-            alt=""
-            aria-hidden
-            className="absolute max-w-none"
-            style={{ left: 15.2, top: 403.2, width: 78 }}
-          />
-          <img
-            src={asset('/assets/figma/hero-mascot.svg')}
-            alt=""
-            aria-hidden
-            className="absolute max-w-none"
-            style={{ left: 107, top: 376, width: 148 }}
-          />
-          <img
-            src={asset('/assets/figma/shibu.svg')}
-            alt=""
-            aria-hidden
-            className="absolute max-w-none"
-            style={{ left: 261.4, top: 392.4, width: 91.5 }}
-          />
+          <ParallaxGroup
+            px={px}
+            py={py}
+            scroll={scrollYProgress}
+            depth={DEPTH.grass}
+            className="absolute inset-0"
+          >
+            <img
+              src={asset('/assets/figma/pepe.svg')}
+              alt=""
+              aria-hidden
+              className="absolute max-w-none"
+              style={{ left: 15.2, top: 403.2, width: 78 }}
+            />
+            <img
+              src={asset('/assets/figma/hero-mascot.svg')}
+              alt=""
+              aria-hidden
+              className="absolute max-w-none"
+              style={{ left: 107, top: 376, width: 148 }}
+            />
+            <img
+              src={asset('/assets/figma/shibu.svg')}
+              alt=""
+              aria-hidden
+              className="absolute max-w-none"
+              style={{ left: 261.4, top: 392.4, width: 91.5 }}
+            />
+          </ParallaxGroup>
         </div>
 
         {/* Content overlay — title + paragraph + CTA pinned at a
@@ -391,11 +547,8 @@ export default function Hero() {
           className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 overflow-hidden"
           style={{ width: 1320, height: 1054 }}
         >
-          {/* Scene image — Figma 1006:113049 nests the bg at
-           * 123.67% × 117.9% sized with negative left / top so the
-           * mountain sits left-of-centre, lake fills the middle and
-           * the pagoda is just inside the right edge. Same source
-           * webp as desktop. */}
+          {/* STATIC base — flat scene, same 123.67% × 117.9% nest as
+           * before. Sits behind the parallax layers as a seam filler. */}
           <img
             src={asset('/assets/figma/background.webp')}
             alt=""
@@ -411,65 +564,111 @@ export default function Hero() {
             }}
           />
 
-          {/* Drop shadows under mascots — Figma 1006:113050. */}
-          <img
-            src={asset('/assets/figma/shadows.svg')}
-            alt=""
-            aria-hidden
-            className="absolute block max-w-none mix-blend-multiply"
-            style={{
-              width: 635.276,
-              height: 63.076,
-              left: 'calc(50% + 12.17px)',
-              top: 666.4,
-              transform: 'translateX(-50%)',
-            }}
-          />
+          {/* Depth layers (back → front), same nest as the base. */}
+          {(['01-sky:sky', '02-lake:lake', '03-tree-L:tree', '03-tree-R:tree'] as const).map(
+            (entry) => {
+              const [file, key] = entry.split(':') as [string, keyof typeof DEPTH]
+              return (
+                <ParallaxLayer
+                  key={file}
+                  px={px}
+                  py={py}
+                  scroll={scrollYProgress}
+                  depth={DEPTH[key]}
+                  src={layerSrc(file)}
+                  className="absolute block max-w-none"
+                  style={{
+                    width: '123.67%',
+                    height: '117.9%',
+                    left: '-11.84%',
+                    top: '-17.86%',
+                  }}
+                />
+              )
+            },
+          )}
 
-          {/* Pepe (frog) — md size 148.75 × 198.95, Figma offset
-           * left=(50%-238.62px), top=515 (centre-anchored). */}
-          <img
-            src={asset('/assets/figma/pepe.svg')}
-            alt="Pepe the frog"
-            className="absolute block max-w-none"
-            style={{
-              width: 148.75,
-              height: 198.95,
-              left: 'calc(50% - 238.62px)',
-              top: 515,
-              transform: 'translateX(-50%)',
-            }}
-          />
+          {/* GRASS GROUP — grass + shadows + mascots move locked together.
+           * Wrapper is inset-0 of the 1320×1054 container so the mascots'
+           * `calc(50% ± px)` offsets resolve unchanged. */}
+          <ParallaxGroup
+            px={px}
+            py={py}
+            scroll={scrollYProgress}
+            depth={DEPTH.grass}
+            className="absolute inset-0"
+          >
+            <img
+              src={layerSrc('04-grass')}
+              alt=""
+              aria-hidden
+              decoding="async"
+              className="absolute block max-w-none"
+              style={{
+                width: '123.67%',
+                height: '117.9%',
+                left: '-11.84%',
+                top: '-17.86%',
+              }}
+            />
 
-          {/* Tofu / Purinta-chan — md size 281.35 × 245.4, Figma
-           * offset left=(50%+1.68px), top=464. */}
-          <img
-            src={asset('/assets/figma/hero-mascot.svg')}
-            alt="Purinta mascot"
-            className="absolute block max-w-none"
-            style={{
-              width: 281.35,
-              height: 245.4,
-              left: 'calc(50% + 1.68px)',
-              top: 464,
-              transform: 'translateX(-50%)',
-            }}
-          />
+            {/* Drop shadows under mascots — Figma 1006:113050. */}
+            <img
+              src={asset('/assets/figma/shadows.svg')}
+              alt=""
+              aria-hidden
+              className="absolute block max-w-none mix-blend-multiply"
+              style={{
+                width: 635.276,
+                height: 63.076,
+                left: 'calc(50% + 12.17px)',
+                top: 666.4,
+                transform: 'translateX(-50%)',
+              }}
+            />
 
-          {/* Shibu (dog) — md size 174.25 × 230.96, Figma offset
-           * left=(50%+241.13px), top=494. */}
-          <img
-            src={asset('/assets/figma/shibu.svg')}
-            alt="Shiba the dog"
-            className="absolute block max-w-none"
-            style={{
-              width: 174.25,
-              height: 230.96,
-              left: 'calc(50% + 241.13px)',
-              top: 494,
-              transform: 'translateX(-50%)',
-            }}
-          />
+            {/* Pepe (frog) */}
+            <img
+              src={asset('/assets/figma/pepe.svg')}
+              alt="Pepe the frog"
+              className="absolute block max-w-none"
+              style={{
+                width: 148.75,
+                height: 198.95,
+                left: 'calc(50% - 238.62px)',
+                top: 515,
+                transform: 'translateX(-50%)',
+              }}
+            />
+
+            {/* Tofu / Purinta-chan */}
+            <img
+              src={asset('/assets/figma/hero-mascot.svg')}
+              alt="Purinta mascot"
+              className="absolute block max-w-none"
+              style={{
+                width: 281.35,
+                height: 245.4,
+                left: 'calc(50% + 1.68px)',
+                top: 464,
+                transform: 'translateX(-50%)',
+              }}
+            />
+
+            {/* Shibu (dog) */}
+            <img
+              src={asset('/assets/figma/shibu.svg')}
+              alt="Shiba the dog"
+              className="absolute block max-w-none"
+              style={{
+                width: 174.25,
+                height: 230.96,
+                left: 'calc(50% + 241.13px)',
+                top: 494,
+                transform: 'translateX(-50%)',
+              }}
+            />
+          </ParallaxGroup>
         </div>
 
         {/* Content overlay — title + paragraph + CTA, 600 px column
