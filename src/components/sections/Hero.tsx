@@ -36,11 +36,13 @@ const CONTENT_RISE_DURATION = 0.55
 
 /* ============================================================
  * Layered parallax — the flat scene was split into 5 transparent
- * 1920×1462 layers (same registration as background.webp), which
- * sits behind them as a STATIC base so any edge revealed by a
- * moving layer shows identical pixels (no seams). Each layer
- * shifts by `depth × POINTER_PX` with the cursor and `depth ×
- * SCROLL_PX` with scroll. SCROLL_PX is NEGATIVE so on scroll-down
+ * 1920×1462 layers (same registration as the original
+ * background.webp). The full-canvas `01-sky` layer is the backmost
+ * plate; the rest overlay it 1:1. (The flat background.webp base was
+ * removed: it held a full copy of the scene that stayed put while the
+ * foreground rose on scroll, reading as a duplicate image below.)
+ * Each layer shifts by `depth × POINTER_PX` with the cursor and
+ * `depth × SCROLL_PX` with scroll. SCROLL_PX is NEGATIVE so on scroll-down
  * every layer rises, and since the offset scales with depth the
  * foreground (grass + mascots, depth 1) rises faster than the
  * background (sky, depth 0.15) — classic depth parallax. The
@@ -62,7 +64,6 @@ const layerSrc = (n: string) => asset(`/assets/figma/hero-layers/${n}.webp`)
  * gated on ALL of these being decoded so the scene reveals as one
  * piece (no mascot popping in over a still-loading background). */
 const HERO_ASSETS = [
-  '/assets/figma/background.webp',
   '/assets/figma/hero-layers/01-sky.webp',
   '/assets/figma/hero-layers/02-lake.webp',
   '/assets/figma/hero-layers/03-tree-L.webp',
@@ -295,28 +296,13 @@ export default function Hero() {
         className="pointer-events-none absolute top-0 left-1/2 z-[1] hidden -translate-x-1/2 min-[1154px]:block"
       >
         <div className="relative h-[1462px] w-[1920px] overflow-hidden">
-          {/* STATIC base — the original flat scene. Sits behind every
-              parallax layer so any edge revealed by a moving layer
-              shows identical pixels (no seams / holes). Keeps the
-              priority hints; the entrance fade is gated on the shared
-              `sceneReady` preload (all layers + mascots), not this one
-              image. Does NOT parallax (depth 0). */}
-          <motion.img
-            src={asset('/assets/figma/background.webp')}
-            alt=""
-            width={1920}
-            height={1462}
-            fetchPriority="high"
-            decoding="async"
-            loading="eager"
-            style={{ scale: sceneScale }}
-            className="absolute top-[-220px] left-0 block h-auto w-[1920px] max-w-none"
-            data-node-id="430:4341"
-          />
-
-          {/* Depth layers (back → front). Same registration / sizing as
-              the base so they overlay 1:1; each scales with scroll like
-              the base and shifts by its own depth on cursor + scroll. */}
+          {/* Depth layers (back → front). The full-canvas sky layer is
+              the static back plate; the rest overlay it 1:1 and each
+              scales with scroll while shifting by its own depth on
+              cursor + scroll. (The old flat `background.webp` base was
+              removed — it held a full copy of the scene that stayed put
+              while the foreground rose on scroll, reading as a duplicate
+              image below the parallaxing layers.) */}
           {(['01-sky:sky', '02-lake:lake', '03-tree-L:tree', '03-tree-R:tree'] as const).map(
             (entry) => {
               const [file, key] = entry.split(':') as [string, keyof typeof DEPTH]
@@ -442,10 +428,7 @@ export default function Hero() {
          * centred on the 360 section and top-aligned, so the bottom
          * ~36 px clip into the section. Fixed width (not object-cover)
          * keeps the scene at the Figma scale and locks it to the
-         * 360-wide mascot overlay at any mobile viewport.
-         *
-         * Doubles as the STATIC seam-filler base behind the parallax
-         * layers (depth 0 — never moves). */}
+         * 360-wide mascot overlay at any mobile viewport. */}
         {/* Scene is masked to fade to transparent toward its bottom so
          * the crew sits on the grass but the lower edge dissolves into
          * the CONTINUOUS page gradient (--gradient-bg) instead of into
@@ -462,25 +445,11 @@ export default function Hero() {
           animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
           transition={bgTransition}
         >
-        <img
-          src={asset('/assets/figma/background.webp')}
-          alt=""
-          aria-hidden
-          fetchPriority="high"
-          decoding="async"
-          className="absolute top-0 left-1/2 max-w-none -translate-x-1/2"
-          style={{
-            width: 908,
-            WebkitMaskImage:
-              'linear-gradient(to bottom, black 66%, transparent 92%)',
-            maskImage:
-              'linear-gradient(to bottom, black 66%, transparent 92%)',
-          }}
-        />
-
-        {/* Depth layers (back → front) — same 908 px width + bottom mask
-         * as the base so they overlay it 1:1. Touch has no fine pointer
-         * → these parallax with scroll only. */}
+        {/* Depth layers (back → front) — 908 px width + bottom mask, the
+         * full-canvas sky as the back plate. Touch has no fine pointer
+         * → these parallax with scroll only. (The old flat
+         * `background.webp` base was removed; it duplicated below on
+         * scroll.) */}
         {(['01-sky:sky', '02-lake:lake', '03-tree-L:tree', '03-tree-R:tree', '04-grass:grass'] as const).map(
           (entry) => {
             const [file, key] = entry.split(':') as [string, keyof typeof DEPTH]
@@ -631,24 +600,11 @@ export default function Hero() {
           animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
           transition={bgTransition}
         >
-          {/* STATIC base — flat scene, same 123.67% × 117.9% nest as
-           * before. Sits behind the parallax layers as a seam filler. */}
-          <img
-            src={asset('/assets/figma/background.webp')}
-            alt=""
-            aria-hidden
-            fetchPriority="high"
-            decoding="async"
-            className="absolute block max-w-none"
-            style={{
-              width: '123.67%',
-              height: '117.9%',
-              left: '-11.84%',
-              top: '-17.86%',
-            }}
-          />
-
-          {/* Depth layers (back → front), same nest as the base. */}
+          {/* Depth layers (back → front), 123.67% × 117.9% nest, the
+           * full-canvas sky as the back plate. (The old flat
+           * `background.webp` base was removed — it held a full copy of
+           * the scene that stayed put on scroll, reading as a duplicate
+           * below the parallaxing layers.) */}
           {(['01-sky:sky', '02-lake:lake', '03-tree-L:tree', '03-tree-R:tree'] as const).map(
             (entry) => {
               const [file, key] = entry.split(':') as [string, keyof typeof DEPTH]

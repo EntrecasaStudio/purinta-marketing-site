@@ -12,16 +12,17 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap"
     />
-    <!-- Hero background: preloaded so it lands in the browser cache
-         before the entrance fade starts, otherwise the small SVG
-         mascots become visible while the heavy 1920×1462 webp is
-         still downloading. -->
-    <link
-      rel="preload"
-      as="image"
-      href="/assets/figma/background.webp"
-      fetchpriority="high"
-    />
+    <!-- Hero parallax layers: preloaded so they land in the cache
+         before the entrance fade starts (the fade is gated on ALL of
+         them decoding). Ordered back-to-front. The old flat
+         background.webp composite was removed — the layers fully
+         reconstruct the scene, so preloading it was wasted bandwidth
+         that also delayed the fade. -->
+    <link rel="preload" as="image" href="/assets/figma/hero-layers/01-sky.webp" fetchpriority="high" />
+    <link rel="preload" as="image" href="/assets/figma/hero-layers/02-lake.webp" fetchpriority="high" />
+    <link rel="preload" as="image" href="/assets/figma/hero-layers/03-tree-L.webp" fetchpriority="high" />
+    <link rel="preload" as="image" href="/assets/figma/hero-layers/03-tree-R.webp" fetchpriority="high" />
+    <link rel="preload" as="image" href="/assets/figma/hero-layers/04-grass.webp" fetchpriority="high" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Purinta</title>
     <meta
