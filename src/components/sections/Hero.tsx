@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import {
   motion,
   useReducedMotion,
@@ -49,19 +49,44 @@ const CONTENT_RISE_DURATION = 0.55
  * ============================================================ */
 const POINTER_PX = 28
 const SCROLL_PX = -280
+/* Mobile uses a much smaller scroll travel: the hero is a fixed 655 px
+ * frame, so the desktop -280 px would shoot the foreground up past the
+ * CTA and expose the static base behind it (the "doubled" image). */
+const MOBILE_SCROLL_PX = -42
 const DEPTH = { sky: 0.04, lake: 0.12, tree: 0.55, grass: 1 } as const
 const layerSrc = (n: string) => asset(`/assets/figma/hero-layers/${n}.webp`)
+
+/* Every graphic that makes up the hero illustration, across all
+ * breakpoints — the flat base, the 5 parallax layers, the three
+ * mascots, their shadows and the hill ellipse. The entrance fade is
+ * gated on ALL of these being decoded so the scene reveals as one
+ * piece (no mascot popping in over a still-loading background). */
+const HERO_ASSETS = [
+  '/assets/figma/background.webp',
+  '/assets/figma/hero-layers/01-sky.webp',
+  '/assets/figma/hero-layers/02-lake.webp',
+  '/assets/figma/hero-layers/03-tree-L.webp',
+  '/assets/figma/hero-layers/03-tree-R.webp',
+  '/assets/figma/hero-layers/04-grass.webp',
+  '/assets/figma/pepe.svg',
+  '/assets/figma/shibu.svg',
+  '/assets/figma/hero-mascot.svg',
+  '/assets/figma/shadows.svg',
+  '/assets/figma/hill-ellipse.svg',
+] as const
 
 function useLayerTransform(
   px: MotionValue<number>,
   py: MotionValue<number>,
   scroll: MotionValue<number>,
   depth: number,
+  scrollPx: number = SCROLL_PX,
+  pointerPx: number = POINTER_PX,
 ) {
-  const x = useTransform(px, (v) => v * depth * POINTER_PX)
+  const x = useTransform(px, (v) => v * depth * pointerPx)
   const y = useTransform(
     [scroll, py] as [MotionValue<number>, MotionValue<number>],
-    ([s, p]: number[]) => s * depth * SCROLL_PX + p * depth * POINTER_PX,
+    ([s, p]: number[]) => s * depth * scrollPx + p * depth * pointerPx,
   )
   return { x, y }
 }
@@ -76,6 +101,7 @@ function ParallaxLayer({
   className,
   scale,
   style,
+  scrollPx,
 }: {
   px: MotionValue<number>
   py: MotionValue<number>
@@ -85,8 +111,9 @@ function ParallaxLayer({
   className?: string
   scale?: MotionValue<number>
   style?: React.CSSProperties
+  scrollPx?: number
 }) {
-  const { x, y } = useLayerTransform(px, py, scroll, depth)
+  const { x, y } = useLayerTransform(px, py, scroll, depth, scrollPx)
   return (
     <motion.img
       src={src}
@@ -108,6 +135,7 @@ function ParallaxGroup({
   className,
   style,
   children,
+  scrollPx,
 }: {
   px: MotionValue<number>
   py: MotionValue<number>
@@ -116,8 +144,9 @@ function ParallaxGroup({
   className?: string
   style?: React.CSSProperties
   children: ReactNode
+  scrollPx?: number
 }) {
-  const { x, y } = useLayerTransform(px, py, scroll, depth)
+  const { x, y } = useLayerTransform(px, py, scroll, depth, scrollPx)
   return (
     <motion.div
       style={{ x, y, willChange: 'transform', ...style }}
@@ -142,13 +171,50 @@ function ParallaxGroup({
 export default function Hero() {
   const ref = useRef<HTMLElement>(null)
   const reduceMotion = useReducedMotion()
-  /* Gate the entrance fade on the bg image's load event so the small
-   * SVG mascots can't render alone while the heavy 1920×1462 webp is
-   * still downloading. The <link rel="preload"> in index.html starts
-   * the fetch before React mounts, and `fetchpriority="high"` makes
-   * the browser prioritise it — for a returning visitor the cache
-   * hit fires onLoad almost immediately. */
-  const [bgLoaded, setBgLoaded] = useState(false)
+  /* Gate the entrance fade on EVERY hero graphic (base + parallax
+   * layers + mascots + shadows + hill) being decoded, so the whole
+   * illustration — backgrounds and characters — fades in together as
+   * one piece instead of the light SVG mascots popping in ahead of
+   * the heavy webp layers. We preload them off-DOM; the browser dedupes
+   * these against the elements React renders (and the <link rel=
+   * "preload"> in index.html), so it's just a readiness probe, not an
+   * extra download. A 3 s safety timer guarantees the scene never
+   * stays hidden if a request stalls. */
+  const [sceneReady, setSceneReady] = useState(false)
+  useEffect(() => {
+    let cancelled = false
+    let remaining = HERO_ASSETS.length
+    const settle = () => {
+      remaining -= 1
+      if (remaining <= 0 && !cancelled) setSceneReady(true)
+    }
+    const imgs = HERO_ASSETS.map((path) => {
+      const img = new Image()
+      let counted = false
+      const once = () => {
+        if (counted) return
+        counted = true
+        settle()
+      }
+      img.onload = once
+      img.onerror = once
+      img.src = asset(path)
+      // Cache hits may already be complete before handlers attach.
+      if (img.complete) once()
+      return img
+    })
+    const fallback = window.setTimeout(() => {
+      if (!cancelled) setSceneReady(true)
+    }, 3000)
+    return () => {
+      cancelled = true
+      window.clearTimeout(fallback)
+      imgs.forEach((img) => {
+        img.onload = null
+        img.onerror = null
+      })
+    }
+  }, [])
   const { px, py } = useParallaxPointer()
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -196,7 +262,7 @@ export default function Hero() {
         className="pointer-events-none absolute left-1/2 z-30 hidden h-[1312.311px] w-[2485.428px] max-w-none -translate-x-1/2 min-[1154px]:block"
         style={{ top: 839.17 }}
         initial={bgInitial}
-        animate={{ opacity: bgLoaded || reduceMotion ? 1 : 0 }}
+        animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
         transition={bgTransition}
         data-node-id="384:2217"
       />
@@ -213,7 +279,7 @@ export default function Hero() {
         className="pointer-events-none absolute left-1/2 z-30 hidden h-[1115.464px] w-[2112.614px] max-w-none -translate-x-1/2 min-[768px]:block min-[1154px]:hidden"
         style={{ top: 713.29 }}
         initial={bgInitial}
-        animate={{ opacity: bgLoaded || reduceMotion ? 1 : 0 }}
+        animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
         transition={bgTransition}
       />
       {/* ---------- BG layer (1920×1462, overflow-clip) ----------
@@ -224,7 +290,7 @@ export default function Hero() {
       <motion.div
         style={{ y: sceneY }}
         initial={bgInitial}
-        animate={{ opacity: bgLoaded || reduceMotion ? 1 : 0 }}
+        animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
         transition={bgTransition}
         className="pointer-events-none absolute top-0 left-1/2 z-[1] hidden -translate-x-1/2 min-[1154px]:block"
       >
@@ -232,8 +298,9 @@ export default function Hero() {
           {/* STATIC base — the original flat scene. Sits behind every
               parallax layer so any edge revealed by a moving layer
               shows identical pixels (no seams / holes). Keeps the
-              load gate (`bgLoaded`) + priority hints that drive the
-              entrance fade. Does NOT parallax (depth 0). */}
+              priority hints; the entrance fade is gated on the shared
+              `sceneReady` preload (all layers + mascots), not this one
+              image. Does NOT parallax (depth 0). */}
           <motion.img
             src={asset('/assets/figma/background.webp')}
             alt=""
@@ -242,7 +309,6 @@ export default function Hero() {
             fetchPriority="high"
             decoding="async"
             loading="eager"
-            onLoad={() => setBgLoaded(true)}
             style={{ scale: sceneScale }}
             className="absolute top-[-220px] left-0 block h-auto w-[1920px] max-w-none"
             data-node-id="430:4341"
@@ -386,6 +452,16 @@ export default function Hero() {
          * a solid band. The page gradient is near-horizontal (106.89°,
          * blush-50 left → mint-50 right) so it has no vertical seam —
          * letting it show through removes the hard cut entirely. */}
+        {/* All mobile graphics (base + layers + hill + mascots) fade in
+         * together via the shared scene-ready gate. inset-0 keeps the
+         * 655 px frame size + offset so every absolute child resolves
+         * unchanged. The content overlay stays OUTSIDE this wrapper. */}
+        <motion.div
+          className="pointer-events-none absolute inset-0"
+          initial={bgInitial}
+          animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
+          transition={bgTransition}
+        >
         <img
           src={asset('/assets/figma/background.webp')}
           alt=""
@@ -415,6 +491,7 @@ export default function Hero() {
                 py={py}
                 scroll={scrollYProgress}
                 depth={DEPTH[key]}
+                scrollPx={MOBILE_SCROLL_PX}
                 src={layerSrc(file)}
                 className="absolute top-0 left-1/2 max-w-none -translate-x-1/2"
                 style={{
@@ -464,6 +541,7 @@ export default function Hero() {
             py={py}
             scroll={scrollYProgress}
             depth={DEPTH.grass}
+            scrollPx={MOBILE_SCROLL_PX}
             className="absolute inset-0"
           >
             <img
@@ -489,6 +567,7 @@ export default function Hero() {
             />
           </ParallaxGroup>
         </div>
+        </motion.div>
 
         {/* Content overlay — title + paragraph + CTA pinned at a
          * fixed top (140 px = 24 px nav offset + 52 px nav height +
@@ -542,10 +621,15 @@ export default function Hero() {
         style={{ height: 962 }}
       >
         {/* Bg container — 1320 × 1054 centered at top, overflow-clip
-         * (so the bg image's negative offsets don't bleed past it). */}
-        <div
+         * (so the bg image's negative offsets don't bleed past it).
+         * Fades in as one piece with the same scene-ready gate as the
+         * desktop layer so backgrounds + mascots enter together. */}
+        <motion.div
           className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 overflow-hidden"
           style={{ width: 1320, height: 1054 }}
+          initial={bgInitial}
+          animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
+          transition={bgTransition}
         >
           {/* STATIC base — flat scene, same 123.67% × 117.9% nest as
            * before. Sits behind the parallax layers as a seam filler. */}
@@ -669,7 +753,7 @@ export default function Hero() {
               }}
             />
           </ParallaxGroup>
-        </div>
+        </motion.div>
 
         {/* Content overlay — title + paragraph + CTA, 600 px column
          * centred in the 768 frame. Figma 1006:113058 sets the
