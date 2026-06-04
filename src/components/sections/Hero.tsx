@@ -9,7 +9,6 @@ import {
 import Nav from '@/components/Nav'
 import { Button } from '@/components/ui/button'
 import { asset } from '@/lib/utils'
-import { useParallaxPointer } from '@/hooks/useParallaxPointer'
 
 /* ============================================================
  * Entrance cascade timeline (seconds from mount):
@@ -41,15 +40,14 @@ const CONTENT_RISE_DURATION = 0.55
  * plate; the rest overlay it 1:1. (The flat background.webp base was
  * removed: it held a full copy of the scene that stayed put while the
  * foreground rose on scroll, reading as a duplicate image below.)
- * Each layer shifts by `depth × POINTER_PX` with the cursor and
- * `depth × SCROLL_PX` with scroll. SCROLL_PX is NEGATIVE so on scroll-down
- * every layer rises, and since the offset scales with depth the
- * foreground (grass + mascots, depth 1) rises faster than the
- * background (sky, depth 0.15) — classic depth parallax. The
- * grass layer carries the three mascots (nested in its group),
- * so the characters stay locked to the floor.
+ * Each layer shifts by `depth × SCROLL_PX` with scroll only (the
+ * cursor-driven parallax was removed). SCROLL_PX is NEGATIVE so on
+ * scroll-down every layer rises, and since the offset scales with depth
+ * the foreground (grass + mascots, depth 1) rises faster than the
+ * background (sky, depth 0.04) — classic depth parallax. The grass
+ * layer carries the three mascots (nested in its group), so the
+ * characters stay locked to the floor.
  * ============================================================ */
-const POINTER_PX = 28
 const SCROLL_PX = -280
 /* Mobile uses a much smaller scroll travel: the hero is a fixed 655 px
  * frame, so the desktop -280 px would shoot the foreground up past the
@@ -77,25 +75,16 @@ const HERO_ASSETS = [
 ] as const
 
 function useLayerTransform(
-  px: MotionValue<number>,
-  py: MotionValue<number>,
   scroll: MotionValue<number>,
   depth: number,
   scrollPx: number = SCROLL_PX,
-  pointerPx: number = POINTER_PX,
 ) {
-  const x = useTransform(px, (v) => v * depth * pointerPx)
-  const y = useTransform(
-    [scroll, py] as [MotionValue<number>, MotionValue<number>],
-    ([s, p]: number[]) => s * depth * scrollPx + p * depth * pointerPx,
-  )
-  return { x, y }
+  const y = useTransform(scroll, (s) => s * depth * scrollPx)
+  return { y }
 }
 
-/** A single transparent scene layer that parallaxes with cursor + scroll. */
+/** A single transparent scene layer that parallaxes with scroll. */
 function ParallaxLayer({
-  px,
-  py,
   scroll,
   depth,
   src,
@@ -104,8 +93,6 @@ function ParallaxLayer({
   style,
   scrollPx,
 }: {
-  px: MotionValue<number>
-  py: MotionValue<number>
   scroll: MotionValue<number>
   depth: number
   src: string
@@ -114,14 +101,14 @@ function ParallaxLayer({
   style?: React.CSSProperties
   scrollPx?: number
 }) {
-  const { x, y } = useLayerTransform(px, py, scroll, depth, scrollPx)
+  const { y } = useLayerTransform(scroll, depth, scrollPx)
   return (
     <motion.img
       src={src}
       alt=""
       aria-hidden
       decoding="async"
-      style={{ ...style, x, y, scale, willChange: 'transform' }}
+      style={{ ...style, y, scale, willChange: 'transform' }}
       className={className}
     />
   )
@@ -129,8 +116,6 @@ function ParallaxLayer({
 
 /** A parallax group (grass + shadows + mascots) that moves as one unit. */
 function ParallaxGroup({
-  px,
-  py,
   scroll,
   depth,
   className,
@@ -138,8 +123,6 @@ function ParallaxGroup({
   children,
   scrollPx,
 }: {
-  px: MotionValue<number>
-  py: MotionValue<number>
   scroll: MotionValue<number>
   depth: number
   className?: string
@@ -147,10 +130,10 @@ function ParallaxGroup({
   children: ReactNode
   scrollPx?: number
 }) {
-  const { x, y } = useLayerTransform(px, py, scroll, depth, scrollPx)
+  const { y } = useLayerTransform(scroll, depth, scrollPx)
   return (
     <motion.div
-      style={{ x, y, willChange: 'transform', ...style }}
+      style={{ y, willChange: 'transform', ...style }}
       className={className}
     >
       {children}
@@ -216,7 +199,6 @@ export default function Hero() {
       })
     }
   }, [])
-  const { px, py } = useParallaxPointer()
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start start', 'end start'],
@@ -309,8 +291,6 @@ export default function Hero() {
               return (
                 <ParallaxLayer
                   key={file}
-                  px={px}
-                  py={py}
                   scroll={scrollYProgress}
                   depth={DEPTH[key]}
                   scale={sceneScale}
@@ -326,8 +306,6 @@ export default function Hero() {
               wrapper is `inset-0` (full BG-container size) so the
               hero-mascot's percent insets still resolve unchanged. */}
           <ParallaxGroup
-            px={px}
-            py={py}
             scroll={scrollYProgress}
             depth={DEPTH.grass}
             className="absolute inset-0"
@@ -456,8 +434,6 @@ export default function Hero() {
             return (
               <ParallaxLayer
                 key={file}
-                px={px}
-                py={py}
                 scroll={scrollYProgress}
                 depth={DEPTH[key]}
                 scrollPx={MOBILE_SCROLL_PX}
@@ -506,8 +482,6 @@ export default function Hero() {
           style={{ width: 360, height: 655 }}
         >
           <ParallaxGroup
-            px={px}
-            py={py}
             scroll={scrollYProgress}
             depth={DEPTH.grass}
             scrollPx={MOBILE_SCROLL_PX}
@@ -611,8 +585,6 @@ export default function Hero() {
               return (
                 <ParallaxLayer
                   key={file}
-                  px={px}
-                  py={py}
                   scroll={scrollYProgress}
                   depth={DEPTH[key]}
                   src={layerSrc(file)}
@@ -632,8 +604,6 @@ export default function Hero() {
            * Wrapper is inset-0 of the 1320×1054 container so the mascots'
            * `calc(50% ± px)` offsets resolve unchanged. */}
           <ParallaxGroup
-            px={px}
-            py={py}
             scroll={scrollYProgress}
             depth={DEPTH.grass}
             className="absolute inset-0"
