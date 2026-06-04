@@ -370,16 +370,17 @@ export function NavMobile() {
             {/* Pill spacer — the real pill is fixed on top of the panel */}
             <div className="h-[52px] w-full shrink-0" />
 
-            {/* Nav links — Figma "Sections" (730:30621). Each row is
-             * items-center: the star wrapper carries a 10 px bottom
-             * pad and the 61 px text block a 10 px top pad, so the
-             * star's centre lands on the text's first-line centre
-             * (≈26 px from the row top) — that's the bullet⇄text
-             * alignment. The "Home" divider is a 1.5 px Green/400
-             * (#57A053) rule, full-width. */}
+            {/* Links + socials group — Figma "Drawer - links"
+             * (730:30621): a flex-1 column that grows to fill the panel
+             * so its rows stay TOP-aligned (links then socials directly
+             * beneath, matching the design) and the empty space falls
+             * below — pushing the CTA to the bottom. Each link row is
+             * items-center: the star wrapper carries a 10 px bottom pad
+             * and the 61 px text block a 10 px top pad, so the star's
+             * centre lands on the text's first-line centre. */}
             <nav
               aria-label="Mobile"
-              className="mt-10 flex w-full max-w-[340px] flex-col gap-2 px-[10px]"
+              className="mt-10 flex w-full max-w-[480px] flex-1 flex-col items-start gap-2 px-[10px]"
             >
               {mobileLinks.map((l) => (
                 <motion.div
@@ -407,41 +408,41 @@ export function NavMobile() {
                   </a>
                 </motion.div>
               ))}
+
+              {/* Social row — directly beneath the links (Figma
+               * 1122:147232: pl-20 py-16), not pinned to the bottom. */}
+              <motion.div
+                variants={itemVariants}
+                className="flex w-full items-center gap-6 py-[16px] pl-[20px]"
+              >
+                <a
+                  href="https://x.com/purintaxyz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Purinta on X"
+                  onClick={() => setOpen(false)}
+                  className="flex size-7 items-center justify-center text-[#333] transition-opacity hover:opacity-70"
+                >
+                  <XIcon width={17} height={15.3} />
+                </a>
+                <a
+                  href="https://discord.gg/purinta"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Purinta on Discord"
+                  onClick={() => setOpen(false)}
+                  className="flex size-7 items-center justify-center text-[#333] transition-opacity hover:opacity-70"
+                >
+                  <DiscordIcon width={21.2} height={16.2} />
+                </a>
+              </motion.div>
             </nav>
 
-            <div className="flex-1" />
-
-            {/* Social row */}
+            {/* Launch App CTA — Figma "Drawer - CTAs" (730:30650, px-32),
+             * pinned at the bottom by the flex-1 links group above. */}
             <motion.div
               variants={itemVariants}
-              className="flex w-full max-w-[360px] items-center gap-6 px-[30px] py-[2px]"
-            >
-              <a
-                href="https://x.com/purintaxyz"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Purinta on X"
-                onClick={() => setOpen(false)}
-                className="flex size-7 items-center justify-center text-[#333] transition-opacity hover:opacity-70"
-              >
-                <XIcon width={17} height={15.3} />
-              </a>
-              <a
-                href="https://discord.gg/purinta"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Purinta on Discord"
-                onClick={() => setOpen(false)}
-                className="flex size-7 items-center justify-center text-[#333] transition-opacity hover:opacity-70"
-              >
-                <DiscordIcon width={21.2} height={16.2} />
-              </a>
-            </motion.div>
-
-            {/* Launch App CTA */}
-            <motion.div
-              variants={itemVariants}
-              className="mt-[88px] w-full max-w-[360px] px-[10px]"
+              className="w-full max-w-[480px] px-[32px]"
             >
               <Button
                 variant="primary"
@@ -463,7 +464,7 @@ export function NavMobile() {
        * viewport over the full-screen panel (body scroll is locked
        * anyway, so there is no visible jump). */}
       <nav
-        className={`fade-in-on-load top-6 right-6 left-6 z-[70] flex h-[52px] items-center justify-between rounded-[64px] border border-solid border-[#9ECF84] bg-[#FEFEFE] px-6 ${
+        className={`fade-in-on-load top-6 left-1/2 z-[70] flex h-[52px] w-[calc(100%-48px)] max-w-[480px] -translate-x-1/2 items-center justify-between rounded-[64px] border border-solid border-[#9ECF84] bg-[#FEFEFE] px-6 ${
           open
             ? 'fixed'
             : 'absolute shadow-[0_4px_24px_rgba(24,82,41,0.06)]'
