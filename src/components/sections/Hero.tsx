@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import {
   motion,
   useReducedMotion,
@@ -15,6 +15,12 @@ import { asset } from '@/lib/utils'
  * render them as an opaque raster and hide those groups. */
 import pepeSvg from '@/assets/figma/pepe.svg?raw'
 import shibuSvg from '@/assets/figma/shibu.svg?raw'
+/* Shadows are inlined too: their soft blobs use SVG `feGaussianBlur`,
+ * and Safari does NOT render SVG filters when the SVG is loaded via
+ * <img> (Chrome does) — so as <img> the shadows showed hard-edged
+ * ellipses in Safari. Inline in the DOM, the blur renders everywhere. */
+import shadowsSvg from '@/assets/figma/shadows.svg?raw'
+import shadowsMobileSvg from '@/assets/figma/shadows-mobile.svg?raw'
 
 /* ============================================================
  * Entrance cascade timeline (seconds from mount):
@@ -40,26 +46,31 @@ const CONTENT_STAGGER = 0.13
 const CONTENT_RISE_DURATION = 0.55
 
 /* ============================================================
- * Layered parallax — the flat scene was split into 5 transparent
- * 1920×1462 layers (same registration as the original
- * background.webp). The full-canvas `01-sky` layer is the backmost
- * plate; the rest overlay it 1:1. (The flat background.webp base was
- * removed: it held a full copy of the scene that stayed put while the
- * foreground rose on scroll, reading as a duplicate image below.)
+ * Layered parallax (v2 set) — the scene is built from 4 1920×1462
+ * layers, all on the same registration:
+ *   01-base  — opaque sky + mountains + lake (the backmost plate)
+ *   02-tree-L / 03-tree-R — the transparent framing cherry trees
+ *   04-grass — the transparent foreground meadow (carries the mascots)
+ * (Earlier the back was split into separate sky + lake layers; they're
+ * now flattened into one base JPG→WebP — one fewer request, lighter.)
  * Each layer shifts by `depth × SCROLL_PX` with scroll only (the
  * cursor-driven parallax was removed). SCROLL_PX is NEGATIVE so on
  * scroll-down every layer rises, and since the offset scales with depth
  * the foreground (grass + mascots, depth 1) rises faster than the
- * background (sky, depth 0.04) — classic depth parallax. The grass
- * layer carries the three mascots (nested in its group), so the
- * characters stay locked to the floor.
+ * base (depth 0.06) — classic depth parallax. The grass layer carries
+ * the three mascots (nested in its group), so they stay locked to the
+ * floor.
  * ============================================================ */
 const SCROLL_PX = -280
 /* Mobile uses a much smaller scroll travel: the hero is a fixed 655 px
  * frame, so the desktop -280 px would shoot the foreground up past the
  * CTA and expose the static base behind it (the "doubled" image). */
 const MOBILE_SCROLL_PX = -42
-const DEPTH = { sky: 0.04, lake: 0.12, tree: 0.55, grass: 1 } as const
+/* v2 layer set: sky + mountains + lake are now baked into a single
+ * opaque `01-base` plate (lighter — one fewer layer), with the framing
+ * trees and the foreground grass as the only transparent overlays. The
+ * base sits furthest back so it gets the smallest parallax depth. */
+const DEPTH = { base: 0.06, tree: 0.55, grass: 1 } as const
 const layerSrc = (n: string) => asset(`/assets/figma/hero-layers/${n}.webp`)
 
 /* Every graphic that makes up the hero illustration, across all
@@ -68,15 +79,13 @@ const layerSrc = (n: string) => asset(`/assets/figma/hero-layers/${n}.webp`)
  * gated on ALL of these being decoded so the scene reveals as one
  * piece (no mascot popping in over a still-loading background). */
 const HERO_ASSETS = [
-  '/assets/figma/hero-layers/01-sky.webp',
-  '/assets/figma/hero-layers/02-lake.webp',
-  '/assets/figma/hero-layers/03-tree-L.webp',
+  '/assets/figma/hero-layers/01-base.webp',
+  '/assets/figma/hero-layers/02-tree-L.webp',
   '/assets/figma/hero-layers/03-tree-R.webp',
   '/assets/figma/hero-layers/04-grass.webp',
   // Pepe & Shibu are inlined (bundled, not fetched) so they're ready
   // the instant React renders — no need to gate the fade on them.
   '/assets/figma/hero-mascot.svg',
-  '/assets/figma/shadows.svg',
   '/assets/figma/hill-ellipse.svg',
 ] as const
 
@@ -148,18 +157,16 @@ function ParallaxGroup({
 }
 
 /**
- * An inline mascot SVG (Pepe / Shibu). Renders the raw `?raw` markup so
- * the `.bm-body` / `.bm-eye-*` groups stay live in the DOM for the CSS
- * breathe + blink animations baked into each SVG's own <style> (scoped
- * under a per-character root class, with per-character transform-origins
- * and timing). Sized exactly like the <img> it replaces: the wrapper
- * carries the width/height + position and `[&>svg]:size-full` stretches
- * the inner <svg> to fill it (the wrapper dims already match each viewBox
- * aspect, so there's no letterboxing). `overflow-visible` lets the subtle
- * breathe scale paint past the viewBox edge instead of being clipped by
- * the SVG viewport (the art fills the canvas to the edges).
+ * Renders a raw (`?raw`) SVG string inline in the DOM (not via <img>).
+ * Used for the mascots (so the `.bm-body` / `.bm-eye-*` groups stay live
+ * for the CSS breathe/blink animations baked into each SVG's <style>) and
+ * for the drop shadows (so their `feGaussianBlur` actually renders in
+ * Safari — Safari drops SVG filters on <img>). The wrapper carries the
+ * width/height + position and `[&>svg]:size-full` stretches the inner
+ * <svg> to fill it; `overflow-visible` lets the mascot breathe-scale and
+ * the shadow blur paint past the viewBox edge instead of being clipped.
  */
-function Mascot({
+function InlineSvg({
   svg,
   className,
   style,
@@ -170,6 +177,17 @@ function Mascot({
   style?: React.CSSProperties
   label?: string
 }) {
+  /* Namespace internal ids (filter / gradient / clip) per instance so
+   * the same SVG inlined in more than one breakpoint block (e.g. the
+   * desktop shadows reused in the tablet layout) doesn't emit duplicate
+   * ids — a `url(#id)` could otherwise resolve to a hidden copy and drop
+   * the filter. Only touches id= / url(#…) / href="#…"; the mascots have
+   * no ids (class-scoped), so they're unaffected. */
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
+  const html = svg
+    .replace(/\bid="([^"]+)"/g, (_m, id) => `id="${id}-${uid}"`)
+    .replace(/url\(#([^)]+)\)/g, (_m, id) => `url(#${id}-${uid})`)
+    .replace(/\b(xlink:href|href)="#([^"]+)"/g, (_m, attr, id) => `${attr}="#${id}-${uid}"`)
   return (
     <div
       role={label ? 'img' : undefined}
@@ -177,7 +195,7 @@ function Mascot({
       aria-hidden={label ? undefined : true}
       className={`pointer-events-none [&>svg]:size-full [&>svg]:overflow-visible ${className ?? ''}`}
       style={style}
-      dangerouslySetInnerHTML={{ __html: svg }}
+      dangerouslySetInnerHTML={{ __html: html }}
     />
   )
 }
@@ -336,7 +354,7 @@ export default function Hero() {
               removed — it held a full copy of the scene that stayed put
               while the foreground rose on scroll, reading as a duplicate
               image below the parallaxing layers.) */}
-          {(['01-sky:sky', '02-lake:lake', '03-tree-L:tree', '03-tree-R:tree'] as const).map(
+          {(['01-base:base', '02-tree-L:tree', '03-tree-R:tree'] as const).map(
             (entry) => {
               const [file, key] = entry.split(':') as [string, keyof typeof DEPTH]
               return (
@@ -372,16 +390,16 @@ export default function Hero() {
               className="absolute top-[-220px] left-0 block h-auto w-[1920px] max-w-none"
             />
 
-            {/* Drop shadows under mascots */}
-            <img
-              src={asset('/assets/figma/shadows.svg')}
-              alt=""
-              className="absolute top-[784px] left-[600.63px] h-[74.208px] w-[747.384px] mix-blend-multiply"
-              data-node-id="384:2213"
+            {/* Drop shadows under mascots — inline so the blur renders
+                in Safari (filters are dropped on <img> there). */}
+            <InlineSvg
+              svg={shadowsSvg}
+              className="absolute mix-blend-multiply"
+              style={{ top: 784, left: 600.63, width: 747.384, height: 74.208 }}
             />
 
             {/* Frog (Pepe) — inline SVG, breathes + blinks */}
-            <Mascot
+            <InlineSvg
               svg={pepeSvg}
               label="Pepe the frog"
               className="absolute h-[231.81px] w-[175.07px] max-w-none"
@@ -390,7 +408,7 @@ export default function Hero() {
 
             {/* Dog (Shibu) — inline SVG, offset rhythm so it doesn't
                 blink in lockstep with Pepe */}
-            <Mascot
+            <InlineSvg
               svg={shibuSvg}
               label="Shiba the dog"
               className="absolute h-[269.75px] w-[205.77px] max-w-none"
@@ -478,7 +496,7 @@ export default function Hero() {
          * → these parallax with scroll only. (The old flat
          * `background.webp` base was removed; it duplicated below on
          * scroll.) */}
-        {(['01-sky:sky', '02-lake:lake', '03-tree-L:tree', '03-tree-R:tree', '04-grass:grass'] as const).map(
+        {(['01-base:base', '02-tree-L:tree', '03-tree-R:tree', '04-grass:grass'] as const).map(
           (entry) => {
             const [file, key] = entry.split(':') as [string, keyof typeof DEPTH]
             return (
@@ -537,22 +555,36 @@ export default function Hero() {
             scrollPx={MOBILE_SCROLL_PX}
             className="absolute inset-0"
           >
-            <Mascot
+            {/* Drop shadows under the crew — Figma 665:56490. One SVG with
+             * 3 blurred ellipses spaced for the mobile mascot layout (the
+             * desktop shadows graphic has different spacing). Positioned at
+             * the blur-bled box (Figma box 18.16/470/321.75×35.24 expanded
+             * by the inner -8.21%/-0.87%… inset). Painted first so it sits
+             * under the mascots; mix-blend-multiply blends it into the
+             * grass behind. */}
+            <InlineSvg
+              svg={shadowsMobileSvg}
+              className="absolute max-w-none mix-blend-multiply"
+              style={{ left: 15.36, top: 467.11, width: 326.218, height: 39.803 }}
+            />
+            {/* Mascots — mobile sizes are 0.4× of desktop (Figma 773:40684,
+             * size="sm"); positions are the Figma left/top in the 360 frame. */}
+            <InlineSvg
               svg={pepeSvg}
               className="absolute max-w-none"
-              style={{ left: 15.2, top: 403.2, width: 78, height: 103.27 }}
+              style={{ left: 15.2, top: 403.2, width: 69.998, height: 93.62 }}
             />
             <img
               src={asset('/assets/figma/hero-mascot.svg')}
               alt=""
               aria-hidden
               className="absolute max-w-none"
-              style={{ left: 107, top: 376, width: 148 }}
+              style={{ left: 107, top: 376, width: 132.399, height: 115.48 }}
             />
-            <Mascot
+            <InlineSvg
               svg={shibuSvg}
               className="absolute max-w-none"
-              style={{ left: 261.4, top: 392.4, width: 91.5, height: 119.96 }}
+              style={{ left: 261.4, top: 392.4, width: 82.002, height: 108.69 }}
             />
           </ParallaxGroup>
         </div>
@@ -625,7 +657,7 @@ export default function Hero() {
            * `background.webp` base was removed — it held a full copy of
            * the scene that stayed put on scroll, reading as a duplicate
            * below the parallaxing layers.) */}
-          {(['01-sky:sky', '02-lake:lake', '03-tree-L:tree', '03-tree-R:tree'] as const).map(
+          {(['01-base:base', '02-tree-L:tree', '03-tree-R:tree'] as const).map(
             (entry) => {
               const [file, key] = entry.split(':') as [string, keyof typeof DEPTH]
               return (
@@ -668,12 +700,11 @@ export default function Hero() {
               }}
             />
 
-            {/* Drop shadows under mascots — Figma 1006:113050. */}
-            <img
-              src={asset('/assets/figma/shadows.svg')}
-              alt=""
-              aria-hidden
-              className="absolute block max-w-none mix-blend-multiply"
+            {/* Drop shadows under mascots — Figma 1006:113050. Inline so
+                the blur renders in Safari. */}
+            <InlineSvg
+              svg={shadowsSvg}
+              className="absolute max-w-none mix-blend-multiply"
               style={{
                 width: 635.276,
                 height: 63.076,
@@ -684,7 +715,7 @@ export default function Hero() {
             />
 
             {/* Pepe (frog) — inline SVG */}
-            <Mascot
+            <InlineSvg
               svg={pepeSvg}
               label="Pepe the frog"
               className="absolute block max-w-none"
@@ -712,7 +743,7 @@ export default function Hero() {
             />
 
             {/* Shibu (dog) — inline SVG, offset rhythm */}
-            <Mascot
+            <InlineSvg
               svg={shibuSvg}
               label="Shiba the dog"
               className="absolute block max-w-none"
