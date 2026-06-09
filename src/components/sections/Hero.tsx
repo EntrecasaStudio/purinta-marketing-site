@@ -9,6 +9,12 @@ import {
 import Nav from '@/components/Nav'
 import { Button } from '@/components/ui/button'
 import { asset } from '@/lib/utils'
+/* Pepe & Shibu are inlined via ?raw (not <img src>) so CSS can reach
+ * inside the artwork: the breathe (`.bm-body`) and blink (`.bm-eye`)
+ * animations target named <g> groups baked into each SVG. <img> would
+ * render them as an opaque raster and hide those groups. */
+import pepeSvg from '@/assets/figma/pepe.svg?raw'
+import shibuSvg from '@/assets/figma/shibu.svg?raw'
 
 /* ============================================================
  * Entrance cascade timeline (seconds from mount):
@@ -67,8 +73,8 @@ const HERO_ASSETS = [
   '/assets/figma/hero-layers/03-tree-L.webp',
   '/assets/figma/hero-layers/03-tree-R.webp',
   '/assets/figma/hero-layers/04-grass.webp',
-  '/assets/figma/pepe.svg',
-  '/assets/figma/shibu.svg',
+  // Pepe & Shibu are inlined (bundled, not fetched) so they're ready
+  // the instant React renders — no need to gate the fade on them.
   '/assets/figma/hero-mascot.svg',
   '/assets/figma/shadows.svg',
   '/assets/figma/hill-ellipse.svg',
@@ -142,6 +148,41 @@ function ParallaxGroup({
 }
 
 /**
+ * An inline mascot SVG (Pepe / Shibu). Renders the raw `?raw` markup so
+ * the `.bm-body` / `.bm-eye-*` groups stay live in the DOM for the CSS
+ * breathe + blink animations baked into each SVG's own <style> (scoped
+ * under a per-character root class, with per-character transform-origins
+ * and timing). Sized exactly like the <img> it replaces: the wrapper
+ * carries the width/height + position and `[&>svg]:size-full` stretches
+ * the inner <svg> to fill it (the wrapper dims already match each viewBox
+ * aspect, so there's no letterboxing). `overflow-visible` lets the subtle
+ * breathe scale paint past the viewBox edge instead of being clipped by
+ * the SVG viewport (the art fills the canvas to the edges).
+ */
+function Mascot({
+  svg,
+  className,
+  style,
+  label,
+}: {
+  svg: string
+  className?: string
+  style?: React.CSSProperties
+  label?: string
+}) {
+  return (
+    <div
+      role={label ? 'img' : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : true}
+      className={`pointer-events-none [&>svg]:size-full [&>svg]:overflow-visible ${className ?? ''}`}
+      style={style}
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
+  )
+}
+
+/**
  * Hero — Figma node 384:2207 ("Purinta - Desktop 1440px").
  *
  * Structure (matches Figma):
@@ -180,11 +221,21 @@ export default function Hero() {
         counted = true
         settle()
       }
-      img.onload = once
-      img.onerror = once
       img.src = asset(path)
-      // Cache hits may already be complete before handlers attach.
-      if (img.complete) once()
+      // Gate on decode(), not onload: decode() resolves only once the
+      // bitmap is ready to PAINT, whereas onload fires when the bytes
+      // have merely downloaded. The mascots are inline SVG (paint
+      // instantly), so if the fade started at onload the heavy webp
+      // layers would still be decoding and the mascots would pop in
+      // first over a blank scene. Waiting for decode() makes the whole
+      // illustration — layers + characters — reveal in the same frame.
+      if (typeof img.decode === 'function') {
+        img.decode().then(once, once)
+      } else {
+        img.onload = once
+        img.onerror = once
+        if (img.complete) once()
+      }
       return img
     })
     const fallback = window.setTimeout(() => {
@@ -329,25 +380,24 @@ export default function Hero() {
               data-node-id="384:2213"
             />
 
-            {/* Frog (Pepe) */}
-            <img
-              src={asset('/assets/figma/pepe.svg')}
-              alt="Pepe the frog"
+            {/* Frog (Pepe) — inline SVG, breathes + blinks */}
+            <Mascot
+              svg={pepeSvg}
+              label="Pepe the frog"
               className="absolute h-[231.81px] w-[175.07px] max-w-none"
               style={{ top: '601.91px', left: '592.83px' }}
-              data-node-id="384:2222"
             />
 
-            {/* Dog (Shibu) */}
-            <img
-              src={asset('/assets/figma/shibu.svg')}
-              alt="Shiba the dog"
+            {/* Dog (Shibu) — inline SVG, offset rhythm so it doesn't
+                blink in lockstep with Pepe */}
+            <Mascot
+              svg={shibuSvg}
+              label="Shiba the dog"
               className="absolute h-[269.75px] w-[205.77px] max-w-none"
               style={{ top: '585.16px', left: '1130.44px' }}
-              data-node-id="384:2220"
             />
 
-            {/* Tofu / Hero mascot — percent insets resolve against the
+            {/* Printer (Purinta) / Hero mascot — percent insets resolve against the
                 inset-0 wrapper (same size as the BG container). */}
             <div
               className="absolute"
@@ -487,12 +537,10 @@ export default function Hero() {
             scrollPx={MOBILE_SCROLL_PX}
             className="absolute inset-0"
           >
-            <img
-              src={asset('/assets/figma/pepe.svg')}
-              alt=""
-              aria-hidden
+            <Mascot
+              svg={pepeSvg}
               className="absolute max-w-none"
-              style={{ left: 15.2, top: 403.2, width: 78 }}
+              style={{ left: 15.2, top: 403.2, width: 78, height: 103.27 }}
             />
             <img
               src={asset('/assets/figma/hero-mascot.svg')}
@@ -501,12 +549,10 @@ export default function Hero() {
               className="absolute max-w-none"
               style={{ left: 107, top: 376, width: 148 }}
             />
-            <img
-              src={asset('/assets/figma/shibu.svg')}
-              alt=""
-              aria-hidden
+            <Mascot
+              svg={shibuSvg}
               className="absolute max-w-none"
-              style={{ left: 261.4, top: 392.4, width: 91.5 }}
+              style={{ left: 261.4, top: 392.4, width: 91.5, height: 119.96 }}
             />
           </ParallaxGroup>
         </div>
@@ -550,7 +596,7 @@ export default function Hero() {
       {/* ============================================================
        *  TABLET Hero (768 ≤ vw < 1154) — Figma 1047:144278.
        *
-       *  Same `background.webp` + Pepe / Tofu / Shibu SVGs as the
+       *  Same `background.webp` + Pepe / Printer / Shibu SVGs as the
        *  desktop scene, but sized down for the 1320-wide bg
        *  container the tablet design uses (vs desktop's 1920). The
        *  768 content column stays centred at any viewport in this
@@ -637,10 +683,10 @@ export default function Hero() {
               }}
             />
 
-            {/* Pepe (frog) */}
-            <img
-              src={asset('/assets/figma/pepe.svg')}
-              alt="Pepe the frog"
+            {/* Pepe (frog) — inline SVG */}
+            <Mascot
+              svg={pepeSvg}
+              label="Pepe the frog"
               className="absolute block max-w-none"
               style={{
                 width: 148.75,
@@ -651,7 +697,7 @@ export default function Hero() {
               }}
             />
 
-            {/* Tofu / Purinta-chan */}
+            {/* Printer (Purinta) — the center mascot */}
             <img
               src={asset('/assets/figma/hero-mascot.svg')}
               alt="Purinta mascot"
@@ -665,10 +711,10 @@ export default function Hero() {
               }}
             />
 
-            {/* Shibu (dog) */}
-            <img
-              src={asset('/assets/figma/shibu.svg')}
-              alt="Shiba the dog"
+            {/* Shibu (dog) — inline SVG, offset rhythm */}
+            <Mascot
+              svg={shibuSvg}
+              label="Shiba the dog"
               className="absolute block max-w-none"
               style={{
                 width: 174.25,

@@ -467,3 +467,9 @@
     transform: rotate(calc(var(--blade-r) + 8deg));
   }
 }
+
+/* Mascot idle animations (Pepe / Shibu breathe + blink) live inside
+ * each mascot SVG's own <style> block — scoped under a per-character
+ * root class with per-character transform-origins and timing — so the
+ * two characters don't collide on the shared .bm-* class names. See
+ * src/assets/figma/pepe.svg + shibu.svg. */
