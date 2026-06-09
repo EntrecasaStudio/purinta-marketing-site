@@ -59,16 +59,18 @@ export default function Community() {
         {/* Heading + body — 540 px on mobile, 700 px on tablet+,
          * 1080 px on desktop. */}
         <div className="reveal reveal-up flex w-full max-w-[480px] flex-col items-center gap-[12px] text-center min-[768px]:max-w-[700px] min-[768px]:gap-[24px] min-[1154px]:gap-6">
-          {/* Title: mobile breaks "The Meme Lending\nCommunity" into
-           * two stacked lines via `block` spans. Tablet+ collapses
-           * them to a single inline line (Figma 1047:144285). */}
-          <h2 className="w-full font-display text-[25px] leading-[33px] font-semibold tracking-[0.5px] text-[var(--color-neutral-900)] min-[768px]:text-[31px] min-[768px]:leading-[37px] min-[768px]:font-bold min-[768px]:tracking-[0.62px] min-[1154px]:text-[39px] min-[1154px]:leading-[43px] min-[1154px]:tracking-[-0.195px]">
-            <span className="block min-[768px]:inline">The Meme Lending</span>{' '}
-            <span className="block min-[768px]:inline">Community</span>
+          {/* Title: "The Meme Lending\nCommunity" stacks on two lines on
+           * mobile and on desktop (Figma 551:41113). Only tablet
+           * (768–1153, Figma 1047:144285) collapses them to one inline
+           * line. */}
+          <h2 className="w-full font-display text-[25px] leading-[33px] font-semibold tracking-[0.5px] text-[var(--color-neutral-900)] min-[768px]:text-[31px] min-[768px]:leading-[37px] min-[768px]:tracking-[0.62px] min-[1154px]:text-[39px] min-[1154px]:leading-[43px] min-[1154px]:tracking-[-0.195px]">
+            <span className="block min-[768px]:inline min-[1154px]:block">The Meme Lending</span>{' '}
+            <span className="block min-[768px]:inline min-[1154px]:block">Community</span>
           </h2>
-          <p className="w-[312px] max-w-full font-body text-[13px] leading-[21px] font-normal tracking-[0.26px] text-[var(--color-neutral-800)] min-[768px]:w-full min-[768px]:text-[20px] min-[768px]:leading-[32px] min-[768px]:tracking-[0.2px] min-[1154px]:text-[25px] min-[1154px]:leading-[38px] min-[1154px]:tracking-[0.25px]">
-            Purinta combines the best DeFi primitives into one seamless
-            memecoin lending experience. No shortcuts, no compromises
+          <p className="w-[312px] max-w-full font-body text-[13px] leading-[21px] font-normal tracking-[0.26px] text-[var(--color-neutral-800)] min-[768px]:w-full min-[768px]:max-w-[496px] min-[768px]:text-[20px] min-[768px]:leading-[32px] min-[768px]:tracking-[0.2px] min-[1154px]:max-w-full min-[1154px]:text-[25px] min-[1154px]:leading-[38px] min-[1154px]:tracking-[0.25px]">
+            Join thousands of degens already using Purinta. Get alpha,
+            share strategies, and be part of the meme lending revolution.
+            Your bags deserve better.
           </p>
         </div>
 

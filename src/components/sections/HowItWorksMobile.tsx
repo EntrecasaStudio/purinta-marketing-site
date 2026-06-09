@@ -168,9 +168,10 @@ export default function HowItWorksMobile() {
   return (
     <section className="w-full pt-[48px] pb-0 min-[768px]:pb-[24px] min-[1154px]:hidden">
       {/* Title — mobile (714:35917): 25/33 semibold. Tablet
-       *  (1006:114833): 31/37 bold tracking 0.62. */}
+       *  (1006:114833): 31/37 tracking 0.62 (weight kept at 600 to
+       *  match the other section titles across all breakpoints). */}
       <div className="reveal reveal-up flex w-full items-center justify-center px-6 pb-2 min-[768px]:py-[24px]">
-        <h2 className="text-center font-display text-[25px] leading-[33px] font-semibold tracking-[0.5px] text-[#333] min-[768px]:text-[31px] min-[768px]:leading-[37px] min-[768px]:font-bold min-[768px]:tracking-[0.62px]">
+        <h2 className="text-center font-display text-[25px] leading-[33px] font-semibold tracking-[0.5px] text-[#333] min-[768px]:text-[31px] min-[768px]:leading-[37px] min-[768px]:tracking-[0.62px]">
           How It Works
         </h2>
       </div>

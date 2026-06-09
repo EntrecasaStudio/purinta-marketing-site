@@ -415,15 +415,16 @@ export default function Ecosystem() {
       />
 
       {/* ---------- Foreground content ---------- */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col items-center gap-6 px-6 py-16 min-[1154px]:h-[1604px] min-[1154px]:justify-start min-[1154px]:gap-[72px] min-[1154px]:py-0 min-[1154px]:pt-[136px]">
-        {/* Copy block — title + subtitle. Mobile sizing (Figma
-         * 773:40687): h2 31/37 Bold, p 13/21 Regular. Desktop keeps
-         * the original 76/76 + 25/38. */}
-        <div className="mx-auto flex w-full max-w-[320px] flex-col items-center gap-2 min-[768px]:max-w-none min-[1154px]:gap-4">
-          <h2 className="reveal reveal-up text-center font-display text-[31px] leading-[37px] font-bold tracking-[0.62px] text-[#185229] min-[1154px]:text-[76px] min-[1154px]:leading-[76px] min-[1154px]:tracking-[0.76px]">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col items-center gap-6 px-6 py-16 min-[768px]:gap-10 min-[1154px]:h-[1604px] min-[1154px]:justify-start min-[1154px]:gap-[72px] min-[1154px]:py-0 min-[1154px]:pt-[136px]">
+        {/* Copy block — title + subtitle. Mobile (Figma 773:40687):
+         * h2 31/37 Bold, p 13/21. Tablet (Figma 1043:37623): copy
+         * column 496 px, h2 49/54 Bold tracking 0.98, p 20/32. Desktop
+         * keeps the original 76/76 + 25/38. */}
+        <div className="mx-auto flex w-full max-w-[320px] flex-col items-center gap-2 min-[768px]:max-w-[496px] min-[768px]:gap-4 min-[1154px]:max-w-none min-[1154px]:gap-4">
+          <h2 className="reveal reveal-up text-center font-display text-[31px] leading-[37px] font-bold tracking-[0.62px] text-[#185229] min-[768px]:text-[49px] min-[768px]:leading-[54px] min-[768px]:tracking-[0.98px] min-[1154px]:text-[76px] min-[1154px]:leading-[76px] min-[1154px]:tracking-[0.76px]">
             The Stack
           </h2>
-          <p className="reveal reveal-up text-center font-body text-[13px] leading-[21px] tracking-[0.26px] text-[#333] min-[1154px]:text-[25px] min-[1154px]:leading-[38px] min-[1154px]:tracking-[0.25px] min-[1154px]:text-[#4C4C4C]">
+          <p className="reveal reveal-up text-center font-body text-[13px] leading-[21px] tracking-[0.26px] text-[#333] min-[768px]:text-[20px] min-[768px]:leading-[32px] min-[768px]:tracking-[0.2px] min-[1154px]:text-[25px] min-[1154px]:leading-[38px] min-[1154px]:tracking-[0.25px] min-[1154px]:text-[#4C4C4C]">
             <span className="min-[1154px]:hidden">
               Purinta combines the best DeFi primitives into one
               seamless memecoin lending experience.
@@ -486,49 +487,44 @@ export default function Ecosystem() {
           ))}
         </div>
 
-        {/* Mobile pillar cards — compact horizontal layout per Figma
-         * 773:40687: 312 px wide, 60 px logo square on the left,
-         * 16/26 Medium title + 10/16 Regular body on the right,
-         * sticker drop shadow 2px / 2px in Mint/100 (#E7F4EC). The
-         * stack uses gap-4 (16 px) — visually tighter than the
-         * desktop card row and matches the compact stack seen in the
-         * Figma mobile screenshot. */}
-        <div className="flex w-full max-w-[360px] flex-col gap-4 min-[1154px]:hidden">
+        {/* Mobile + tablet pillar cards — horizontal layout (logo left,
+         * text right). Mobile (Figma 773:40687): 360 px column, 60 px
+         * logo, 16/26 title + 10/16 body, 8 px radius, 2·2 sticker
+         * shadow, gap-4. Tablet (Figma 1043:37623): 680 px column,
+         * 80 px logo, 25/38 title + 16/26 body, 32 px radius, 4·4
+         * shadow, gap-6 (24 px) between cards, gap-8 (32 px) logo↔text,
+         * px-8 py-10 card padding, logo top-aligned. Hidden on desktop
+         * (the 4-across card row above takes over). */}
+        <div className="flex w-full max-w-[360px] flex-col gap-4 min-[768px]:max-w-[680px] min-[768px]:gap-6 min-[1154px]:hidden">
           {pillars.map((p) => (
             <div
               key={p.title}
-              /* Same signature shape as desktop: sharp top-left, 8 px
-               * radius on the other three corners. Lighter 2/2 sticker
-               * shadow vs desktop's 4/4 to keep the mobile card feeling
-               * lighter. */
-              className="reveal reveal-up flex w-full items-center gap-2 rounded-tr-[8px] rounded-br-[8px] rounded-bl-[8px] bg-[#FEFEFE] px-6 py-4"
-              style={{
-                filter: 'drop-shadow(2px 2px 0 #E7F4EC)',
-              }}
+              /* Signature shape: sharp top-left, rounded other three
+               * corners (8 px mobile → 32 px tablet). Sticker shadow
+               * grows 2·2 → 4·4 from mobile to tablet. */
+              className="reveal reveal-up flex w-full items-center gap-2 rounded-tr-[8px] rounded-br-[8px] rounded-bl-[8px] bg-[#FEFEFE] px-6 py-4 [filter:drop-shadow(2px_2px_0_#E7F4EC)] min-[768px]:items-start min-[768px]:gap-8 min-[768px]:rounded-tr-[32px] min-[768px]:rounded-br-[32px] min-[768px]:rounded-bl-[32px] min-[768px]:px-8 min-[768px]:py-10 min-[768px]:[filter:drop-shadow(4px_4px_0_#E7F4EC)]"
             >
-              <div className="flex size-[60px] shrink-0 items-center justify-center">
+              <div className="flex size-[60px] shrink-0 items-center justify-center min-[768px]:size-20">
                 <img
                   src={p.logo}
                   alt=""
                   aria-hidden
-                  /* Mobile logos render ~25% smaller than desktop so
-                   * they fit the 60 px square cleanly. */
-                  style={{
-                    width: p.logoSize.w * 0.75,
-                    height: p.logoSize.h * 0.75,
-                  }}
-                  className="max-w-none object-contain"
+                  /* Logo rendered at its natural size; scaled to 75 %
+                   * on mobile to fit the 60 px square, full size on
+                   * tablet+ (80 px square, matching desktop). */
+                  style={{ width: p.logoSize.w, height: p.logoSize.h }}
+                  className="max-w-none scale-75 object-contain min-[768px]:scale-100"
                 />
               </div>
-              <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <h3 className="font-body text-[16px] leading-[26px] font-medium tracking-[0.16px] text-[#185229]">
+              <div className="flex min-w-0 flex-1 flex-col gap-1 min-[768px]:gap-2">
+                <h3 className="font-body text-[16px] leading-[26px] font-medium tracking-[0.16px] text-[#185229] min-[768px]:text-[25px] min-[768px]:leading-[38px] min-[768px]:tracking-[0.25px]">
                   {p.title}
                 </h3>
                 {/* `whitespace-pre-line` kept so the same body strings
                  * can still drop a line-break in a future iteration;
                  * with no \n in the data they read as a single line
-                 * (per Figma 773:40687). */}
-                <p className="font-body text-[10px] leading-[16px] tracking-[0.3px] whitespace-pre-line text-[#333]">
+                 * (per Figma 773:40687 / 1043:37623). */}
+                <p className="font-body text-[10px] leading-[16px] tracking-[0.3px] whitespace-pre-line text-[#333] min-[768px]:text-[16px] min-[768px]:leading-[26px] min-[768px]:tracking-[0.16px]">
                   {p.body}
                 </p>
               </div>
