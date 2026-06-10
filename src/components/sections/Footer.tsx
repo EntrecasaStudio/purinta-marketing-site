@@ -122,8 +122,12 @@ function FooterScene({
 }
 
 export default function Footer() {
+  /* z-0 makes the footer its own stacking context BELOW Community
+   * (z-10), so Community's flower scatter (which overflows down past its
+   * bottom edge) paints over the footer instead of being hidden by the
+   * footer band (z-20). */
   return (
-    <footer className="relative w-full">
+    <footer className="relative z-0 w-full">
       <FooterScene
         visibility="min-[768px]:hidden"
         img={footerBgMobile}
@@ -190,7 +194,7 @@ function BandInner() {
           className="h-4 w-[67.39px] shrink-0 min-[768px]:h-6 min-[768px]:w-[101.085px] min-[1152px]:h-8 min-[1152px]:w-[134.78px]"
         />
         <p className="font-body text-[11px] leading-[18px] font-medium tracking-[0.33px] text-[#333] whitespace-nowrap min-[1152px]:text-[13px] min-[1152px]:leading-[21px] min-[1152px]:tracking-[0.26px]">
-          © {new Date().getFullYear()} Purinta Inc. All rights reserved.
+          © {new Date().getFullYear()} Purinta. All rights reserved.
         </p>
       </div>
       <nav
