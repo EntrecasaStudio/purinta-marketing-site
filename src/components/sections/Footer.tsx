@@ -64,10 +64,13 @@ function FooterScene({
   mascotCenterY,
   bandH,
 }: SceneProps) {
+  /* Top-aligned: the image's faded TOP edge stays visible (dissolving
+   * into Community); only the bottom is cropped by the shorter sceneH —
+   * matching Figma (1279:76837 / 76838). */
   const imgStyle: CSSProperties = {
     width: imgW,
     height: imgH,
-    top: Math.round((sceneH - imgH) / 2),
+    top: 0,
   }
   return (
     <div className={visibility}>
@@ -126,29 +129,29 @@ export default function Footer() {
         img={footerBgMobile}
         imgW={960}
         imgH={566}
-        sceneH={566}
+        sceneH={480}
         mascotW={250}
         mascotH={234}
         mascotCenterY={238}
-        bandH={150}
+        bandH={103}
       />
       <FooterScene
         visibility="hidden min-[768px]:block min-[1152px]:hidden"
         img={footerBgTablet}
         imgW={1320}
         imgH={778}
-        sceneH={778}
+        sceneH={774}
         mascotW={344}
         mascotH={322}
         mascotCenterY={327}
-        bandH={170}
+        bandH={114}
       />
       <FooterScene
         visibility="hidden min-[1152px]:block"
         img={footerBg}
         imgW={1920}
         imgH={1132}
-        sceneH={1132}
+        sceneH={916}
         mascotW={500}
         mascotH={468}
         mascotCenterY={475}
