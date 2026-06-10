@@ -126,10 +126,10 @@ export default function Footer() {
         img={footerBgMobile}
         imgW={960}
         imgH={566}
-        sceneH={470}
+        sceneH={566}
         mascotW={250}
         mascotH={234}
-        mascotCenterY={205}
+        mascotCenterY={238}
         bandH={150}
       />
       <FooterScene
@@ -137,10 +137,10 @@ export default function Footer() {
         img={footerBgTablet}
         imgW={1320}
         imgH={778}
-        sceneH={620}
+        sceneH={778}
         mascotW={344}
         mascotH={322}
-        mascotCenterY={270}
+        mascotCenterY={327}
         bandH={170}
       />
       <FooterScene
@@ -148,10 +148,10 @@ export default function Footer() {
         img={footerBg}
         imgW={1920}
         imgH={1132}
-        sceneH={760}
+        sceneH={1132}
         mascotW={500}
         mascotH={468}
-        mascotCenterY={330}
+        mascotCenterY={475}
         bandH={176}
       />
     </footer>

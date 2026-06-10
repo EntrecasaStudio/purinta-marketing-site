@@ -94,7 +94,7 @@ const steps: Step[] = [
 
 /* Per-panel backgrounds from Figma (495:11062 / 11099 / 11113). */
 const BG_COLORS = [
-  '#FEFEFE', // Neutral/50  — Step 1
+  '#FCFBF5', // Cream/50    — Step 1
   '#F0EDD4', // Cream/300   — Step 2
   '#C8E6D0', // Mint/300    — Step 3
 ] as const
