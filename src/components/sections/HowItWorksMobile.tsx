@@ -166,7 +166,7 @@ const STEPS: Step[] = [
 
 export default function HowItWorksMobile() {
   return (
-    <section className="w-full pt-[48px] pb-0 min-[768px]:pb-[24px] min-[1154px]:hidden">
+    <section className="w-full pt-[48px] pb-0 min-[768px]:pb-[24px] min-[1152px]:hidden">
       {/* Title — mobile (714:35917): 25/33 semibold. Tablet
        *  (1006:114833): 31/37 tracking 0.62 (weight kept at 600 to
        *  match the other section titles across all breakpoints). */}

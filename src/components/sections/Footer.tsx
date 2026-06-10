@@ -13,10 +13,10 @@ import { asset } from '@/lib/utils'
  *   Tablet 768–1153 → footer-bg-tablet.webp (1320 ×  778)
  *   Mobile  <768   → footer-bg-mobile.webp  ( 960 ×  566)
  *
- * The image carries its own alpha edge-fade; a Neutral/50 overlay at the
- * top adds a longer dissolve into the Community section above (which is
- * solid Neutral/50). The band (logo + copyright + links) overlaps the
- * bottom of the scene.
+ * The image carries its OWN alpha edge-fade (top + sides baked in), so it
+ * dissolves into the Community section above on its own — no extra fade
+ * overlay needed. The band (logo + copyright + links) overlaps the bottom
+ * of the scene.
  */
 
 const footerBg = asset('/assets/figma/footer/footer-bg.webp')
@@ -24,6 +24,7 @@ const footerBgTablet = asset('/assets/figma/footer/footer-bg-tablet.webp')
 const footerBgMobile = asset('/assets/figma/footer/footer-bg-mobile.webp')
 
 type FooterLink = { label: string; href: string; external?: boolean }
+/* (The footer image bakes in its own top/edge fade — no CSS dissolve.) */
 
 /* Footer links — Figma 551:37655: two pipe-separated groups.
  * Group 1 (773:43242 "Socila"): X | Discord.
@@ -39,10 +40,6 @@ const linkGroups: FooterLink[][] = [
   ],
 ]
 
-/* The Neutral/50 top dissolve into Community. */
-const TOP_FADE_MASK =
-  'linear-gradient(to bottom, #000 0%, #000 12%, rgba(0,0,0,0.5) 45%, transparent 100%)'
-
 type SceneProps = {
   visibility: string
   img: string
@@ -54,7 +51,6 @@ type SceneProps = {
   mascotH: number
   mascotCenterY: number
   bandH: number
-  fadeH: number
 }
 
 function FooterScene({
@@ -67,7 +63,6 @@ function FooterScene({
   mascotH,
   mascotCenterY,
   bandH,
-  fadeH,
 }: SceneProps) {
   const imgStyle: CSSProperties = {
     width: imgW,
@@ -93,18 +88,6 @@ function FooterScene({
           decoding="async"
           className="pointer-events-none absolute left-1/2 z-0 block max-w-none -translate-x-1/2"
           style={imgStyle}
-        />
-
-        {/* Top dissolve into Community (Neutral/50). */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 z-[5]"
-          style={{
-            height: fadeH,
-            background: 'var(--color-neutral-50)',
-            maskImage: TOP_FADE_MASK,
-            WebkitMaskImage: TOP_FADE_MASK,
-          }}
         />
 
         {/* Mascot — centred horizontally, tilted -15.32° (Figma). The
@@ -148,10 +131,9 @@ export default function Footer() {
         mascotH={234}
         mascotCenterY={205}
         bandH={150}
-        fadeH={150}
       />
       <FooterScene
-        visibility="hidden min-[768px]:block min-[1154px]:hidden"
+        visibility="hidden min-[768px]:block min-[1152px]:hidden"
         img={footerBgTablet}
         imgW={1320}
         imgH={778}
@@ -160,10 +142,9 @@ export default function Footer() {
         mascotH={322}
         mascotCenterY={270}
         bandH={170}
-        fadeH={220}
       />
       <FooterScene
-        visibility="hidden min-[1154px]:block"
+        visibility="hidden min-[1152px]:block"
         img={footerBg}
         imgW={1920}
         imgH={1132}
@@ -172,7 +153,6 @@ export default function Footer() {
         mascotH={468}
         mascotCenterY={330}
         bandH={176}
-        fadeH={300}
       />
     </footer>
   )
@@ -197,32 +177,32 @@ export default function Footer() {
  */
 function BandInner() {
   return (
-    <div className="relative mx-auto flex h-full max-w-[1440px] flex-col items-center justify-center gap-4 px-4 py-6 min-[768px]:gap-4 min-[768px]:px-6 min-[1154px]:flex-row min-[1154px]:justify-between min-[1154px]:gap-10 min-[1154px]:px-[156px] min-[1154px]:py-0">
+    <div className="relative mx-auto flex h-full max-w-[1440px] flex-col items-center justify-center gap-4 px-4 py-6 min-[768px]:gap-4 min-[768px]:px-6 min-[1152px]:flex-row min-[1152px]:justify-between min-[1152px]:gap-10 min-[1152px]:px-[156px] min-[1152px]:py-0">
       {/* Logo + copyright (always a row) — below the links on mobile/
        * tablet, to the left on desktop. */}
-      <div className="order-2 flex items-center gap-2 min-[768px]:gap-[18px] min-[1154px]:order-1">
+      <div className="order-2 flex items-center gap-2 min-[768px]:gap-[18px] min-[1152px]:order-1">
         <img
           src={asset('/assets/figma/footer/logotype-footer.svg')}
           alt="Purinta"
-          className="h-4 w-[67.39px] shrink-0 min-[768px]:h-6 min-[768px]:w-[101.085px] min-[1154px]:h-8 min-[1154px]:w-[134.78px]"
+          className="h-4 w-[67.39px] shrink-0 min-[768px]:h-6 min-[768px]:w-[101.085px] min-[1152px]:h-8 min-[1152px]:w-[134.78px]"
         />
-        <p className="font-body text-[11px] leading-[18px] font-medium tracking-[0.33px] text-[#333] whitespace-nowrap min-[1154px]:text-[13px] min-[1154px]:leading-[21px] min-[1154px]:tracking-[0.26px]">
+        <p className="font-body text-[11px] leading-[18px] font-medium tracking-[0.33px] text-[#333] whitespace-nowrap min-[1152px]:text-[13px] min-[1152px]:leading-[21px] min-[1152px]:tracking-[0.26px]">
           © {new Date().getFullYear()} Purinta Inc. All rights reserved.
         </p>
       </div>
       <nav
         aria-label="Footer"
-        className="order-1 flex items-start justify-center gap-4 px-14 min-[768px]:gap-8 min-[768px]:px-0 min-[1154px]:order-2 min-[1154px]:gap-[64px]"
+        className="order-1 flex items-start justify-center gap-4 px-14 min-[768px]:gap-8 min-[768px]:px-0 min-[1152px]:order-2 min-[1152px]:gap-[64px]"
       >
         {linkGroups.map((group, gi) => (
           <div
             key={gi}
-            className="flex items-center gap-1 min-[768px]:gap-2 min-[1154px]:gap-4"
+            className="flex items-center gap-1 min-[768px]:gap-2 min-[1152px]:gap-4"
           >
             {group.map((l, li) => (
               <span
                 key={l.label}
-                className="flex items-center gap-1 min-[768px]:gap-2 min-[1154px]:gap-4"
+                className="flex items-center gap-1 min-[768px]:gap-2 min-[1152px]:gap-4"
               >
                 <a
                   href={l.href}

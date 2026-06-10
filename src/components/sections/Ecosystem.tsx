@@ -299,7 +299,7 @@ export default function Ecosystem() {
        *  Fixed 1920×1604 reference frame, centered horizontally. Every
        *  child uses absolute pixel offsets copied straight from the
        *  Figma artboard. Hidden below `md`. */}
-      <div className="pointer-events-none absolute top-0 left-1/2 z-0 hidden h-[1604px] w-[1920px] -translate-x-1/2 min-[1154px]:block">
+      <div className="pointer-events-none absolute top-0 left-1/2 z-0 hidden h-[1604px] w-[1920px] -translate-x-1/2 min-[1152px]:block">
         {/* Top isometric squares pattern (rotated 180° per Figma) */}
         <img
           src={v2('squares-top.svg')}
@@ -368,7 +368,7 @@ export default function Ecosystem() {
        *  mobile scene); items outside the viewport are clipped by the
        *  section's overflow-hidden. */}
       <div
-        className="pointer-events-none absolute top-0 left-1/2 z-0 h-[1300px] w-[960px] -translate-x-1/2 min-[1154px]:hidden"
+        className="pointer-events-none absolute top-0 left-1/2 z-0 h-[1300px] w-[960px] -translate-x-1/2 min-[1152px]:hidden"
       >
         {/* Top isometric squares pattern (rotated 180° per Figma) */}
         <img
@@ -398,23 +398,23 @@ export default function Ecosystem() {
       </div>
 
       {/* ---------- Foreground content ---------- */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col items-center gap-6 px-6 py-16 min-[768px]:gap-10 min-[1154px]:h-[1604px] min-[1154px]:justify-start min-[1154px]:gap-[72px] min-[1154px]:py-0 min-[1154px]:pt-[136px]">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col items-center gap-6 px-6 py-16 min-[768px]:gap-10 min-[1152px]:h-[1604px] min-[1152px]:justify-start min-[1152px]:gap-[72px] min-[1152px]:py-0 min-[1152px]:pt-[136px]">
         {/* Copy block — title + subtitle. Mobile (Figma 773:40687):
          * h2 31/37 Bold, p 13/21. Tablet (Figma 1043:37623): copy
          * column 496 px, h2 49/54 Bold tracking 0.98, p 20/32. Desktop
          * keeps the original 76/76 + 25/38. */}
-        <div className="mx-auto flex w-full max-w-[320px] flex-col items-center gap-2 min-[768px]:max-w-[496px] min-[768px]:gap-4 min-[1154px]:max-w-none min-[1154px]:gap-4">
-          <h2 className="reveal reveal-up text-center font-display text-[31px] leading-[37px] font-bold tracking-[0.62px] text-[#185229] min-[768px]:text-[49px] min-[768px]:leading-[54px] min-[768px]:tracking-[0.98px] min-[1154px]:text-[76px] min-[1154px]:leading-[76px] min-[1154px]:tracking-[0.76px]">
+        <div className="mx-auto flex w-full max-w-[320px] flex-col items-center gap-2 min-[768px]:max-w-[496px] min-[768px]:gap-4 min-[1152px]:max-w-none min-[1152px]:gap-4">
+          <h2 className="reveal reveal-up text-center font-display text-[31px] leading-[37px] font-bold tracking-[0.62px] text-[#185229] min-[768px]:text-[49px] min-[768px]:leading-[54px] min-[768px]:tracking-[0.98px] min-[1152px]:text-[76px] min-[1152px]:leading-[76px] min-[1152px]:tracking-[0.76px]">
             The Stack
           </h2>
-          <p className="reveal reveal-up text-center font-body text-[13px] leading-[21px] tracking-[0.26px] text-[#333] min-[768px]:text-[20px] min-[768px]:leading-[32px] min-[768px]:tracking-[0.2px] min-[1154px]:text-[25px] min-[1154px]:leading-[38px] min-[1154px]:tracking-[0.25px] min-[1154px]:text-[#4C4C4C]">
-            <span className="min-[1154px]:hidden">
+          <p className="reveal reveal-up text-center font-body text-[13px] leading-[21px] tracking-[0.26px] text-[#4C4C4C] min-[768px]:text-[20px] min-[768px]:leading-[32px] min-[768px]:tracking-[0.2px] min-[1152px]:text-[25px] min-[1152px]:leading-[38px] min-[1152px]:tracking-[0.25px]">
+            <span className="min-[1152px]:hidden">
               Purinta combines the best DeFi primitives into one
               seamless memecoin lending experience.
               <br />
               No shortcuts, no compromises.
             </span>
-            <span className="hidden min-[1154px]:inline">
+            <span className="hidden min-[1152px]:inline">
               Purinta combines the best DeFi primitives into one
               <br />
               seamless memecoin lending experience.
@@ -425,13 +425,13 @@ export default function Ecosystem() {
         </div>
 
         {/* Pillar cards — desktop: 4 across, big vertical cards.
-         * `min-[1154px]:-mx-6 min-[1154px]:w-[calc(100%+3rem)]` cancels the foreground's
+         * `min-[1152px]:-mx-6 min-[1152px]:w-[calc(100%+3rem)]` cancels the foreground's
          * `px-6` mobile gutter on desktop so the row spans the full
          * 1024 px Figma width — without it the cards are 12 px
          * narrower each and "Battle-tested lending" wraps to a 2nd
          * line. Hidden on mobile (the mobile layout below renders
          * a more compact horizontal-card variant). */}
-        <div className="hidden min-[1154px]:-mx-6 min-[1154px]:flex min-[1154px]:w-[calc(100%+3rem)] min-[1154px]:flex-row min-[1154px]:items-stretch min-[1154px]:gap-6">
+        <div className="hidden min-[1152px]:-mx-6 min-[1152px]:flex min-[1152px]:w-[calc(100%+3rem)] min-[1152px]:flex-row min-[1152px]:items-stretch min-[1152px]:gap-6">
           {pillars.map((p, i) => (
             <div
               key={p.title}
@@ -478,7 +478,7 @@ export default function Ecosystem() {
          * shadow, gap-6 (24 px) between cards, gap-8 (32 px) logo↔text,
          * px-8 py-10 card padding, logo top-aligned. Hidden on desktop
          * (the 4-across card row above takes over). */}
-        <div className="flex w-full max-w-[360px] flex-col gap-4 min-[768px]:max-w-[680px] min-[768px]:gap-6 min-[1154px]:hidden">
+        <div className="flex w-full max-w-[360px] flex-col gap-4 min-[768px]:max-w-[680px] min-[768px]:gap-6 min-[1152px]:hidden">
           {pillars.map((p) => (
             <div
               key={p.title}
@@ -520,7 +520,7 @@ export default function Ecosystem() {
          * mascot so the character's feet rest on the top step (~50%
          * of mascot height overlap, matching the desktop scene
          * composition where the steps span the mascot's bottom half). */}
-        <div className="flex w-full justify-center -mt-2 min-[1154px]:hidden min-[1154px]:mt-0">
+        <div className="flex w-full justify-center -mt-2 min-[1152px]:hidden min-[1152px]:mt-0">
           <div className="relative h-[295px] w-[260px]">
             {/* Steps SVG — Figma 714:36018, three isometric tiers
              * exported as one combined image. Same asset as desktop

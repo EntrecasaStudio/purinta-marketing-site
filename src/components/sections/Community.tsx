@@ -31,7 +31,7 @@ export default function Community() {
   return (
     <section
       id="community"
-      className="relative z-10 w-full px-6 pt-1 pb-12 min-[768px]:px-[24px] min-[768px]:py-[40px] min-[1154px]:min-h-[638px] min-[1154px]:px-[var(--ds-space-24,24px)] min-[1154px]:pt-[80px] min-[1154px]:pb-[83px]"
+      className="relative z-10 w-full px-6 pt-1 pb-12 min-[768px]:px-[24px] min-[768px]:py-[40px] min-[1152px]:min-h-[638px] min-[1152px]:px-[var(--ds-space-24,24px)] min-[1152px]:pt-[80px] min-[1152px]:pb-[83px]"
     >
       {/* Community surface — solid Neutral/50 (#fefefe) full-bleed behind
        * the content (z-0), on ALL breakpoints. (The shared
@@ -41,19 +41,19 @@ export default function Community() {
         aria-hidden
         className="pointer-events-none absolute inset-0 z-0 bg-[var(--color-neutral-50)]"
       />
-      <div className="relative z-10 mx-auto flex w-full max-w-[1080px] flex-col items-center gap-[28px] min-[768px]:gap-[24px] min-[1154px]:gap-[72px]">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1080px] flex-col items-center gap-[28px] min-[768px]:gap-[24px] min-[1152px]:gap-[72px]">
         {/* Heading + body — 540 px on mobile, 700 px on tablet+,
          * 1080 px on desktop. */}
-        <div className="reveal reveal-up flex w-full max-w-[480px] flex-col items-center gap-[12px] text-center min-[768px]:max-w-[700px] min-[768px]:gap-[24px] min-[1154px]:gap-6">
+        <div className="reveal reveal-up flex w-full max-w-[480px] flex-col items-center gap-[12px] text-center min-[768px]:max-w-[700px] min-[768px]:gap-[24px] min-[1152px]:gap-6">
           {/* Title: "The Meme Lending\nCommunity" stacks on two lines on
            * mobile and on desktop (Figma 551:41113). Only tablet
            * (768–1153, Figma 1047:144285) collapses them to one inline
            * line. */}
-          <h2 className="w-full font-display text-[25px] leading-[33px] font-semibold tracking-[0.5px] text-[var(--color-neutral-900)] min-[768px]:text-[31px] min-[768px]:leading-[37px] min-[768px]:tracking-[0.62px] min-[1154px]:text-[39px] min-[1154px]:leading-[43px] min-[1154px]:tracking-[-0.195px]">
-            <span className="block min-[768px]:inline min-[1154px]:block">The Meme Lending</span>{' '}
-            <span className="block min-[768px]:inline min-[1154px]:block">Community</span>
+          <h2 className="w-full font-display text-[25px] leading-[33px] font-semibold tracking-[0.5px] text-[var(--color-neutral-900)] min-[768px]:text-[31px] min-[768px]:leading-[37px] min-[768px]:tracking-[0.62px] min-[1152px]:text-[39px] min-[1152px]:leading-[43px] min-[1152px]:tracking-[-0.195px]">
+            <span className="block min-[768px]:inline min-[1152px]:block">The Meme Lending</span>{' '}
+            <span className="block min-[768px]:inline min-[1152px]:block">Community</span>
           </h2>
-          <p className="w-[312px] max-w-full font-body text-[13px] leading-[21px] font-normal tracking-[0.26px] text-[var(--color-neutral-800)] min-[768px]:w-full min-[768px]:max-w-[496px] min-[768px]:text-[20px] min-[768px]:leading-[32px] min-[768px]:tracking-[0.2px] min-[1154px]:max-w-full min-[1154px]:text-[25px] min-[1154px]:leading-[38px] min-[1154px]:tracking-[0.25px]">
+          <p className="w-[312px] max-w-full font-body text-[13px] leading-[21px] font-normal tracking-[0.26px] text-[var(--color-neutral-800)] min-[768px]:w-full min-[768px]:max-w-[496px] min-[768px]:text-[20px] min-[768px]:leading-[32px] min-[768px]:tracking-[0.2px] min-[1152px]:max-w-full min-[1152px]:text-[25px] min-[1152px]:leading-[38px] min-[1152px]:tracking-[0.25px]">
             Join thousands of degens already using Purinta. Get alpha,
             share strategies, and be part of the meme lending revolution.
             Your bags deserve better.

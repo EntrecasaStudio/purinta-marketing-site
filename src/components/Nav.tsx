@@ -86,31 +86,37 @@ export default function Nav() {
       /* Nav pill — Figma desktop 384:2293 (1280×84, px-24 py-24) and
        * Figma tablet 1041:29233 (720×72, px-20 py-16). All inner
        * spacings + element sizes interpolate between the two
-       * breakpoints via min-[768px]: (tablet) and min-[1154px]:
+       * breakpoints via min-[768px]: (tablet) and min-[1152px]:
        * (desktop) overrides so the same nav renders pixel-perfect
        * at both ranges. */
-      className="relative z-50 mx-auto hidden w-full items-center justify-center rounded-[64px] bg-[#FEFEFE] shadow-[0_4px_24px_rgba(24,82,41,0.06)] md:flex min-[768px]:h-[72px] min-[768px]:max-w-[720px] min-[768px]:px-[20px] min-[768px]:py-[16px] min-[1154px]:h-[84px] min-[1154px]:max-w-[1280px] min-[1154px]:px-[24px] min-[1154px]:py-[24px]"
+      className="relative z-50 hidden w-full items-center justify-center rounded-[64px] bg-[#FEFEFE] shadow-[0_4px_24px_rgba(24,82,41,0.06)] md:flex min-[768px]:h-[72px] min-[768px]:px-[20px] min-[768px]:py-[16px] min-[1152px]:h-[84px] min-[1152px]:px-[24px] min-[1152px]:py-[24px]"
       data-node-id="384:2293"
     >
       <div className="flex w-full items-center justify-between">
         {/* Logo — Figma tablet 1041:29180 sizes the lockup at
          * 126.356 × 30 (symbol 26.5×30 + wordmark 93.69×18.56 at
          * left:32.6 top:6.61). Desktop keeps the 168.475×40
-         * default lockup shipped by <Logo />. */}
+         * default lockup shipped by <Logo />.
+         *
+         * Internal left pad: Figma (384:2293) insets the logo +16 px
+         * past the nav content edge while the CTA sits flush on the
+         * right — so the logo has a bit more breathing room on the left
+         * than the CTA on the right. Re-added here (ml-4 desktop, ml-2
+         * tablet) since the symmetric default had dropped it. */}
         <a
           href="#"
           aria-label="Purinta"
-          className="relative flex shrink-0 min-[768px]:h-[30px] min-[768px]:w-[126.36px] min-[1154px]:h-[40px] min-[1154px]:w-[168.475px]"
+          className="relative flex shrink-0 min-[768px]:ml-2 min-[768px]:h-[30px] min-[768px]:w-[126.36px] min-[1152px]:ml-4 min-[1152px]:h-[40px] min-[1152px]:w-[168.475px]"
         >
           <img
             src={asset('/assets/figma/logo-symbol.svg')}
             alt=""
-            className="absolute top-0 left-0 min-[768px]:h-[30px] min-[768px]:w-[26.5px] min-[1154px]:h-[40px] min-[1154px]:w-[35.33px]"
+            className="absolute top-0 left-0 min-[768px]:h-[30px] min-[768px]:w-[26.5px] min-[1152px]:h-[40px] min-[1152px]:w-[35.33px]"
           />
           <img
             src={asset('/assets/figma/wordmark.svg')}
             alt="Purinta"
-            className="absolute min-[768px]:top-[6.61px] min-[768px]:left-[32.6px] min-[768px]:h-[18.56px] min-[768px]:w-[93.69px] min-[1154px]:top-[8.814px] min-[1154px]:left-[43.47px] min-[1154px]:h-[24.746px] min-[1154px]:w-[124.915px]"
+            className="absolute min-[768px]:top-[6.61px] min-[768px]:left-[32.6px] min-[768px]:h-[18.56px] min-[768px]:w-[93.69px] min-[1152px]:top-[8.814px] min-[1152px]:left-[43.47px] min-[1152px]:h-[24.746px] min-[1152px]:w-[124.915px]"
           />
         </a>
 
@@ -118,9 +124,9 @@ export default function Nav() {
          * flex (links / socials / button) with gap-24; desktop
          * keeps the nested 32/64-gap structure from the original
          * 1280-wide design. */}
-        <div className="flex items-center min-[768px]:gap-[24px] min-[1154px]:gap-[32px]">
-          <div className="flex items-center min-[768px]:gap-[24px] min-[1154px]:gap-[64px]">
-            <ul className="flex items-center justify-end min-[768px]:gap-[8px] min-[1154px]:gap-[20px]">
+        <div className="flex items-center min-[768px]:gap-[24px] min-[1152px]:gap-[32px]">
+          <div className="flex items-center min-[768px]:gap-[24px] min-[1152px]:gap-[64px]">
+            <ul className="flex items-center justify-end min-[768px]:gap-[8px] min-[1152px]:gap-[20px]">
               {links.map((l) => (
                 <li key={l.label}>
                   <a
@@ -132,7 +138,7 @@ export default function Nav() {
                     }}
                     /* Tablet: 13 px Rubik Regular tracking 0.26.
                      * Desktop: 16 px Rubik tracking 0.16. */
-                    className="block whitespace-nowrap text-[#333] transition-colors hover:text-[var(--color-green-600)] min-[768px]:px-[8px] min-[768px]:py-[1.5px] min-[768px]:font-body min-[768px]:text-[13px] min-[768px]:leading-[21px] min-[768px]:font-normal min-[768px]:tracking-[0.26px] min-[1154px]:text-[16px] min-[1154px]:leading-[26px] min-[1154px]:font-medium min-[1154px]:tracking-[0.16px]"
+                    className="block whitespace-nowrap text-[#333] transition-colors hover:text-[var(--color-green-600)] min-[768px]:px-[8px] min-[768px]:py-[1.5px] min-[768px]:font-body min-[768px]:text-[13px] min-[768px]:leading-[21px] min-[768px]:font-normal min-[768px]:tracking-[0.26px] min-[1152px]:text-[16px] min-[1152px]:leading-[26px] min-[1152px]:font-medium min-[1152px]:tracking-[0.16px]"
                   >
                     {l.label}
                   </a>
@@ -142,13 +148,13 @@ export default function Nav() {
 
             {/* Socials — tablet 28×28 wrapper, gap-8. Desktop
              * 32×32, gap-24. */}
-            <div className="flex items-center justify-end min-[768px]:h-[28px] min-[768px]:gap-[8px] min-[1154px]:h-[32px] min-[1154px]:gap-[24px]">
+            <div className="flex items-center justify-end min-[768px]:h-[28px] min-[768px]:gap-[8px] min-[1152px]:h-[32px] min-[1152px]:gap-[24px]">
               <a
                 href="https://x.com/purintaxyz"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Purinta on X"
-                className="flex items-center justify-center text-[#666666] transition-colors hover:text-[var(--color-green-600)] min-[768px]:size-[28px] min-[1154px]:size-[32px]"
+                className="flex items-center justify-center text-[#666666] transition-colors hover:text-[var(--color-green-600)] min-[768px]:size-[28px] min-[1152px]:size-[32px]"
               >
                 <XIcon width={20} height={18} />
               </a>
@@ -157,7 +163,7 @@ export default function Nav() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Purinta on Discord"
-                className="flex items-center justify-center text-[#666666] transition-colors hover:text-[var(--color-green-600)] min-[768px]:size-[28px] min-[1154px]:size-[32px]"
+                className="flex items-center justify-center text-[#666666] transition-colors hover:text-[var(--color-green-600)] min-[768px]:size-[28px] min-[1152px]:size-[32px]"
               >
                 <DiscordIcon width={24} height={18.5} />
               </a>
@@ -170,7 +176,7 @@ export default function Nav() {
           <Button
             variant="primary"
             asChild
-            className="shrink-0 rounded-[22px] whitespace-nowrap min-[768px]:!px-[16px] min-[768px]:!py-[6px] min-[768px]:!text-[13px] min-[768px]:!tracking-[0.39px] min-[1154px]:!px-[21px] min-[1154px]:!py-[13px] min-[1154px]:!text-[16px] min-[1154px]:!tracking-[0.48px]"
+            className="shrink-0 rounded-[22px] whitespace-nowrap min-[768px]:!px-[16px] min-[768px]:!py-[6px] min-[768px]:!text-[13px] min-[768px]:!tracking-[0.39px] min-[1152px]:!px-[21px] min-[1152px]:!py-[13px] min-[1152px]:!text-[16px] min-[1152px]:!tracking-[0.48px]"
           >
             <a href="https://app.purinta.xyz">Launch App</a>
           </Button>

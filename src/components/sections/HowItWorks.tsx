@@ -202,7 +202,7 @@ function HowItWorksDesktop() {
    * with their flat Figma backgrounds, no scroll pin, no slide. */
   if (reduceMotion) {
     return (
-      <section className="relative hidden w-full min-[1154px]:block">
+      <section className="relative hidden w-full min-[1152px]:block">
         <div className="py-12 text-center">
           <h2 className="font-display text-[39px] leading-[1] font-semibold tracking-[0.88px] text-[var(--color-neutral-900)]">
             How It Works?
@@ -228,7 +228,7 @@ function HowItWorksDesktop() {
        * (z-30) which extends ~300 px PAST Features' bottom into the
        * top of HowItWorks. Without this, the ellipse would render on
        * top of the title + first panel during the entry phase. */
-      className="relative z-40 hidden w-full min-[1154px]:block"
+      className="relative z-40 hidden w-full min-[1152px]:block"
       /* 3.92× viewport. The sticky pin eats 100vh, leaving a 292vh
        * scroll range: 130vh + 130vh to slide between the three panels,
        * plus two 16vh DWELL stretches where panels 2 and 3 hold

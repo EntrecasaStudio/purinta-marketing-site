@@ -274,7 +274,7 @@ function FeaturesDesktop() {
        * tail of the hero hill ellipse. The cards (z-40) and title
        * (z-40) paint above the hill (z-30), and the Features bg
        * gradient still fades in transparent → Neutral/50 underneath. */
-      className="relative -mt-[200px] hidden w-full pt-[60px] pb-32 min-[1154px]:block"
+      className="relative -mt-[200px] hidden w-full pt-[60px] pb-32 min-[1152px]:block"
       style={{
         backgroundImage:
           'linear-gradient(to bottom, transparent 0px, var(--color-neutral-50) 240px)',

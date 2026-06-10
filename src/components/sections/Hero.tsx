@@ -21,6 +21,17 @@ import shibuSvg from '@/assets/figma/shibu.svg?raw'
  * ellipses in Safari. Inline in the DOM, the blur renders everywhere. */
 import shadowsSvg from '@/assets/figma/shadows.svg?raw'
 import shadowsMobileSvg from '@/assets/figma/shadows-mobile.svg?raw'
+/* Hero-bottom fade — Figma "Ellipse fade" (1003:129461). A blurred
+ * cream-50 → pale-lime ellipse whose soft edge dissolves the meadow into
+ * the page. The blur is baked into the SVG (feGaussianBlur, applied to
+ * the SHAPE only — not a rectangular backdrop), so it must be INLINE:
+ * Safari drops SVG filters on <img>, which is why the cut looked hard.
+ * Inlined 3× (one per breakpoint), so the internal ids are suffixed to
+ * avoid collisions. */
+import ellipseFadeSvg from '@/assets/figma/ellipse-fade.svg?raw'
+const ellipseFadeD = ellipseFadeSvg.replace(/_0_906/g, '_0_906d')
+const ellipseFadeT = ellipseFadeSvg.replace(/_0_906/g, '_0_906t')
+const ellipseFadeM = ellipseFadeSvg.replace(/_0_906/g, '_0_906m')
 
 /* ============================================================
  * Entrance cascade timeline (seconds from mount):
@@ -86,7 +97,6 @@ const HERO_ASSETS = [
   // Pepe & Shibu are inlined (bundled, not fetched) so they're ready
   // the instant React renders — no need to gate the fade on them.
   '/assets/figma/hero-mascot.svg',
-  '/assets/figma/hill-ellipse.svg',
 ] as const
 
 function useLayerTransform(
@@ -299,7 +309,7 @@ export default function Hero() {
   return (
     <section
       ref={ref}
-      className="relative flex w-full flex-col items-center min-[768px]:min-h-[962px] min-[1154px]:min-h-[1300px]"
+      className="relative flex w-full flex-col items-center min-[768px]:min-h-[962px] min-[1152px]:min-h-[1300px]"
       data-node-id="384:2207"
     >
       {/* Hill ellipse — DESKTOP. Pulled out of the bg container so the
@@ -307,16 +317,15 @@ export default function Hero() {
           with z-30 so it paints OVER Features' bg plane (z-auto).
           The Features title / cards have z-40+ so they stay above
           the hill. */}
-      <motion.img
-        src={asset('/assets/figma/hill-ellipse.svg')}
-        alt=""
+      <motion.div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 z-30 hidden h-[1312.311px] w-[2485.428px] max-w-none -translate-x-1/2 min-[1154px]:block"
+        className="pointer-events-none absolute left-1/2 z-30 hidden h-[1312.311px] w-[2485.428px] -translate-x-1/2 min-[1152px]:block [&>svg]:block [&>svg]:size-full [&>svg]:overflow-visible"
         style={{ top: 839.17 }}
         initial={bgInitial}
         animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
         transition={bgTransition}
         data-node-id="384:2217"
+        dangerouslySetInnerHTML={{ __html: ellipseFadeD }}
       />
       {/* Hill ellipse — TABLET (Figma 1006:113054). Same SVG as
           desktop, scaled to the smaller 2112×1115 footprint and
@@ -324,15 +333,14 @@ export default function Hero() {
           curve bleeds into the Why Purinta section below, providing
           the visual hand-off between hero meadow and the cards
           canvas without a hard horizontal cut. */}
-      <motion.img
-        src={asset('/assets/figma/hill-ellipse.svg')}
-        alt=""
+      <motion.div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 z-30 hidden h-[1115.464px] w-[2112.614px] max-w-none -translate-x-1/2 min-[768px]:block min-[1154px]:hidden"
+        className="pointer-events-none absolute left-1/2 z-30 hidden h-[1115.464px] w-[2112.614px] -translate-x-1/2 min-[768px]:block min-[1152px]:hidden [&>svg]:block [&>svg]:size-full [&>svg]:overflow-visible"
         style={{ top: 713.29 }}
         initial={bgInitial}
         animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
         transition={bgTransition}
+        dangerouslySetInnerHTML={{ __html: ellipseFadeT }}
       />
       {/* ---------- BG layer (1920×1462, overflow-clip) ----------
           Container matches the image's exact natural size so the
@@ -344,7 +352,7 @@ export default function Hero() {
         initial={bgInitial}
         animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
         transition={bgTransition}
-        className="pointer-events-none absolute top-0 left-1/2 z-[1] hidden -translate-x-1/2 min-[1154px]:block"
+        className="pointer-events-none absolute top-0 left-1/2 z-[1] hidden -translate-x-1/2 min-[1152px]:block"
       >
         <div className="relative h-[1462px] w-[1920px] overflow-hidden">
           {/* Depth layers (back → front). The full-canvas sky layer is
@@ -438,11 +446,11 @@ export default function Hero() {
       </motion.div>
 
       {/* ---------- Top spacer (Bg flex item, 48px) ---------- */}
-      <div className="hidden h-[48px] w-full min-[1154px]:block" />
+      <div className="hidden h-[48px] w-full min-[1152px]:block" />
 
       {/* ---------- Nav ---------- */}
       <motion.div
-        className="relative z-50 hidden w-full px-4 md:block min-[768px]:pt-6 min-[1154px]:pt-0"
+        className="relative z-50 hidden w-full px-4 md:block min-[768px]:px-[24px] min-[768px]:pt-6 min-[1152px]:px-[80px] min-[1152px]:pt-0"
         initial={navInitial}
         animate={{ opacity: 1, y: 0 }}
         transition={navTransition}
@@ -519,17 +527,14 @@ export default function Hero() {
           },
         )}
 
-        {/* Soft transition — Figma 665:56494 (Ellipse 1052): a 50px
-         * blurred white→pale-lime ellipse rising from the bottom of
-         * the scene. It sits ABOVE the scene but BELOW the mascots so
-         * the crew stays crisp. Masked to fade out before the 655 px
-         * section edge so its semi-opaque tail isn't hard-clipped into
-         * a faint line by the section's overflow-hidden. */}
-        <img
-          src={asset('/assets/figma/hill-ellipse.svg')}
-          alt=""
+        {/* Soft transition — Figma "Ellipse fade": the blurred cream-50 →
+         * pale-lime ellipse dissolving the meadow into the page. Inlined
+         * so its feGaussianBlur renders in Safari (it wouldn't on <img>).
+         * Masked to fade out before the 655 px section edge so its
+         * semi-opaque tail isn't hard-clipped by the section overflow. */}
+        <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 max-w-none -translate-x-1/2"
+          className="pointer-events-none absolute left-1/2 -translate-x-1/2 [&>svg]:block [&>svg]:size-full [&>svg]:overflow-visible"
           style={{
             top: 475.71,
             width: 1113.265,
@@ -539,6 +544,7 @@ export default function Hero() {
             maskImage:
               'linear-gradient(to bottom, black 22%, transparent 31%)',
           }}
+          dangerouslySetInnerHTML={{ __html: ellipseFadeM }}
         />
 
         {/* Mascot crew — centred on the 360-wide inner (static), with an
@@ -638,7 +644,7 @@ export default function Hero() {
        *  continuing" pattern used on desktop.
        * ============================================================ */}
       <div
-        className="absolute inset-x-0 top-0 z-[1] hidden w-full overflow-hidden min-[768px]:block min-[1154px]:hidden"
+        className="absolute inset-x-0 top-0 z-[1] hidden w-full overflow-hidden min-[768px]:block min-[1152px]:hidden"
         style={{ height: 962 }}
       >
         {/* Bg container — 1320 × 1054 centered at top, overflow-clip
@@ -801,7 +807,7 @@ export default function Hero() {
       </div>
 
       {/* ---------- Hero content (1280 × 668, pt-58 pb-148) ---------- */}
-      <div className="relative z-10 hidden w-full flex-col items-center min-[1154px]:flex">
+      <div className="relative z-10 hidden w-full flex-col items-center min-[1152px]:flex">
         <motion.div
           style={{ y: contentY, opacity: contentOpacity }}
           className="flex h-[668px] w-full max-w-[1280px] flex-col items-start px-6 pt-[58px] pb-[148px]"
