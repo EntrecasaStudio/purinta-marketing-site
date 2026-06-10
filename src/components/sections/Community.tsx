@@ -1,3 +1,4 @@
+import CommunityFlowers from '@/components/sections/CommunityFlowers'
 import { XIcon, DiscordIcon } from '@/components/icons/Social'
 import { Button } from '@/components/ui/button'
 
@@ -22,16 +23,19 @@ import { Button } from '@/components/ui/button'
  * Both breakpoints reuse the shared <Button> (btn-primary / btn-secondary)
  * so hover / focus / active match Hero and the dapp source of truth.
  *
- * (The decorative flower scatter that used to cross into the Footer
- * meadow was removed — the flowers are now baked into the new footer
- * background image.)
+ * Decorative flowers (<CommunityFlowers />) scatter across the section
+ * on every breakpoint (mobile + desktop layers); the section stays
+ * `overflow-visible` so the cluster can spill past the bottom edge.
  */
 
 export default function Community() {
   return (
     <section
       id="community"
-      className="relative z-10 w-full px-6 pt-1 pb-12 min-[768px]:px-[24px] min-[768px]:py-[40px] min-[1152px]:min-h-[638px] min-[1152px]:px-[var(--ds-space-24,24px)] min-[1152px]:pt-[80px] min-[1152px]:pb-[83px]"
+      /* overflow-visible + z-10 so the CommunityFlowers scatter (z-20
+       * inside) can overflow Community's bottom edge and paint over the
+       * Footer that follows in document order. */
+      className="relative z-10 w-full overflow-visible px-6 pt-1 pb-12 min-[768px]:px-[24px] min-[768px]:py-[40px] min-[1152px]:min-h-[638px] min-[1152px]:px-[var(--ds-space-24,24px)] min-[1152px]:pt-[80px] min-[1152px]:pb-[83px]"
     >
       {/* Community surface — solid Neutral/50 (#fefefe) full-bleed behind
        * the content (z-0), on ALL breakpoints. (The shared
@@ -137,6 +141,10 @@ export default function Community() {
         </div>
 
       </div>
+
+      {/* Decorative flower scatter — mobile + desktop layers (Figma
+       * 726:40370), restored across all breakpoints. */}
+      <CommunityFlowers />
     </section>
   )
 }
