@@ -10,11 +10,11 @@ import { useReveal } from '@/hooks/useReveal'
 function App() {
   useReveal()
   return (
-    /* Page-level Blush/50 → Mint/50 gradient (per Figma — every
-     * section in the design sits on this same canvas, individual
-     * surfaces like cards are white on top). Applied on the root so
-     * the gradient is ONE continuous fill across all sections and
-     * doesn't reset at every section boundary. */
+    /* Page-level background is a solid Cream/50 (#fcfbf5) — per Figma
+     * the old Blush/50 → Mint/50 diagonal gradient was dropped for a
+     * single flat canvas. Every section sits on this same fill; surfaces
+     * like cards / Community paint their own colour on top. Applied on
+     * the root so it's ONE continuous fill across all sections. */
     <div
       /* overflow-x: clip clips the wide absolute layers in the Hero
        * (the 1920 px background scene + the 2485 px hill ellipse,
@@ -25,7 +25,7 @@ function App() {
        * pinning to the viewport correctly. */
       className="min-h-screen"
       style={{
-        backgroundImage: 'var(--gradient-bg)',
+        backgroundColor: 'var(--color-cream-50)',
         overflowX: 'clip',
       }}
     >

@@ -285,16 +285,14 @@ export default function Ecosystem() {
       id="ecosystem"
       ref={ref}
       className="relative w-full overflow-hidden"
-      /* Per Figma: subtle gradient peaks at Blush/100 around 86 % of
-       * the section height, fading back toward Neutral/50 above and
-       * to fully transparent at the bottom. Letting the bottom go
-       * transparent removes the seam against Community below — that
-       * section is also transparent over the page-level diagonal
-       * gradient, so when Ecosystem fades out the two sections share
-       * the exact same boundary color at every x. */
+      /* Per Figma (551:35786): the section gradient STARTS and ENDS in
+       * Neutral/50, peaking at Blush/100 around 86 % of the height —
+       * neutral-50 0% → blush-100 86.19% → neutral-50 100%. Ending on
+       * neutral-50 makes the Stack→Community boundary seamless (Community
+       * is solid neutral-50 too). */
       style={{
         background:
-          'linear-gradient(to bottom, #FEFEFE 0%, #FFF5F4 86%, rgba(254,254,254,0) 100%)',
+          'linear-gradient(to bottom, #FEFEFE 0%, #FFF5F4 86.19%, #FEFEFE 100%)',
       }}
     >
       {/* ---------- Decorative background layer ----------
@@ -398,21 +396,6 @@ export default function Ecosystem() {
         <Bill spec={billsMobile.bill5} progress={scrollYProgress} />
         <Bill spec={billsMobile.bill6} progress={scrollYProgress} />
       </div>
-
-      {/* Mobile/tablet bottom blush — the section background fades to
-       * transparent over its last ~14 % (revealing the page's cool
-       * diagonal gradient behind the grid graphic). Community below is
-       * solid Blush-white (#FFF5F4), so paint the bottom band blush too
-       * and the Stack→Community boundary reads as one warm surface.
-       * Sits above the z-0 grid layer but below the z-10 content. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[220px] min-[1154px]:hidden"
-        style={{
-          background:
-            'linear-gradient(to bottom, rgba(255,245,244,0) 0%, #FFF5F4 100%)',
-        }}
-      />
 
       {/* ---------- Foreground content ---------- */}
       <div className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col items-center gap-6 px-6 py-16 min-[768px]:gap-10 min-[1154px]:h-[1604px] min-[1154px]:justify-start min-[1154px]:gap-[72px] min-[1154px]:py-0 min-[1154px]:pt-[136px]">

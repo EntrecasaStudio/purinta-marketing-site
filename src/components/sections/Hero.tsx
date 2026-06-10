@@ -784,20 +784,18 @@ export default function Hero() {
           </Button>
         </div>
 
-        {/* Gradient fade — long, very gentle dissolve of the scene
-         * into the PAGE background (blush-50 → mint-50 diagonal
-         * --gradient-bg). Painted in transparent → mint-50 so the
-         * bottom edge matches the page gradient at the section
-         * boundary instead of ramping to opaque white, which used to
-         * create a faint color band against the Why Purinta canvas
-         * below. The mascot crew at y≈770 already lives in the more
-         * opaque area; the dissolve happens BEHIND them. */}
+        {/* Gradient fade — long, very gentle dissolve of the scene into
+         * the PAGE background (now solid Cream/50). Painted transparent →
+         * cream-50 so the bottom edge matches the page fill at the section
+         * boundary instead of ramping to opaque white. The mascot crew at
+         * y≈770 already lives in the more opaque area; the dissolve
+         * happens BEHIND them. */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[340px]"
           style={{
             background:
-              'linear-gradient(to bottom, transparent 0%, rgba(242,247,244,0.12) 35%, rgba(242,247,244,0.45) 65%, rgba(242,247,244,0.78) 85%, var(--color-mint-50) 100%)',
+              'linear-gradient(to bottom, transparent 0%, rgba(252,251,245,0.12) 35%, rgba(252,251,245,0.45) 65%, rgba(252,251,245,0.78) 85%, var(--color-cream-50) 100%)',
           }}
         />
       </div>

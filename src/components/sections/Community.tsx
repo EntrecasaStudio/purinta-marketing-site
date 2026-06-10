@@ -1,4 +1,3 @@
-import CommunityFlowers from '@/components/sections/CommunityFlowers'
 import { XIcon, DiscordIcon } from '@/components/icons/Social'
 import { Button } from '@/components/ui/button'
 
@@ -23,37 +22,24 @@ import { Button } from '@/components/ui/button'
  * Both breakpoints reuse the shared <Button> (btn-primary / btn-secondary)
  * so hover / focus / active match Hero and the dapp source of truth.
  *
- * Decorative flowers (<CommunityFlowers />) are a desktop-only scatter
- * that crosses the boundary into the Footer meadow; the section stays
- * `overflow-visible` so the cluster reads as one piece. The mobile
- * flower instances from Figma 726:39999 are deferred (5 small sprite
- * crops; can be added under <CommunityFlowers /> with a `mobile` mode
- * if the design needs them).
+ * (The decorative flower scatter that used to cross into the Footer
+ * meadow was removed — the flowers are now baked into the new footer
+ * background image.)
  */
 
 export default function Community() {
   return (
     <section
       id="community"
-      /* z-10 promotes Community to its own stacking context so the
-       * CommunityFlowers scatter (with z-20 inside) paints OVER the
-       * Footer section that follows in document order. Without this
-       * the later <Footer /> sibling covers the flowers that overflow
-       * Community's bottom edge into the Footer meadow. */
-      className="relative z-10 w-full overflow-visible px-6 pt-1 pb-12 min-[768px]:px-[24px] min-[768px]:py-[40px] min-[1154px]:min-h-[638px] min-[1154px]:px-[var(--ds-space-24,24px)] min-[1154px]:pt-[80px] min-[1154px]:pb-[83px]"
+      className="relative z-10 w-full px-6 pt-1 pb-12 min-[768px]:px-[24px] min-[768px]:py-[40px] min-[1154px]:min-h-[638px] min-[1154px]:px-[var(--ds-space-24,24px)] min-[1154px]:pt-[80px] min-[1154px]:pb-[83px]"
     >
-      {/* Mobile/tablet warm-white surface — Figma 831:43460 places the
-       * Community block on the same warm Blush-white as The Stack
-       * (#FFF5F4), NOT the page's cool diagonal gradient. Painted as a
-       * full-bleed solid layer behind the content (z-0). It stays solid
-       * all the way to the bottom edge: Ecosystem above and the Footer
-       * meadow below each carry their own blush backdrop at the shared
-       * boundary, so the whole region reads as one continuous warm
-       * surface. Desktop keeps its own treatment (CommunityFlowers over
-       * the page bg). */}
+      {/* Community surface — solid Neutral/50 (#fefefe) full-bleed behind
+       * the content (z-0), on ALL breakpoints. (The shared
+       * Stack→Community→Footer fade transitions are tuned separately to
+       * land on this tone.) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-0 bg-[#FFF5F4] min-[1154px]:hidden"
+        className="pointer-events-none absolute inset-0 z-0 bg-[var(--color-neutral-50)]"
       />
       <div className="relative z-10 mx-auto flex w-full max-w-[1080px] flex-col items-center gap-[28px] min-[768px]:gap-[24px] min-[1154px]:gap-[72px]">
         {/* Heading + body — 540 px on mobile, 700 px on tablet+,
@@ -151,9 +137,6 @@ export default function Community() {
         </div>
 
       </div>
-
-      {/* Decorative flower scatter — Figma 726:40370, desktop-only. */}
-      <CommunityFlowers />
     </section>
   )
 }

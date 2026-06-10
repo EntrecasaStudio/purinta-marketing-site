@@ -1,30 +1,27 @@
+import type { CSSProperties } from 'react'
 import FooterMascot from '@/components/sections/FooterMascot'
 import { asset } from '@/lib/utils'
 
 /**
- * Footer — two layouts that share the band content (logo + copyright +
- * links) but diverge on the meadow scene above it.
+ * Footer — one meadow scene per breakpoint, all built from the same
+ * `Footer-Background` illustration scaled to three widths (the flowers
+ * and the faded edges are baked into the image, so there are no separate
+ * flower layers). The animated <FooterMascot> is the only live element;
+ * it's centred horizontally in every breakpoint and sits on the meadow.
  *
- *  Desktop (≥ md), Figma 551:41114 + 551:41115:
- *    1920 × 916 scene with the band OVERLAPPING the bottom 176 px so
- *    the meadow runs full-bleed under the legibility tint. Scaling is
- *    handled by the `.footer-scene-wrap` CSS rule (Hero pattern).
+ *   Desktop ≥1154 → footer-bg.webp        (1920 × 1132)
+ *   Tablet 768–1153 → footer-bg-tablet.webp (1320 ×  778)
+ *   Mobile  <768   → footer-bg-mobile.webp  ( 960 ×  566)
  *
- *  Mobile (< md), Figma 773:40689 + 773:40690:
- *    360 × 377 portrait scene STACKED above a 360 × 171 band — no
- *    overlap, because the mascot sits low enough in the mobile scene
- *    that a band overlay would slice through its legs. A different
- *    Figma meadow asset (`scene-bg-mobile.webp`, exported from
- *    "Purinta footer V4") drives this view; the desktop bg is too wide.
- *
- * The mascot SVG (`mascot-footer.svg`) is shared between both views.
- * It carries its own internal CSS keyframes (breath / sync-blink /
- * arm sway) so each layout just sizes the wrapper and the animation
- * scales with it.
+ * The image carries its own alpha edge-fade; a Neutral/50 overlay at the
+ * top adds a longer dissolve into the Community section above (which is
+ * solid Neutral/50). The band (logo + copyright + links) overlaps the
+ * bottom of the scene.
  */
 
-const sceneBg = asset('/assets/figma/footer/scene-bg.webp')
-const sceneBgMobile = asset('/assets/figma/footer/scene-bg-mobile.webp')
+const footerBg = asset('/assets/figma/footer/footer-bg.webp')
+const footerBgTablet = asset('/assets/figma/footer/footer-bg-tablet.webp')
+const footerBgMobile = asset('/assets/figma/footer/footer-bg-mobile.webp')
 
 type FooterLink = { label: string; href: string; external?: boolean }
 
@@ -42,299 +39,204 @@ const linkGroups: FooterLink[][] = [
   ],
 ]
 
-const BAND_H = 176
+/* The Neutral/50 top dissolve into Community. */
+const TOP_FADE_MASK =
+  'linear-gradient(to bottom, #000 0%, #000 12%, rgba(0,0,0,0.5) 45%, transparent 100%)'
 
-export default function Footer() {
+type SceneProps = {
+  visibility: string
+  img: string
+  imgW: number
+  imgH: number
+  sceneH: number
+  /** mascot box size + vertical centre (px from scene top) */
+  mascotW: number
+  mascotH: number
+  mascotCenterY: number
+  bandH: number
+  fadeH: number
+}
+
+function FooterScene({
+  visibility,
+  img,
+  imgW,
+  imgH,
+  sceneH,
+  mascotW,
+  mascotH,
+  mascotCenterY,
+  bandH,
+  fadeH,
+}: SceneProps) {
+  const imgStyle: CSSProperties = {
+    width: imgW,
+    height: imgH,
+    top: Math.round((sceneH - imgH) / 2),
+  }
   return (
-    <footer className="relative w-full">
-      {/* =====================================================
-       *  DESKTOP (≥ md) — scene + band overlapping, Figma
-       *  551:41114 + 551:41115.
-       * ===================================================== */}
-      <div className="hidden md:block">
-      {/* overflow-clip (not hidden): `hidden` makes the section a
-       * scroll container, so a focus()/scrollIntoView() on any child
-       * link silently scrolls its content — shifting the meadow up.
-       * `clip` clips identically but is NOT scrollable. */}
-      <div className="footer-section relative w-full overflow-clip">
+    <div className={visibility}>
+      {/* overflow-clip (not hidden): `hidden` would make the section a
+       * scroll container and a focus()/scrollIntoView on a link could
+       * shift the meadow. `clip` clips identically but isn't scrollable. */}
+      <div
+        className="relative w-full overflow-clip"
+        style={{ height: sceneH }}
+      >
+        {/* Meadow — native width, centred (sides clip on narrow viewports);
+         * the image's baked alpha fades the edges. */}
+        <img
+          src={img}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+          className="pointer-events-none absolute left-1/2 z-0 block max-w-none -translate-x-1/2"
+          style={imgStyle}
+        />
 
-        {/* Scene wrapper — Hero pattern (centered, native 1920 wide,
-         * scaled to fit below md via .footer-scene-wrap rules). The
-         * class also owns the wrapper height (740 on mobile so the
-         * scene stays its natural ratio above the unscaled band; 916
-         * on md+ so the band overlays the bottom of the scene per
-         * Figma). */}
-        <div
-          className="footer-scene-wrap pointer-events-none absolute top-0 left-1/2"
-          style={{ width: '1920px' }}
-        >
-          <img
-            src={sceneBg}
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            decoding="async"
-            className="absolute block max-w-none"
-            style={{
-              left: '-24px',
-              top: '-142px',
-              width: '2048px',
-              height: '1325px',
-            }}
-          />
-
-          {/* Mascot — Figma 551:37818, vector SVG. Natural box 500 ×
-           * 468, centered at Figma (1048, 564.6) inside the 1920
-           * wrapper and tilted -15.32° (Figma rotation). Static for
-           * now — `<g id="...">` groups inside the SVG let future
-           * animations target individual parts. */}
-          <div
-            className="pointer-events-auto absolute"
-            style={{
-              left: '1048px',
-              top: '564.6px',
-              width: '500px',
-              height: '468px',
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                transform: 'rotate(-15.32deg)',
-                transformOrigin: 'center',
-              }}
-            >
-              <FooterMascot />
-            </div>
-          </div>
-        </div>
-
-        {/* Top fade — softens the meadow into Community. The meadow
-         * webp already carries a baked alpha fade; this overlay adds
-         * a second, longer pass painted in the page-gradient colour
-         * so the very top edge is indistinguishable from Community's
-         * background. Anchored to the section (not the scene wrapper)
-         * and reliable now the section uses overflow-clip (no scroll
-         * offset). Sits below the band, above the meadow. */}
+        {/* Top dissolve into Community (Neutral/50). */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 z-[5]"
           style={{
-            height: '420px',
-            background:
-              'linear-gradient(106.89deg, #f9f9f7 0%, #f4f7f5 100%)',
-            maskImage:
-              'linear-gradient(to bottom, #000 0%, #000 14%, rgba(0,0,0,0.55) 46%, transparent 100%)',
-            WebkitMaskImage:
-              'linear-gradient(to bottom, #000 0%, #000 14%, rgba(0,0,0,0.55) 46%, transparent 100%)',
+            height: fadeH,
+            background: 'var(--color-neutral-50)',
+            maskImage: TOP_FADE_MASK,
+            WebkitMaskImage: TOP_FADE_MASK,
           }}
         />
 
-        {/* Footer band — sits OVER the meadow's bottom 176 px. */}
+        {/* Mascot — centred horizontally, tilted -15.32° (Figma). The
+         * animated SVG (breath / blink / arm sway) scales with the box. */}
         <div
-          className="absolute inset-x-0 bottom-0 text-[#333]"
-          style={{ height: `${BAND_H}px` }}
-        >
-          {/* Band tint — radial gradient copied 1:1 from the Figma SVG
-           * fill (rgba(157,189,90,0) → rgba(100,154,96,0.61), 940 × 333
-           * ellipse at 706.36 / 61.404). Rendered as its own layer and
-           * vertically masked so the tint FADES IN from the band's top
-           * edge — without the mask the rectangle's top is a hard line
-           * of green tint over the meadow ("frame cut"). The mask
-           * leaves the lower band (where the logo + links sit) fully
-           * tinted for legibility. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                'radial-gradient(ellipse 940px 333px at 706.36px 61.404px, rgba(157,189,90,0) 0%, rgba(100,154,96,0.61) 100%)',
-              maskImage:
-                'linear-gradient(to bottom, transparent 0%, #000 46%)',
-              WebkitMaskImage:
-                'linear-gradient(to bottom, transparent 0%, #000 46%)',
-            }}
-          />
-          {/* Content row — Figma 551:37650. Shared with the mobile
-           * band via <BandInner />; responsive classes inside switch
-           * between stacked (mobile) and side-by-side (desktop). */}
-          <BandInner />
-        </div>
-      </div>
-      </div>
-
-      {/* =====================================================
-       *  MOBILE (< md) — Figma 773:40689 (scene 360×377) +
-       *  773:40690 (band 360×171). One overflow-clipped section,
-       *  548 tall total. The meadow runs FULL-bleed under both the
-       *  scene area and the band, so the band's logo + links sit
-       *  over the grass (Figma intent) — no solid plane behind them.
-       * ===================================================== */}
-      <div
-        className="md:hidden relative w-full overflow-clip"
-        style={{ height: '548px' }}
-      >
-        {/* Blush backdrop — the meadow's top ~18 % fades to transparent
-         * to dissolve into the section above. That section (Community)
-         * is now solid Blush-white (#FFF5F4), so back the fade with the
-         * same blush instead of the page's cool diagonal gradient. A
-         * short top band, blush → transparent, sits behind the scene so
-         * the grass melts into one continuous warm surface. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 z-0"
+          className="pointer-events-auto absolute left-1/2 z-[10]"
           style={{
-            height: '160px',
-            background:
-              'linear-gradient(to bottom, #FFF5F4 0%, #FFF5F4 35%, rgba(255,245,244,0) 100%)',
+            top: mascotCenterY,
+            width: mascotW,
+            height: mascotH,
+            transform: 'translate(-50%, -50%) rotate(-15.32deg)',
+            transformOrigin: 'center',
           }}
-        />
-        {/* Scene — Figma 726:40007 sized 960 × 730.692. Centered
-         * horizontally so x-positions copied from Figma still resolve
-         * 1:1; vertical anchor stays at top so the mascot lands at its
-         * Figma y. The 960-wide canvas overflows the 360 viewport and
-         * is clipped by the section. */}
-        <div
-          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2"
-          style={{ width: '960px', height: '730.692px' }}
         >
-          {/* Background meadow — Figma 726:40364 "Purinta footer V4".
-           * Native 4096×2651 (RGBA) downsampled to 1200×776 webp. The
-           * webp carries its OWN baked alpha fade at the top edge.
-           * A long, gentle CSS mask supplements that fade — the top
-           * ~18 % of the image ramps slowly from transparent to opaque
-           * so the meadow dissolves into the diagonal page gradient
-           * (Community) over ~105 px without a visible band. The grass
-           * body below the mascot stays fully visible. */}
-          <img
-            src={sceneBgMobile}
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            decoding="async"
-            className="absolute block max-w-none"
-            style={{
-              left: '-40px',
-              top: '0px',
-              width: '1040px',
-              height: '581px',
-              objectFit: 'cover',
-              objectPosition: '50% 50%',
-              maskImage:
-                'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 5%, rgba(0,0,0,0.4) 9%, rgba(0,0,0,0.7) 13%, rgba(0,0,0,0.92) 16%, #000 18%)',
-              WebkitMaskImage:
-                'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 5%, rgba(0,0,0,0.4) 9%, rgba(0,0,0,0.7) 13%, rgba(0,0,0,0.92) 16%, #000 18%)',
-            }}
-          />
-
-          {/* Mascot — Figma 726:40023, MascotFooter size="sm" (250 ×
-           * 234) wrapped in a -15.32° rotation. The rotated bounding
-           * box (302.939 × 291.734) sits at Figma (341, 117); we
-           * place the unrotated 250×234 mascot at the centre of that
-           * box and apply the same -15.32° rotation. The animated
-           * SVG (sync-blink / breath / arm sway) scales 1:1 with
-           * this wrapper. */}
-          <div
-            className="pointer-events-auto absolute"
-            style={{
-              left: `${341 + 302.939 / 2}px`,
-              top: `${117 + 291.734 / 2}px`,
-              width: '250px',
-              height: '234px',
-              transform: 'translate(-50%, -50%) rotate(-15.32deg)',
-              transformOrigin: 'center',
-            }}
-          >
-            <FooterMascot />
-          </div>
+          <FooterMascot />
         </div>
 
-        {/* Band — Figma 773:40690, absolute bottom 171. The radial
-         * tint is the SAME pattern as desktop (transparent at the top
-         * edge → green tint at the bottom for text legibility),
-         * scaled down for the 360-wide viewport. The meadow keeps
-         * showing through; the logo + links sit on top of the grass,
-         * not on a solid plane. */}
+        {/* Band — overlaps the bottom of the scene (sits over the meadow's
+         * faded, light lower edge; no tint needed — Figma keeps it clean). */}
         <div
-          className="absolute inset-x-0 bottom-0 text-[#333]"
-          style={{ height: '171px' }}
+          className="absolute inset-x-0 bottom-0 z-[20] text-[#333]"
+          style={{ height: bandH }}
         >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                'radial-gradient(ellipse 360px 171px at 50% 100%, rgba(100,154,96,0.55) 0%, rgba(157,189,90,0) 100%)',
-              maskImage:
-                'linear-gradient(to bottom, transparent 0%, #000 46%)',
-              WebkitMaskImage:
-                'linear-gradient(to bottom, transparent 0%, #000 46%)',
-            }}
-          />
           <BandInner />
         </div>
       </div>
+    </div>
+  )
+}
+
+export default function Footer() {
+  return (
+    <footer className="relative w-full">
+      <FooterScene
+        visibility="min-[768px]:hidden"
+        img={footerBgMobile}
+        imgW={960}
+        imgH={566}
+        sceneH={470}
+        mascotW={250}
+        mascotH={234}
+        mascotCenterY={205}
+        bandH={150}
+        fadeH={150}
+      />
+      <FooterScene
+        visibility="hidden min-[768px]:block min-[1154px]:hidden"
+        img={footerBgTablet}
+        imgW={1320}
+        imgH={778}
+        sceneH={620}
+        mascotW={344}
+        mascotH={322}
+        mascotCenterY={270}
+        bandH={170}
+        fadeH={220}
+      />
+      <FooterScene
+        visibility="hidden min-[1154px]:block"
+        img={footerBg}
+        imgW={1920}
+        imgH={1132}
+        sceneH={760}
+        mascotW={500}
+        mascotH={468}
+        mascotCenterY={330}
+        bandH={176}
+        fadeH={300}
+      />
     </footer>
   )
 }
 
 /* Shared band content — logotype + copyright + two link groups.
- * Responsive utilities switch the type scale & layout per breakpoint:
+ * Layout per Figma (Footer links 773:40690 / 1044:47782 / 551:41115):
  *
- *   Mobile  (Figma 773:40690): logo 20 px, text Rubik Medium 13/21
- *                              tracking 0.26, gap-8 logo↔copyright,
- *                              gap-24 logo-block↔links-block, links
- *                              flex-wrap with separator pipes.
- *   Desktop (Figma 551:41115):  logo 34 px, text 16/26 tracking 0.16,
- *                              gap-18 logo↔copyright, flex-row, gap-64
- *                              between link groups.
+ *   Mobile  (<768)  : column, links row ON TOP (px-56), then logo+©
+ *                     row below. Logo 16px, © 11/18 ls0.33, links 13/21
+ *                     ls0.26; group-gap 16, in-group gap 4, logo↔© gap 8.
+ *   Tablet  (768-1153): same column order. Logo 24px, © 11/18 ls0.33,
+ *                     links 16/26 ls0.16; group-gap 32, in-group 8,
+ *                     logo↔© 18.
+ *   Desktop (≥1154) : single row, logo+© LEFT, links RIGHT (space-
+ *                     between, px-156). Logo 32px, © 13/21 ls0.26, links
+ *                     16/26 ls0.16; group-gap 64, in-group 16, logo↔© 18.
+ *
+ * `order` flips the stack so the links sit on top on mobile/tablet but
+ * to the right on desktop. (Each FooterScene only renders at its own
+ * breakpoint, so the min-[…] utilities here are effectively scoped.)
  */
 function BandInner() {
   return (
-    <div className="relative mx-auto flex h-full max-w-[1440px] flex-col items-center justify-center gap-[24px] px-[16px] py-[24px] md:gap-[16px] md:px-[24px] md:pt-[56px] md:pb-[40px] min-[1154px]:flex-row min-[1154px]:items-center min-[1154px]:justify-between min-[1154px]:gap-10 min-[1154px]:px-[156px] min-[1154px]:pt-[88px] min-[1154px]:pb-[56px]">
-      <div className="flex flex-col items-center gap-[8px] min-[1154px]:flex-row min-[1154px]:gap-[18px]">
-        {/* Logo — Figma sizes the mobile lockup at 20 × 84 (symbol
-         * 17.66 × 20 + wordmark 62.46 × 12.37). Rendering the 135×34
-         * SVG at h=20 keeps the same composition at the natural 3.97:1
-         * aspect → 79.4 px wide (≈ Figma's 84). Desktop stays 34×135. */}
+    <div className="relative mx-auto flex h-full max-w-[1440px] flex-col items-center justify-center gap-4 px-4 py-6 min-[768px]:gap-4 min-[768px]:px-6 min-[1154px]:flex-row min-[1154px]:justify-between min-[1154px]:gap-10 min-[1154px]:px-[156px] min-[1154px]:py-0">
+      {/* Logo + copyright (always a row) — below the links on mobile/
+       * tablet, to the left on desktop. */}
+      <div className="order-2 flex items-center gap-2 min-[768px]:gap-[18px] min-[1154px]:order-1">
         <img
           src={asset('/assets/figma/footer/logotype-footer.svg')}
           alt="Purinta"
-          className="h-[20px] w-[79.4px] shrink-0 md:h-[34px] md:w-[135px]"
+          className="h-4 w-[67.39px] shrink-0 min-[768px]:h-6 min-[768px]:w-[101.085px] min-[1154px]:h-8 min-[1154px]:w-[134.78px]"
         />
-        <p className="font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] text-[#333] whitespace-nowrap md:text-[16px] md:leading-[26px] md:tracking-[0.16px]">
+        <p className="font-body text-[11px] leading-[18px] font-medium tracking-[0.33px] text-[#333] whitespace-nowrap min-[1154px]:text-[13px] min-[1154px]:leading-[21px] min-[1154px]:tracking-[0.26px]">
           © {new Date().getFullYear()} Purinta Inc. All rights reserved.
         </p>
       </div>
       <nav
         aria-label="Footer"
-        className="flex flex-wrap items-start justify-center gap-y-2 gap-x-[32px] px-[56px] md:flex-nowrap md:items-center md:gap-[32px] md:px-0 min-[1154px]:gap-[64px]"
+        className="order-1 flex items-start justify-center gap-4 px-14 min-[768px]:gap-8 min-[768px]:px-0 min-[1154px]:order-2 min-[1154px]:gap-[64px]"
       >
         {linkGroups.map((group, gi) => (
           <div
             key={gi}
-            className="flex items-center gap-[12px] md:gap-[16px]"
+            className="flex items-center gap-1 min-[768px]:gap-2 min-[1154px]:gap-4"
           >
             {group.map((l, li) => (
               <span
                 key={l.label}
-                className="flex items-center gap-[12px] md:gap-[16px]"
+                className="flex items-center gap-1 min-[768px]:gap-2 min-[1154px]:gap-4"
               >
                 <a
                   href={l.href}
                   {...(l.external
                     ? { target: '_blank', rel: 'noopener noreferrer' }
                     : {})}
-                  className="font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] whitespace-nowrap text-[#333] transition-opacity hover:opacity-70 md:text-[16px] md:leading-[26px] md:tracking-[0.16px]"
+                  className="font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] whitespace-nowrap text-[#333] transition-opacity hover:opacity-70 min-[768px]:text-[16px] min-[768px]:leading-[26px] min-[768px]:tracking-[0.16px]"
                 >
                   {l.label}
                 </a>
                 {li === 0 && (
                   <span
                     aria-hidden
-                    className="font-body text-[13px] leading-[21px] font-medium text-[#808080] md:text-[16px] md:leading-[26px]"
+                    className="font-body text-[13px] leading-[21px] font-medium text-[#808080] min-[768px]:text-[16px] min-[768px]:leading-[26px]"
                   >
                     |
                   </span>
