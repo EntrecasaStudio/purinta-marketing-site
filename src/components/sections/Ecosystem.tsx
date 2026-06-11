@@ -520,7 +520,51 @@ export default function Ecosystem() {
          * mascot so the character's feet rest on the top step (~50%
          * of mascot height overlap, matching the desktop scene
          * composition where the steps span the mascot's bottom half). */}
-        <div className="flex w-full justify-center -mt-2 min-[1152px]:hidden min-[1152px]:mt-0">
+        <div className="relative flex w-full justify-center -mt-2 min-[1152px]:hidden min-[1152px]:mt-0">
+          {/* Isometric squares grid BEHIND the mascot. In Figma the mascot
+           * + steps live inside the same bg-illustration frame as the
+           * squares, so the grid passes behind them. The fixed decorative
+           * layer above is anchored to the section top in a 960×1300
+           * reference that no longer reaches the mascot once the (taller)
+           * tablet cards push it down — that's why the pattern was missing
+           * behind the platform on tablet. Anchoring a copy to the mascot
+           * block (content flow) keeps it aligned at any content height.
+           * `-z-10` keeps it behind the opaque cards + mascot but in front
+           * of the section gradient. TABLET ONLY: on mobile the fixed
+           * decorative layer's 960×1300 reference already lands behind the
+           * mascot (shorter content), so adding this there would double the
+           * grid (moiré); only the taller tablet cards push the mascot past
+           * the layer's reach. */}
+          <img
+            src={v2('squares-bottom.svg')}
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute top-[-130px] left-1/2 -z-10 hidden h-[480px] w-[960px] max-w-none -translate-x-1/2 min-[768px]:block"
+          />
+          {/* Floating bills around the mascot — TABLET ONLY, same reason as
+           * the squares: the fixed decorative layer's bills don't reach the
+           * mascot once the taller tablet cards push it down. Each offset is
+           * the mobile scene's bill→mascot offset (bills' 960-layer pos minus
+           * the mascot iframe's layer pos 389,628, then re-anchored to the
+           * mascot iframe's top-left = 50% − 91.5px), so the cluster matches
+           * the (correct) mobile layout. `-z-10` keeps them behind the mascot
+           * like the decorative layer does on mobile. */}
+          {[
+            { src: 'bill-2.svg', left: 'calc(50% - 209.5px)', top: -191, w: 92, h: 52, rot: 34.61 },
+            { src: 'bill-3.svg', left: 'calc(50% + 363.5px)', top: -186, w: 92, h: 52, rot: 34.61 },
+            { src: 'bill-4.svg', left: 'calc(50% - 453.5px)', top: -181, w: 91, h: 52, rot: -28.72 },
+            { src: 'bill-5.svg', left: 'calc(50% + 11.5px)', top: -94, w: 296, h: 291, rot: 34.61 },
+            { src: 'bill-6.svg', left: 'calc(50% - 221.5px)', top: 17, w: 130, h: 75, rot: -6.47 },
+          ].map((b) => (
+            <img
+              key={b.src}
+              src={v2(b.src)}
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute -z-10 hidden max-w-none min-[768px]:block"
+              style={{ left: b.left, top: b.top, width: b.w, height: b.h, rotate: `${b.rot}deg` }}
+            />
+          ))}
           <div className="relative h-[295px] w-[260px]">
             {/* Steps SVG — Figma 714:36018, three isometric tiers
              * exported as one combined image. Same asset as desktop
