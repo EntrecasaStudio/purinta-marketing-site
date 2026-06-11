@@ -140,11 +140,11 @@ export default function Community() {
           </Button>
         </div>
 
+        {/* Decorative flower scatter — Figma "Illustrations" group, the
+         * last item in the content column (551:41113 / 773:40688). Centred
+         * on the column and overflowing down toward the Footer meadow. */}
+        <CommunityFlowers />
       </div>
-
-      {/* Decorative flower scatter — mobile + desktop layers (Figma
-       * 726:40370), restored across all breakpoints. */}
-      <CommunityFlowers />
     </section>
   )
 }

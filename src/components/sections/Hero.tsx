@@ -20,7 +20,6 @@ import shibuSvg from '@/assets/figma/shibu.svg?raw'
  * <img> (Chrome does) — so as <img> the shadows showed hard-edged
  * ellipses in Safari. Inline in the DOM, the blur renders everywhere. */
 import shadowsSvg from '@/assets/figma/shadows.svg?raw'
-import shadowsMobileSvg from '@/assets/figma/shadows-mobile.svg?raw'
 /* Hero-bottom fade — Figma "Ellipse fade" (1003:129461). A blurred
  * cream-50 → pale-lime ellipse whose soft edge dissolves the meadow into
  * the page. The blur is baked into the SVG (feGaussianBlur, applied to
@@ -73,10 +72,12 @@ const CONTENT_RISE_DURATION = 0.55
  * floor.
  * ============================================================ */
 const SCROLL_PX = -280
-/* Mobile uses a much smaller scroll travel: the hero is a fixed 655 px
- * frame, so the desktop -280 px would shoot the foreground up past the
- * CTA and expose the static base behind it (the "doubled" image). */
-const MOBILE_SCROLL_PX = -42
+/* Tablet + mobile travel are gentler than desktop's -280 (see the per-
+ * breakpoint ZOOM/DRIFT note in the component): the same travel reads as a
+ * stronger lurch on a smaller, closer screen, so we scale it down with the
+ * viewport rather than match desktop 1:1. */
+const TABLET_SCROLL_PX = -210
+const MOBILE_SCROLL_PX = -80
 /* v2 layer set: sky + mountains + lake are now baked into a single
  * opaque `01-base` plate (lighter — one fewer layer), with the framing
  * trees and the foreground grass as the only transparent overlays. The
@@ -283,12 +284,37 @@ export default function Hero() {
     offset: ['start start', 'end start'],
   })
 
-  // Scroll-driven parallax (mascot parallax removed — would break their
-  // percent-based positioning by creating a new containing block).
-  const sceneY = useTransform(scrollYProgress, [0, 1], ['0%', '20%'])
-  const sceneScale = useTransform(scrollYProgress, [0, 1], [1, 1.22])
-  const contentY = useTransform(scrollYProgress, [0, 1], ['0%', '-30%'])
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0])
+  // ── Scroll-driven parallax (per breakpoint) ──────────────────────────
+  // Tablet and especially mobile are deliberately GENTLER than desktop: a
+  // 22% zoom reads as subtle depth on a far desktop monitor, but on a phone
+  // held close it fills the field of view (a vestibular trigger) and the
+  // zooming meadow can crowd the headline/CTA that sit over it on narrow
+  // screens. prefers-reduced-motion pins the whole scene static (scale 1,
+  // no drift, no layer travel) — the scroll effect was previously NOT gated
+  // on it, only the entrance fades were.
+  const ZOOM = { d: 1.22, t: 1.15, m: 1.1 } as const
+  const DRIFT = { d: '20%', t: '15%', m: '12%' } as const
+  // Layer travel passed to ParallaxLayer/Group (0 when reduced-motion).
+  const travelD = reduceMotion ? 0 : SCROLL_PX
+  const travelT = reduceMotion ? 0 : TABLET_SCROLL_PX
+  const travelM = reduceMotion ? 0 : MOBILE_SCROLL_PX
+  const sceneScale = useTransform(scrollYProgress, [0, 1], [1, reduceMotion ? 1 : ZOOM.d])
+  const sceneScaleT = useTransform(scrollYProgress, [0, 1], [1, reduceMotion ? 1 : ZOOM.t])
+  const sceneScaleM = useTransform(scrollYProgress, [0, 1], [1, reduceMotion ? 1 : ZOOM.m])
+  const sceneY = useTransform(scrollYProgress, [0, 1], ['0%', reduceMotion ? '0%' : DRIFT.d])
+  const sceneYT = useTransform(scrollYProgress, [0, 1], ['0%', reduceMotion ? '0%' : DRIFT.t])
+  const sceneYM = useTransform(scrollYProgress, [0, 1], ['0%', reduceMotion ? '0%' : DRIFT.m])
+  // Bottom-fade ellipse RIDE. The zoom is matched by each ellipse's
+  // transform-origin (pivoted on the grass centre — see the ellipse styles),
+  // so here we only match the grass's net VERTICAL translate so they slide
+  // together: desktop/tablet = scene drift (% of container height) + grass
+  // parallax; mobile shares the container drift already (the ellipse lives
+  // inside it), so it only needs the grass layer's travel.
+  const ellipseRideY = useTransform(scrollYProgress, [0, 1], [0, reduceMotion ? 0 : 0.2 * 1462 + DEPTH.grass * SCROLL_PX])
+  const ellipseRideYTablet = useTransform(scrollYProgress, [0, 1], [0, reduceMotion ? 0 : 0.15 * 1054 + DEPTH.grass * TABLET_SCROLL_PX])
+  const ellipseRideYMobile = useTransform(scrollYProgress, [0, 1], [0, reduceMotion ? 0 : DEPTH.grass * MOBILE_SCROLL_PX])
+  const contentY = useTransform(scrollYProgress, [0, 1], ['0%', reduceMotion ? '0%' : '-30%'])
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, reduceMotion ? 1 : 0])
 
   /* When the user prefers reduced motion, skip all entrance fades —
    * `initial={false}` jumps each element straight to its rest state. */
@@ -319,8 +345,13 @@ export default function Hero() {
           the hill. */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 z-30 hidden h-[1312.311px] w-[2485.428px] -translate-x-1/2 min-[1152px]:block [&>svg]:block [&>svg]:size-full [&>svg]:overflow-visible"
-        style={{ top: 839.17 }}
+        className="pointer-events-none absolute left-1/2 z-30 hidden h-[1312.311px] w-[2485.428px] min-[1152px]:block [&>svg]:block [&>svg]:size-full [&>svg]:overflow-visible"
+        /* transform-origin pivots the ellipse about the GRASS plate's centre
+         * (grass box top -220 + height 1462/2 = 511px from the BG-container
+         * top; ellipse top 839.17 → 511 − 839.17 = −328.17px in the ellipse's
+         * own frame). Scaling about the same point as the grass keeps the
+         * meadow's bottom edge covered at every zoom level — no drift. */
+        style={{ top: 839.17, x: '-50%', y: ellipseRideY, scale: sceneScale, transformOrigin: '50% -328.17px' }}
         initial={bgInitial}
         animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
         transition={bgTransition}
@@ -336,7 +367,10 @@ export default function Hero() {
       <motion.div
         aria-hidden
         className="pointer-events-none absolute left-1/2 z-30 hidden h-[1115.464px] w-[2112.614px] -translate-x-1/2 min-[768px]:block min-[1152px]:hidden [&>svg]:block [&>svg]:size-full [&>svg]:overflow-visible"
-        style={{ top: 713.29 }}
+        /* Pivot about the tablet grass centre: grass box top −17.86%×1054 =
+         * −188.2 + (117.9%×1054)/2 = 433.1px from container top; ellipse top
+         * 713.29 → 433.1 − 713.29 = −280.1px. */
+        style={{ top: 713.29, y: ellipseRideYTablet, scale: sceneScaleT, transformOrigin: '50% -280.1px' }}
         initial={bgInitial}
         animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
         transition={bgTransition}
@@ -370,6 +404,7 @@ export default function Hero() {
                   key={file}
                   scroll={scrollYProgress}
                   depth={DEPTH[key]}
+                  scrollPx={travelD}
                   scale={sceneScale}
                   src={layerSrc(file)}
                   className="absolute top-[-220px] left-0 block h-auto w-[1920px] max-w-none"
@@ -385,6 +420,7 @@ export default function Hero() {
           <ParallaxGroup
             scroll={scrollYProgress}
             depth={DEPTH.grass}
+            scrollPx={travelD}
             className="absolute inset-0"
           >
             {/* Grass plate — scales with scroll like the other scene
@@ -402,7 +438,7 @@ export default function Hero() {
                 in Safari (filters are dropped on <img> there). */}
             <InlineSvg
               svg={shadowsSvg}
-              className="absolute mix-blend-multiply"
+              className="absolute"
               style={{ top: 784, left: 600.63, width: 747.384, height: 74.208 }}
             />
 
@@ -495,6 +531,7 @@ export default function Hero() {
          * unchanged. The content overlay stays OUTSIDE this wrapper. */}
         <motion.div
           className="pointer-events-none absolute inset-0"
+          style={{ y: sceneYM }}
           initial={bgInitial}
           animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
           transition={bgTransition}
@@ -512,7 +549,8 @@ export default function Hero() {
                 key={file}
                 scroll={scrollYProgress}
                 depth={DEPTH[key]}
-                scrollPx={MOBILE_SCROLL_PX}
+                scrollPx={travelM}
+                scale={sceneScaleM}
                 src={layerSrc(file)}
                 className="absolute top-0 left-1/2 max-w-none -translate-x-1/2"
                 style={{
@@ -532,13 +570,19 @@ export default function Hero() {
          * so its feGaussianBlur renders in Safari (it wouldn't on <img>).
          * Masked to fade out before the 655 px section edge so its
          * semi-opaque tail isn't hard-clipped by the section overflow. */}
-        <div
+        <motion.div
           aria-hidden
           className="pointer-events-none absolute left-1/2 -translate-x-1/2 [&>svg]:block [&>svg]:size-full [&>svg]:overflow-visible"
           style={{
             top: 475.71,
             width: 1113.265,
             height: 587.806,
+            y: ellipseRideYMobile,
+            scale: sceneScaleM,
+            // Pivot about the mobile grass centre: grass layer top 0 + height
+            // 1462×(908/1920)/2 = 345.7px from container top; ellipse top
+            // 475.71 → 345.7 − 475.71 = −130px.
+            transformOrigin: '50% -130px',
             WebkitMaskImage:
               'linear-gradient(to bottom, black 22%, transparent 31%)',
             maskImage:
@@ -558,20 +602,26 @@ export default function Hero() {
           <ParallaxGroup
             scroll={scrollYProgress}
             depth={DEPTH.grass}
-            scrollPx={MOBILE_SCROLL_PX}
+            scrollPx={travelM}
             className="absolute inset-0"
           >
-            {/* Drop shadows under the crew — Figma 665:56490. One SVG with
-             * 3 blurred ellipses spaced for the mobile mascot layout (the
-             * desktop shadows graphic has different spacing). Positioned at
-             * the blur-bled box (Figma box 18.16/470/321.75×35.24 expanded
-             * by the inner -8.21%/-0.87%… inset). Painted first so it sits
-             * under the mascots; mix-blend-multiply blends it into the
-             * grass behind. */}
+            {/* Drop shadows under the crew — reuse the DESKTOP shadows
+             * graphic (soft, transparent feGaussianBlur blobs) scaled into
+             * the mobile mascot footprint, rather than the harder mobile
+             * export. The box is sized so the desktop SVG's three blobs
+             * (relative cx 12.3% / 53.6% / 87.6% of its viewBox) land under
+             * the mobile mascots' feet (pepe centre 50.2, shibu 302.4 anchor
+             * the scale → W 335, L 9.1); height preserves the desktop box's
+             * aspect so the ellipses aren't squashed. InlineSvg namespaces
+             * the filter ids per instance, so reusing the desktop SVG a
+             * third time can't collide. The shadow uses baked alpha
+             * (black @ 0.2), NOT mix-blend-multiply: on mobile the grass
+             * here is mask-faded, so a multiply blend would have nothing
+             * coloured to darken and would read as a flat grey blob. */}
             <InlineSvg
-              svg={shadowsMobileSvg}
-              className="absolute max-w-none mix-blend-multiply"
-              style={{ left: 15.36, top: 467.11, width: 326.218, height: 39.803 }}
+              svg={shadowsSvg}
+              className="absolute max-w-none"
+              style={{ left: 9.1, top: 470, width: 335, height: 33.3 }}
             />
             {/* Mascots — mobile sizes are 0.4× of desktop (Figma 773:40684,
              * size="sm"); positions are the Figma left/top in the 360 frame. */}
@@ -653,7 +703,7 @@ export default function Hero() {
          * desktop layer so backgrounds + mascots enter together. */}
         <motion.div
           className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 overflow-hidden"
-          style={{ width: 1320, height: 1054 }}
+          style={{ width: 1320, height: 1054, y: sceneYT }}
           initial={bgInitial}
           animate={{ opacity: sceneReady || reduceMotion ? 1 : 0 }}
           transition={bgTransition}
@@ -671,6 +721,8 @@ export default function Hero() {
                   key={file}
                   scroll={scrollYProgress}
                   depth={DEPTH[key]}
+                  scrollPx={travelT}
+                  scale={sceneScaleT}
                   src={layerSrc(file)}
                   className="absolute block max-w-none"
                   style={{
@@ -690,9 +742,10 @@ export default function Hero() {
           <ParallaxGroup
             scroll={scrollYProgress}
             depth={DEPTH.grass}
+            scrollPx={travelT}
             className="absolute inset-0"
           >
-            <img
+            <motion.img
               src={layerSrc('04-grass')}
               alt=""
               aria-hidden
@@ -703,6 +756,8 @@ export default function Hero() {
                 height: '117.9%',
                 left: '-11.84%',
                 top: '-17.86%',
+                scale: sceneScaleT,
+                willChange: 'transform',
               }}
             />
 
@@ -710,7 +765,7 @@ export default function Hero() {
                 the blur renders in Safari. */}
             <InlineSvg
               svg={shadowsSvg}
-              className="absolute max-w-none mix-blend-multiply"
+              className="absolute max-w-none"
               style={{
                 width: 635.276,
                 height: 63.076,
