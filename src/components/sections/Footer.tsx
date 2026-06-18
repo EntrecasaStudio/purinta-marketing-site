@@ -193,9 +193,6 @@ function BandInner() {
           alt="Purinta"
           className="h-4 w-[67.39px] shrink-0 min-[768px]:h-6 min-[768px]:w-[101.085px] min-[1152px]:h-8 min-[1152px]:w-[134.78px]"
         />
-        <p className="font-body text-[11px] leading-[18px] font-medium tracking-[0.33px] text-[#333] whitespace-nowrap min-[1152px]:text-[13px] min-[1152px]:leading-[21px] min-[1152px]:tracking-[0.26px]">
-          © {new Date().getFullYear()} Purinta. All rights reserved.
-        </p>
       </div>
       <nav
         aria-label="Footer"

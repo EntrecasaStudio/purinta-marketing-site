@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import { ChevronRight } from 'lucide-react'
 import { asset } from '@/lib/utils'
 import FeaturesMobile from '@/components/sections/FeaturesMobile'
 
@@ -501,13 +500,6 @@ function ExpandedContent({
         <p className="font-body text-[16px] leading-[26px] tracking-[0.16px] text-[var(--color-neutral-600)]">
           {card.body}
         </p>
-        <a
-          href="#"
-          className="mt-2 inline-flex items-center gap-1.5 font-body text-[15px] leading-[20px] text-[var(--color-green-500)] transition-opacity hover:opacity-80"
-        >
-          Learn more
-          <ChevronRight className="size-4" strokeWidth={2} />
-        </a>
       </div>
 
       {/* Mascot lives outside this component in Card → see <Mascot /> */}
