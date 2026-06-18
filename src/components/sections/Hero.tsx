@@ -662,8 +662,8 @@ export default function Hero() {
                 Print USDC.
               </h1>
               <p className="max-w-[320px] text-center font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] text-[#333]">
-                The first lending protocol for memecoin believers. Lock
-                your bags, borrow USDC, and keep the upside.
+                The first lending protocol for memecoin believers.
+                Deposit your bags, borrow USDC, and keep the upside.
               </p>
             </div>
             {/* Mobile CTA — Figma matches the Community mobile button:
@@ -837,7 +837,7 @@ export default function Hero() {
             <p className="w-full px-10 text-center font-body text-[16px] leading-[26px] font-medium tracking-[0.16px] text-[#333]">
               The first lending protocol for memecoin believers.
               <br />
-              Lock your bags, borrow USDC, and keep the upside.
+              Deposit your bags, borrow USDC, and keep the upside.
             </p>
           </div>
           <Button variant="primary" size="md" asChild>
@@ -895,9 +895,9 @@ export default function Hero() {
                 transition={contentTransition(1)}
                 data-node-id="384:2315"
               >
-                The first lending protocol for memecoin degens —
+                The first lending protocol for memecoin believers.
                 <br />
-                lock your bags, borrow USDC, keep the upside.
+                Deposit your bags, borrow USDC, and keep the upside.
               </motion.p>
             </div>
 

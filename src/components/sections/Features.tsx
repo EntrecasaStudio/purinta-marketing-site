@@ -96,7 +96,7 @@ const CARDS: CardData[] = [
     id: 'borrow',
     title: 'Borrow Against Memes',
     titleCollapsed: 'Borrow\nAgainst Memes',
-    body: 'Lock your PEPE, SHIB, or any supported memecoin as collateral and borrow USDC without selling your bags. Your memes stay yours — you just unlock their liquidity.',
+    body: 'Deposit any of the supported memecoins as collateral and borrow USDC without selling. Your memes stay yours. You just unlock their liquidity.',
     mascot: asset('/assets/figma/features/borrow.svg'),
     /* Natural SVG viewBox size (Type=1 export). */
     mascotSize: { w: 130, h: 110 },
@@ -167,7 +167,7 @@ const CARDS: CardData[] = [
     id: 'morpho',
     title: 'Built on Morpho',
     titleCollapsed: 'Built on\nMorpho',
-    body: "Purinta is built on Morpho's battle-tested lending infrastructure — the same protocol securing billions in DeFi. No shortcuts on security.",
+    body: "Purinta is built on Morpho's battle-tested lending infrastructure, the same protocol securing billions in DeFi. No shortcuts on security.",
     mascot: asset('/assets/figma/features/morpho.svg'),
     mascotSize: { w: 131, h: 161 },
     accent: {
@@ -194,7 +194,7 @@ const CARDS: CardData[] = [
     id: 'mainnet',
     title: 'Mainnet Native',
     titleCollapsed: 'Mainnet\nNative',
-    body: 'Live on Ethereum mainnet from day one. Deep liquidity, real security, no testnet games. Your memes deserve the real thing.',
+    body: 'Live on Ethereum mainnet from day one. Deep liquidity, real security, great volumes. Your memes deserve the real thing.',
     mascot: asset('/assets/figma/features/mainnet.svg'),
     mascotSize: { w: 130, h: 160 },
     accent: {
@@ -221,7 +221,7 @@ const CARDS: CardData[] = [
     id: 'api3',
     title: 'Powered by Api3',
     titleCollapsed: 'Powered\nby Api3',
-    body: 'First-party oracle feeds with OEV capture. Accurate pricing for your memecoins, with value flowing back to the protocol.',
+    body: 'A curator you can trust. An oracle that never misreported. Api3 picks which memecoins make the cut and powers the price feeds, while OEV capture sends value back to the protocol.',
     mascot: asset('/assets/figma/features/api3.svg'),
     mascotSize: { w: 172, h: 135 },
     accent: {
