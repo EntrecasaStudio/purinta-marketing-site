@@ -257,7 +257,7 @@ function HowItWorksDesktop() {
          *  hook in App.tsx — same fade+rise entrance pattern as the
          *  original reference site's main titles (see Community.tsx,
          *  Ecosystem.tsx for the existing usage). */}
-        <div className="relative z-10 flex shrink-0 justify-center pt-12">
+        <div className="relative z-10 flex shrink-0 justify-center pt-[72px]">
           {/* Title rides the same grid as the panels — a number-column
            * spacer + 40 px gap — so its left edge lands exactly on the
            * panels' title/body text column. */}

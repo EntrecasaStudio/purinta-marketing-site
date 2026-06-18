@@ -647,8 +647,13 @@ function Star({
  * ============================================================ */
 const TITLE_EASE = [0.32, 0.72, 0, 1] as const
 const TITLE_OUT_DURATION = 0.14
-const TITLE_IN_DURATION = 0.16
-const TITLE_IN_DELAY = 0.12 + 0.06 // 60 ms after the pill's 130 ms delay = ~190 ms total
+/* The expanded title waits for the pill's width-expand (130 ms delay +
+ * 550 ms tween ≈ 680 ms) to essentially finish before it fades in, so the
+ * large title no longer flashes clipped while the card is still narrow. A
+ * slower fade keeps it near-invisible through the last sliver of the
+ * expand, so it reads as appearing *after* the card opens. */
+const TITLE_IN_DURATION = 0.3
+const TITLE_IN_DELAY = 0.5
 
 function Title({ card, isActive }: { card: CardData; isActive: boolean }) {
   const reduceMotion = useReducedMotion()
