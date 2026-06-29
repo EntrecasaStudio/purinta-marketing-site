@@ -392,10 +392,13 @@ function PanelContent({ step, isActive }: { step: Step; isActive: boolean }) {
           style={{
             width: 256,
             height: 332,
-            /* Scale about the mascot's own centre so it grows out from the
-             * centre of its final position (no upward rise) rather than
-             * popping up from the baseline. */
-            transformOrigin: 'center',
+            /* Per-step scale origin (no upward translate either way):
+             *  - Step 1 grows from its centre.
+             *  - Steps 2 & 3 grow from the bottom-centre so the character's
+             *    feet stay anchored at their final position from the start
+             *    (these poses read as "coming from above/the middle" when
+             *    scaled about the centre). */
+            transformOrigin: step.num === '1' ? 'center' : 'center bottom',
             willChange: 'transform',
           }}
           initial={false}
