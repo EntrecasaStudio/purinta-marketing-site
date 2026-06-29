@@ -392,14 +392,16 @@ function PanelContent({ step, isActive }: { step: Step; isActive: boolean }) {
           style={{
             width: 256,
             height: 332,
-            transformOrigin: 'center bottom',
+            /* Scale about the mascot's own centre so it grows out from the
+             * centre of its final position (no upward rise) rather than
+             * popping up from the baseline. */
+            transformOrigin: 'center',
             willChange: 'transform',
           }}
           initial={false}
           animate={{
             scale: isActive ? 1 : 0.5,
             opacity: isActive ? 1 : 0,
-            y: isActive ? 0 : 24,
           }}
           transition={
             isActive
