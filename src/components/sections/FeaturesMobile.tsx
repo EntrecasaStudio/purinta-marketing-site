@@ -128,7 +128,7 @@ const cards: Card[] = [
 
 export default function FeaturesMobile() {
   return (
-    <section className="relative z-40 -mt-[60px] w-full pt-10 pb-4 min-[768px]:mt-0 min-[1152px]:hidden min-[768px]:pt-[24px] min-[768px]:pb-[124px]">
+    <section className="relative z-40 -mt-[60px] w-full pt-10 pb-16 min-[768px]:mt-0 min-[1152px]:hidden min-[768px]:pt-[24px] min-[768px]:pb-[124px]">
       <div className="flex w-full flex-col items-center gap-8">
         {/* Title — Figma 665:61546: Rubik Medium 25 / 38 */}
         <h2 className="reveal reveal-up px-[5px] text-center font-display text-[25px] leading-[38px] font-semibold tracking-[0.25px] text-[#333]">
