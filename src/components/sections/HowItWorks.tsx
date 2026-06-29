@@ -257,7 +257,7 @@ function HowItWorksDesktop() {
          *  hook in App.tsx — same fade+rise entrance pattern as the
          *  original reference site's main titles (see Community.tsx,
          *  Ecosystem.tsx for the existing usage). */}
-        <div className="relative z-10 flex shrink-0 justify-center pt-12">
+        <div className="relative z-10 flex shrink-0 justify-center pt-[72px]">
           {/* Title rides the same grid as the panels — a number-column
            * spacer + 40 px gap — so its left edge lands exactly on the
            * panels' title/body text column. */}
@@ -392,14 +392,16 @@ function PanelContent({ step, isActive }: { step: Step; isActive: boolean }) {
           style={{
             width: 256,
             height: 332,
-            transformOrigin: 'center bottom',
+            /* Scale about the mascot's own centre so it grows out from the
+             * centre of its final position (no upward rise) rather than
+             * popping up from the baseline. */
+            transformOrigin: 'center',
             willChange: 'transform',
           }}
           initial={false}
           animate={{
             scale: isActive ? 1 : 0.5,
             opacity: isActive ? 1 : 0,
-            y: isActive ? 0 : 24,
           }}
           transition={
             isActive

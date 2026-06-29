@@ -1,13 +1,13 @@
 <svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 758.624 85.4485" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="Shadows" style="mix-blend-mode:multiply">
+<g id="Shadows">
 <g id="Ellipse 1053" filter="url(#filter0_f_0_171)">
-<ellipse cx="406.931" cy="35.7572" rx="140.557" ry="28.7572" fill="var(--fill-0, #CCCCCC)"/>
+<ellipse cx="406.931" cy="35.7572" rx="140.557" ry="28.7572" fill="#000000" fill-opacity="0.2"/>
 </g>
 <g id="Ellipse 1055" filter="url(#filter1_f_0_171)">
-<ellipse cx="93.062" cy="41.7572" rx="86.062" ry="20.8431" fill="var(--fill-0, #CCCCCC)"/>
+<ellipse cx="93.062" cy="41.7572" rx="86.062" ry="20.8431" fill="#000000" fill-opacity="0.2"/>
 </g>
 <g id="Ellipse 1054" filter="url(#filter2_f_0_171)">
-<ellipse cx="664.205" cy="62.7571" rx="90.1782" ry="18.45" fill="var(--fill-0, #CCCCCC)"/>
+<ellipse cx="664.205" cy="62.7571" rx="90.1782" ry="18.45" fill="#000000" fill-opacity="0.2"/>
 </g>
 </g>
 <defs>

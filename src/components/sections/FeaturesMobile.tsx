@@ -7,8 +7,8 @@ import { asset } from '@/lib/utils'
  *
  * Card illustrations reuse the desktop mascot PNGs at their natural
  * Figma 1x size (same files used by the desktop card row, transparent
- * background). Everything else — colours, copy, the star bullet, the
- * "Learn more" link — is live markup.
+ * background). Everything else — colours, copy, the star bullet — is
+ * live markup.
  *
  * Responsive: the section background is full-bleed; only the cards
  * are capped at 480 px wide (centred, margins grow past that).
@@ -52,7 +52,7 @@ const cards: Card[] = [
   {
     key: 'borrow',
     title: 'Borrow\nAgainst Memes',
-    body: 'Lock any of the supported memecoins as collateral and borrow USDC without selling. Your memes stay yours. You just unlock their liquidity.',
+    body: 'Deposit any of the supported memecoins as collateral and borrow USDC without selling. Your memes stay yours. You just unlock their liquidity.',
     bg: '#FFFAFA',
     border: '#FEC4C0',
     star: asset('/assets/figma/features/star-mobile-borrow.svg'),
@@ -126,30 +126,9 @@ const cards: Card[] = [
   },
 ]
 
-function Caret() {
-  return (
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden
-      className="shrink-0"
-    >
-      <path
-        d="M6 3.5 10.5 8 6 12.5"
-        stroke="#39763D"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
 export default function FeaturesMobile() {
   return (
-    <section className="relative z-40 -mt-[60px] w-full pt-10 pb-4 min-[768px]:mt-0 min-[1152px]:hidden min-[768px]:pt-[24px] min-[768px]:pb-[124px]">
+    <section className="relative z-40 -mt-[60px] w-full pt-10 pb-16 min-[768px]:mt-0 min-[1152px]:hidden min-[768px]:pt-[24px] min-[768px]:pb-[124px]">
       <div className="flex w-full flex-col items-center gap-8">
         {/* Title — Figma 665:61546: Rubik Medium 25 / 38 */}
         <h2 className="reveal reveal-up px-[5px] text-center font-display text-[25px] leading-[38px] font-semibold tracking-[0.25px] text-[#333]">
@@ -208,15 +187,6 @@ export default function FeaturesMobile() {
                     <p className="font-body text-[13px] leading-[21px] font-normal tracking-[0.26px] text-[#808080]">
                       {c.body}
                     </p>
-                    <a
-                      href="https://docs.purinta.xyz/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-0.5 font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] text-[#39763D] transition-opacity hover:opacity-70"
-                    >
-                      Learn more
-                      <Caret />
-                    </a>
                   </div>
                 </div>
                 <div
@@ -293,15 +263,6 @@ export default function FeaturesMobile() {
                 <p className="font-body text-[13px] leading-[21px] font-normal tracking-[0.26px] text-[#808080]">
                   {c.body}
                 </p>
-                <a
-                  href="https://docs.purinta.xyz/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-0.5 font-body text-[13px] leading-[21px] font-medium tracking-[0.26px] text-[#39763D] transition-opacity hover:opacity-70"
-                >
-                  Learn more
-                  <Caret />
-                </a>
               </div>
             </article>
           ))}

@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import { ChevronRight } from 'lucide-react'
 import { asset } from '@/lib/utils'
 import FeaturesMobile from '@/components/sections/FeaturesMobile'
 
@@ -97,7 +96,7 @@ const CARDS: CardData[] = [
     id: 'borrow',
     title: 'Borrow Against Memes',
     titleCollapsed: 'Borrow\nAgainst Memes',
-    body: 'Lock your PEPE, SHIB, or any supported memecoin as collateral and borrow USDC without selling your bags. Your memes stay yours — you just unlock their liquidity.',
+    body: 'Deposit any of the supported memecoins as collateral and borrow USDC without selling. Your memes stay yours. You just unlock their liquidity.',
     mascot: asset('/assets/figma/features/borrow.svg'),
     /* Natural SVG viewBox size (Type=1 export). */
     mascotSize: { w: 130, h: 110 },
@@ -168,7 +167,7 @@ const CARDS: CardData[] = [
     id: 'morpho',
     title: 'Built on Morpho',
     titleCollapsed: 'Built on\nMorpho',
-    body: "Purinta is built on Morpho's battle-tested lending infrastructure — the same protocol securing billions in DeFi. No shortcuts on security.",
+    body: "Purinta is built on Morpho's battle-tested lending infrastructure, the same protocol securing billions in DeFi. No shortcuts on security.",
     mascot: asset('/assets/figma/features/morpho.svg'),
     mascotSize: { w: 131, h: 161 },
     accent: {
@@ -195,7 +194,7 @@ const CARDS: CardData[] = [
     id: 'mainnet',
     title: 'Mainnet Native',
     titleCollapsed: 'Mainnet\nNative',
-    body: 'Live on Ethereum mainnet from day one. Deep liquidity, real security, no testnet games. Your memes deserve the real thing.',
+    body: 'Live on Ethereum mainnet from day one. Deep liquidity, real security, great volumes. Your memes deserve the real thing.',
     mascot: asset('/assets/figma/features/mainnet.svg'),
     mascotSize: { w: 130, h: 160 },
     accent: {
@@ -222,7 +221,7 @@ const CARDS: CardData[] = [
     id: 'api3',
     title: 'Powered by Api3',
     titleCollapsed: 'Powered\nby Api3',
-    body: 'First-party oracle feeds with OEV capture. Accurate pricing for your memecoins, with value flowing back to the protocol.',
+    body: 'A curator you can trust. An oracle that never misreported. Api3 picks which memecoins make the cut and powers the price feeds, while OEV capture sends value back to the protocol.',
     mascot: asset('/assets/figma/features/api3.svg'),
     mascotSize: { w: 172, h: 135 },
     accent: {
@@ -501,13 +500,6 @@ function ExpandedContent({
         <p className="font-body text-[16px] leading-[26px] tracking-[0.16px] text-[var(--color-neutral-600)]">
           {card.body}
         </p>
-        <a
-          href="#"
-          className="mt-2 inline-flex items-center gap-1.5 font-body text-[15px] leading-[20px] text-[var(--color-green-500)] transition-opacity hover:opacity-80"
-        >
-          Learn more
-          <ChevronRight className="size-4" strokeWidth={2} />
-        </a>
       </div>
 
       {/* Mascot lives outside this component in Card → see <Mascot /> */}
@@ -655,8 +647,13 @@ function Star({
  * ============================================================ */
 const TITLE_EASE = [0.32, 0.72, 0, 1] as const
 const TITLE_OUT_DURATION = 0.14
-const TITLE_IN_DURATION = 0.16
-const TITLE_IN_DELAY = 0.12 + 0.06 // 60 ms after the pill's 130 ms delay = ~190 ms total
+/* The expanded title waits for the pill's width-expand (130 ms delay +
+ * 550 ms tween ≈ 680 ms) to essentially finish before it fades in, so the
+ * large title no longer flashes clipped while the card is still narrow. A
+ * slower fade keeps it near-invisible through the last sliver of the
+ * expand, so it reads as appearing *after* the card opens. */
+const TITLE_IN_DURATION = 0.3
+const TITLE_IN_DELAY = 0.5
 
 function Title({ card, isActive }: { card: CardData; isActive: boolean }) {
   const reduceMotion = useReducedMotion()
